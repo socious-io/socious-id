@@ -8,8 +8,10 @@ import (
 
 type VerificationCredential struct {
 	ID uuid.UUID `db:"id" json:"id"`
-	// TODO: make it enum
-	Status        string    `db:"status" json:"status"`
+
+	// @TODO: make it enum
+	Status string `db:"status" json:"status"`
+
 	UserID        uuid.UUID `db:"user_id" json:"user_id"`
 	ConnectionID  *string   `db:"connection_id" json:"connection_id"`
 	ConnectionUrl *string   `db:"connection_url" json:"connection_url"`

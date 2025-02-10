@@ -1,0 +1,17 @@
+{{template "header" .}}
+
+<div class="container">
+  <div class="card">
+    <div class="header">
+      <h2>Confirm page</h2>
+    </div>
+    <div class="section">
+      <h3>User :</h3>
+      <p>{{ .User.FirstName }} {{ .User.LastName }}</p>
+    </div>
+    <h2>Access :</h2>
+    {{ .AuthSession.Access.Name }}
+  </div>
+</div>
+
+{{ template "footer" . }}

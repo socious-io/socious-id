@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"math/big"
 	"strings"
 )
 
@@ -50,4 +52,26 @@ func AppendIfNotExists[T comparable](arr []T, x T) []T {
 		arr = append(arr, x)
 	}
 	return arr
+}
+
+func GenerateRandomDigits(digits int) int {
+	if digits < 1 {
+		return 0
+	}
+
+	lowerBound := int64(1)
+	upperBound := int64(10)
+
+	for i := 1; i < digits; i++ {
+		lowerBound *= 10
+		upperBound *= 10
+	}
+
+	n, err := rand.Int(rand.Reader, big.NewInt(upperBound-lowerBound))
+	if err != nil {
+		// Fallback: return a fixed mid-range number to ensure function always works
+		return int((upperBound + lowerBound) / 2)
+	}
+
+	return int(n.Int64() + lowerBound)
 }

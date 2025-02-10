@@ -155,14 +155,6 @@ func GetUser(id uuid.UUID) (*User, error) {
 	return u, nil
 }
 
-func GetUserByOrg(orgId uuid.UUID) (*User, error) {
-	u := new(User)
-	if err := database.Get(u, "users/fetch_by_org", orgId); err != nil {
-		return nil, err
-	}
-	return u, nil
-}
-
 func GetUserByEmail(email string) (*User, error) {
 	u := new(User)
 	if err := database.Get(u, "users/fetch_by_email", email); err != nil {

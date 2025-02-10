@@ -1,0 +1,60 @@
+{{template "header" .}}
+
+<div class="container">
+  <form method="post">
+    <div class="card">
+      <img
+        src="/statics/logo.svg"
+        alt="Socious Logo"
+        width="40"
+        height="40"
+        class="logo"
+      />
+      <div class="header">
+        <h2>Sign up with Socious</h2>
+        <span class="light">This is just for develope example</span>
+      </div>
+      <div class="section">
+        <input
+          placeholder="Enter your firstname"
+          type="text"
+          name="first_name"
+          autocomplete="firstname"
+        />
+        <input
+          placeholder="Enter your lastname"
+          type="text"
+          name="last_name"
+          autocomplete="lastname"
+        />
+        <input
+          placeholder="Enter your username"
+          type="text"
+          name="username"
+          autocomplete="username"
+        />
+        <input
+          placeholder="Enter your email"
+          type="email"
+          name="email"
+          autocomplete="email"
+        />
+        <input
+          placeholder="Enter your password"
+          type="password"
+          name="password"
+          autocomplete="current-password"
+        />
+      </div>
+      {{if .error}}
+      <p style="color: red">{{.error}}</p>
+      {{end}}
+      <div class="section">
+        <button type="submit" theme="primary">Sign up</button>
+        <a theme="primary-outline" href="/auth/login">Already have account ? Sing in</a>
+      </div>
+    </div>
+  </form>
+</div>
+
+{{ template "footer" . }}

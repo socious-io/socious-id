@@ -1,82 +1,232 @@
 package views
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
+	"time"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func authGroup(router *gin.Engine) {
-	g := router.Group("sso")
+	g := router.Group("auth")
 
-	router.LoadHTMLGlob("src/apps/templates/*.html")
-	router.Static("/public", "src/apps/templates/public")
+	g.GET("/confirm", auth.LoginRequired(), func(c *gin.Context) {
+		if authSession := loadAuthSession(c); authSession != nil {
+			c.HTML(http.StatusOK, "confirm.html", gin.H{
+				"User":        c.MustGet("user").(*models.User),
+				"AuthSession": authSession,
+			})
+		}
+		// NOTE: look like page sent without any session so detect it's self authorization
+		// TODO: configure account platform path
+		c.Redirect(http.StatusPermanentRedirect, "https://account.socious.io")
 
-	g.GET("/login", func(c *gin.Context) {
-		redirect_url := c.Query("redirect_url")
-
-		c.HTML(http.StatusOK, "login.html", gin.H{
-			"redirect_url": redirect_url,
-		})
 	})
 
-	g.POST("/login", func(c *gin.Context) {
-		redirect_url := c.Query("redirect_url")
-
-		loginForm := new(auth.LoginForm)
-		if err := c.ShouldBind(loginForm); err != nil {
-			c.HTML(http.StatusBadRequest, "login.html", gin.H{
-				"redirect_url": redirect_url,
-				"error":        err.Error(),
+	g.POST("/confirm", auth.LoginRequired(), func(c *gin.Context) {
+		authSession := loadAuthSession(c)
+		if authSession == nil {
+			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
+				"error": "not accepted without auth session",
 			})
 			return
 		}
 
-		u, err := models.GetUserByEmail(loginForm.Email)
+		form := new(ConfirmForm)
+		c.ShouldBind(form)
+		params := url.Values{}
+		params.Add("session", authSession.ID.String())
+
+		if !form.Confirmed {
+
+			params.Add("status", "canceled")
+
+			c.Redirect(http.StatusFound, fmt.Sprintf("%s?%s", authSession.RedirectURL, params.Encode()))
+			return
+		}
+
+		otp := &models.OTP{
+			RefID: authSession.ID,
+			Type:  models.SSOOTP,
+		}
+
+		if err := otp.Create(c.MustGet("ctx").(context.Context)); err != nil {
+			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		params.Add("status", "success")
+		params.Add("code", otp.Code)
+
+		c.Redirect(http.StatusFound, fmt.Sprintf("%s?%s", authSession.RedirectURL, params.Encode()))
+
+	})
+
+	g.GET("/login", auth.CheckLogin(), func(c *gin.Context) {
+		c.HTML(http.StatusOK, "login.html", gin.H{})
+	})
+
+	g.POST("/login", auth.CheckLogin(), func(c *gin.Context) {
+
+		form := new(auth.LoginForm)
+		if err := c.ShouldBind(form); err != nil {
+			c.HTML(http.StatusBadRequest, "login.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		u, err := models.GetUserByEmail(form.Email)
 		if err != nil || u == nil {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
-				"redirect_url": redirect_url,
-				"error":        "Error: User couldn't be found/is not registered on Socious",
+				"error": "Error: User couldn't be found/is not registered on Socious",
 			})
 			return
 		}
 		if u.Password == nil {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
-				"redirect_url": redirect_url,
-				"error":        "Error: email/password not match",
+				"error": "Error: email/password not match",
 			})
 			return
 		}
-		if err := auth.CheckPasswordHash(loginForm.Password, *u.Password); err != nil {
+		if err := auth.CheckPasswordHash(form.Password, *u.Password); err != nil {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
-				"redirect_url": redirect_url,
-				"error":        "Error: email/password not match",
+				"error": "Error: email/password not match",
 			})
 			return
 		}
-		// TODO: make temp-token
-		//Add redirect_url to query params
-		parsedURL, err := url.Parse(redirect_url)
-		if err != nil {
+
+		session := sessions.Default(c)
+		session.Set("user_id", u.ID.String())
+		session.Save()
+		// TODO: make sso otp if it has auth session
+		c.Redirect(http.StatusFound, "/auth/confirm")
+	})
+
+	g.POST("/register", auth.CheckLogin(), func(c *gin.Context) {
+
+		form := new(auth.RegisterForm)
+		if err := c.ShouldBind(form); err != nil {
+			c.HTML(http.StatusBadRequest, "register.html", gin.H{
+				"error": err.Error(),
+			})
 			return
 		}
-		queryParams := parsedURL.Query()
-		queryParams.Add("token", "@TODO:TOKEN")
-		parsedURL.RawQuery = queryParams.Encode()
-		c.Redirect(http.StatusSeeOther, parsedURL.String())
+		password, _ := auth.HashPassword(*form.Password)
+		u := &models.User{
+			Username:  form.Email,
+			Email:     form.Email,
+			FirstName: form.FirstName,
+			LastName:  form.LastName,
+			Password:  &password,
+		}
 
-		return
+		if err := u.Create(c.MustGet("ctx").(context.Context)); err != nil {
+			c.HTML(http.StatusBadRequest, "register.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		session := sessions.Default(c)
+		session.Set("user_id", u.ID.String())
+		session.Save()
+		// TODO: make temp-token
+		c.Redirect(http.StatusTemporaryRedirect, "/auth/confirm")
 	})
 
-	g.GET("/register", func(c *gin.Context) {
-		redirect_url := c.Query("redirect_url")
+	g.GET("/register", auth.CheckLogin(), func(c *gin.Context) {
+		c.HTML(http.StatusOK, "register.html", gin.H{})
+	})
 
-		c.HTML(http.StatusOK, "register.html", gin.H{
-			"redirect_url": redirect_url,
+	g.DELETE("/logout", auth.LoginRequired(), func(c *gin.Context) {
+
+		c.Redirect(http.StatusPermanentRedirect, "/auth/login")
+	})
+
+	g.POST("/session", func(c *gin.Context) {
+		form := new(AuthSessionForm)
+
+		if err := c.ShouldBind(form); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		access, err := models.GetAccessByClientID(form.ClientID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		authSession := &models.AuthSession{
+			RedirectURL: form.RedirectURL,
+			AccessID:    access.ID,
+			ExpireAt:    time.Now().Add(time.Minute * 10),
+		}
+
+		if err := authSession.Create(c.MustGet("ctx").(context.Context)); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusCreated, gin.H{
+			"auth_session": authSession,
 		})
+
 	})
 
+	g.GET("/session/:id", func(c *gin.Context) {
+		id, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+		}
+		authSession, err := models.GetAuthSession(id)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+		}
+		if authSession.ExpireAt.Before(time.Now()) {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "session has been expired",
+			})
+		}
+
+		session := sessions.Default(c)
+		session.Set("auth_session_id", authSession.ID.String())
+		session.Save()
+
+		c.Redirect(http.StatusPermanentRedirect, "/auth/login")
+	})
+
+}
+
+func loadAuthSession(c *gin.Context) *models.AuthSession {
+	session := sessions.Default(c)
+
+	if authSessionID := session.Get("auth_session_id"); authSessionID != nil {
+		authSession, err := models.GetAuthSession(uuid.MustParse(authSessionID.(string)))
+		if err == nil {
+			return authSession
+		}
+	}
+
+	return nil
 }

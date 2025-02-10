@@ -1,0 +1,120 @@
+body,
+html {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background-color: #f9fafb;
+  font-family: sans-serif;
+  font-size: 16px;
+  color: #101828;
+  overflow: hidden;
+
+  h2 {
+    margin: 0 !important;
+  }
+
+  input {
+    padding: 0.625rem 0.875rem;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 #1018280d;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    text-align: left;
+    color: #101828;
+
+    &::placeholder {
+      color: #667085;
+    }
+
+    &:focus {
+      border: 1px solid #99b7b5;
+      box-shadow: 0 0 0 4px #e6eded;
+    }
+
+    &:focus-visible {
+      outline: 0;
+    }
+  }
+
+  button,
+  a {
+    padding: 0.625rem 0.875rem;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 24px;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  button[theme="primary"],
+  a[theme="primary"] {
+    background-color: #004a46;
+    color: #ffffff;
+    border: 1px solid #004a46;
+  }
+
+  button[theme="primary-outline"],
+  a[theme="primary-outline"] {
+    color: #004a46;
+    background-color: inherit;
+    border: none;
+  }
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-shadow: 0 1px 3px 0 #1018281a;
+    width: 23.5rem;
+    padding: 2rem;
+    border-radius: 12px;
+    background-color: #ffffff;
+
+    .logo {
+      align-self: center;
+    }
+
+    .header,
+    .section {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+    }
+
+    .header {
+      text-align: center;
+      gap: 0.5rem;
+      line-height: 32px;
+
+      .light {
+        line-height: 24px;
+        color: #475467;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 720px) {
+  .container {
+    .card {
+      box-shadow: none;
+      border-radius: 0;
+      width: 100%;
+      height: calc(100% - 4rem);
+      padding: 3rem 1rem;
+    }
+  }
+}
