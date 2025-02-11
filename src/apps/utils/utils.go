@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+const RandCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
 func Copy(src interface{}, dst interface{}) error {
 	bytes, err := json.Marshal(src)
 	if err != nil {
@@ -74,4 +76,16 @@ func GenerateRandomDigits(digits int) int {
 	}
 
 	return int(n.Int64() + lowerBound)
+}
+
+func RandomString(length int) string {
+	b := make([]byte, length)
+	for i := range b {
+		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(RandCharset))))
+		if err != nil {
+			return RandomString(length)
+		}
+		b[i] = RandCharset[num.Int64()]
+	}
+	return string(b)
 }

@@ -53,8 +53,9 @@ func authGroup(router *gin.Engine) {
 		}
 
 		otp := &models.OTP{
-			RefID: authSession.ID,
-			Type:  models.SSOOTP,
+			UserID:        c.MustGet("user").(*models.User).ID,
+			AuthSessionID: &authSession.ID,
+			Type:          models.SSOOTP,
 		}
 
 		if err := otp.Create(c.MustGet("ctx").(context.Context)); err != nil {
@@ -149,7 +150,9 @@ func authGroup(router *gin.Engine) {
 	})
 
 	g.DELETE("/logout", auth.LoginRequired(), func(c *gin.Context) {
-
+		session := sessions.Default(c)
+		session.Delete("user_id")
+		session.Save()
 		c.Redirect(http.StatusPermanentRedirect, "/auth/login")
 	})
 
@@ -167,6 +170,13 @@ func authGroup(router *gin.Engine) {
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
+			})
+			return
+		}
+
+		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "client access not valid",
 			})
 			return
 		}
@@ -216,6 +226,76 @@ func authGroup(router *gin.Engine) {
 		c.Redirect(http.StatusPermanentRedirect, "/auth/login")
 	})
 
+	g.POST("/session/token", func(c *gin.Context) {
+
+		form := new(GetTokenForm)
+		if err := c.ShouldBind(form); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		access, err := models.GetAccessByClientID(form.ClientID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "client access not valid",
+			})
+			return
+		}
+
+		otp, err := models.GetOTPByCode(form.Code)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "not valid auth code",
+			})
+			return
+		}
+
+		if otp.ExpireAt.Before(time.Now()) || otp.VerifiedAt != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "code has been expired",
+			})
+			return
+		}
+
+		if otp.AuthSession == nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "not valid otp for this session",
+			})
+		}
+
+		if otp.AuthSession.ExpireAt.Before(time.Now()) || otp.AuthSession.VerifiedAt != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "auth session has been expired",
+			})
+			return
+		}
+
+		tokens, err := auth.Signin(otp.User.ID.String(), otp.User.Email)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+		}
+		return
+
+		if err := otp.Verify(c.MustGet("ctx").(context.Context)); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusAccepted, tokens)
+	})
 }
 
 func loadAuthSession(c *gin.Context) *models.AuthSession {

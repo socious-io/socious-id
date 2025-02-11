@@ -1,0 +1,1 @@
+SELECT * FROM accesses WHERE client_id=$1

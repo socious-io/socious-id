@@ -34,7 +34,7 @@ func CheckPasswordHash(password, hash string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 }
 
-func GenerateFullTokens(id, email string) (map[string]any, error) {
+func Signin(id, email string) (map[string]any, error) {
 	accessToken, err := GenerateToken(id, email, false)
 	if err != nil {
 		return nil, err

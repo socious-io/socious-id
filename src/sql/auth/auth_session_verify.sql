@@ -1,0 +1,1 @@
+UPDATE auth_sessions SET verified_at=NOW() WHERE id=$1

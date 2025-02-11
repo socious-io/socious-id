@@ -1,0 +1,1 @@
+UPDATE otps SET verified_at=NOW() WHERE id=$1

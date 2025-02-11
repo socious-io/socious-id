@@ -5,11 +5,12 @@ type ConfirmForm struct {
 }
 
 type AuthSessionForm struct {
-	ClientID    string `json:"client_id" form:"client_id" validate:"required"`
-	RedirectURL string `json:"reirect_url" form:"redirect_url" validate:"required"`
+	ClientSecret string `json:"client_secret" form:"client_secret" validate:"required"`
+	ClientID     string `json:"client_id" form:"client_id" validate:"required"`
+	RedirectURL  string `json:"reirect_url" form:"redirect_url" validate:"required"`
 }
 
-type GetAuthForm struct {
+type GetTokenForm struct {
 	ClientSecret string `json:"client_secret" form:"client_secret" validate:"required"`
 	ClientID     string `json:"client_id" form:"client_id" validate:"required"`
 	Code         string `json:"code" form:"code" validate:"required"`
