@@ -12,12 +12,16 @@ env:
   REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
   IMAGE_NAME: ${{ github.repository }}
   WORKER_IMAGE_NAME: ${{ github.repository }}-worker
+  DOCKER_CONTAINER_NAME: socious-id
+  DOCKER_CONTAINER_NETWORK: sociousid_default
+  CONFIG_DIR_NAME: socious-id
+  GITHUB_RUNNER: socious-id-prod
 
 jobs:
   test-build:
     name: Test & Build for Production env
     # if: github.ref == 'refs/heads/production' && github.event_name == 'push'
-    runs-on: ["socious-v3-production"]
+    runs-on: ["${{ env.GITHUB_RUNNER }}"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,8 +33,8 @@ jobs:
 
       - name: Copying build & test environment
         run: |
-          cp /etc/socious-api-v3/config.yml .
-          cp /etc/socious-api-v3/test.config.yml .
+          cp /etc/${{ env.CONFIG_DIR_NAME }}/config.yml .
+          cp /etc/${{ env.CONFIG_DIR_NAME }}/test.config.yml .
 
       - name: Downloading dependencies
         run: |
@@ -90,7 +94,7 @@ jobs:
     needs: [test-build]
     name: Deploy to Production
     # if: github.ref == 'refs/heads/production' && github.event_name == 'push'
-    runs-on: ["socious-v3-production"]
+    runs-on: ["${{ env.GITHUB_RUNNER }}"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -112,8 +116,8 @@ jobs:
       - name: Docker run
         run: |
           docker pull ${{ steps.meta.outputs.tags }}
-          docker ps -qa --filter "name=socious-api-v3" | grep -q . && docker stop socious-api-v3 && docker rm -fv socious-api-v3
-          docker run -d --restart always -p 5063:5063 -h socious-api-v3 --network sociousapiv3_default --name socious-api-v3 ${{ steps.meta.outputs.tags }}
+          docker ps -qa --filter "name=${{ env.DOCKER_CONTAINER_NAME }}" | grep -q . && docker stop ${{ env.DOCKER_CONTAINER_NAME }} && docker rm -fv ${{ env.DOCKER_CONTAINER_NAME }}
+          docker run -d --restart always -p 5064:5064 -h ${{ env.DOCKER_CONTAINER_NAME }} --network ${{ env.DOCKER_CONTAINER_NETWORK }} --name ${{ env.DOCKER_CONTAINER_NAME }} ${{ steps.meta.outputs.tags }}
 
       # - name: Extract Docker metadata
       #   id: meta-worker
@@ -124,5 +128,5 @@ jobs:
       # - name: Docker run worker
       #   run: |
       #     docker pull ${{ steps.meta-worker.outputs.tags }}
-      #     docker ps -qa --filter "name=socious-api-v3-worker" | grep -q . && docker stop socious-api-v3-worker && docker rm -fv socious-api-v3-worker
-      #     docker run -d --restart always -h socious-api-v3-worker --network sociousapiv3_default --name socious-api-v3-worker ${{ steps.meta-worker.outputs.tags }}
+      #     docker ps -qa --filter "name=${{ env.DOCKER_CONTAINER_NAME }}-worker" | grep -q . && docker stop ${{ env.DOCKER_CONTAINER_NAME }}-worker && docker rm -fv ${{ env.DOCKER_CONTAINER_NAME }}-worker
+      #     docker run -d --restart always -h ${{ env.DOCKER_CONTAINER_NAME }}-worker --network ${{ env.DOCKER_CONTAINER_NETWORK }}_default --name ${{ env.DOCKER_CONTAINER_NAME }}-worker ${{ steps.meta-worker.outputs.tags }}
