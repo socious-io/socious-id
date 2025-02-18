@@ -15,14 +15,13 @@ env:
   DOCKER_CONTAINER_NAME: socious-id
   DOCKER_CONTAINER_NETWORK: sociousid_default
   CONFIG_DIR_NAME: socious-id
-  GITHUB_RUNNER: socious-id-dev
 
 jobs:
 
   test-build-dev:
     name: Test & Build for Development env
     # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ["${{ env.GITHUB_RUNNER }}"]
+    runs-on: ["socious-id-dev"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -95,7 +94,7 @@ jobs:
     needs: [test-build-dev]
     name: Deploy to Dev
     # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ["${{ env.GITHUB_RUNNER }}"]
+    runs-on: ["socious-id-dev"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
