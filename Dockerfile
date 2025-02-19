@@ -6,5 +6,5 @@ COPY . .
 RUN go mod download
 RUN go build -C cmd/app -o ../../build
 
-EXPOSE 5062
+EXPOSE 5064
 CMD ["./build"]
