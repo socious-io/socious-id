@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/lib/pq"
 	database "github.com/socious-io/pkg_database"
 
 	"github.com/google/uuid"
@@ -37,8 +36,6 @@ type User struct {
 
 	Avatar     *uuid.UUID `db:"avatar" json:"avatar"`
 	CoverImage *uuid.UUID `db:"cover_image" json:"cover_image"`
-
-	SocialCauses pq.StringArray `db:"social_causes" json:"social_causes"`
 
 	IdentityVerifiedAt *time.Time `db:"identity_verified_at" json:"identity_verified_at"`
 	EmailVerifiedAt    *time.Time `db:"email_verified_at" json:"email_verified_at"`
