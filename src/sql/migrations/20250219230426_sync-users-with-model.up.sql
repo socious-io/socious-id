@@ -6,6 +6,9 @@ CREATE TYPE status_type AS ENUM (
 );
 
 ALTER TABLE users
+    ALTER COLUMN status DROP DEFAULT,
+    ALTER COLUMN status TYPE status_type USING status::text::status_type,
+    ALTER COLUMN status SET DEFAULT 'INACTIVE',
     ALTER COLUMN first_name TYPE VARCHAR(70),
     ALTER COLUMN last_name TYPE VARCHAR(70),
     ADD COLUMN password_expired boolean DEFAULT false,
