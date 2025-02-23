@@ -7,6 +7,8 @@ import (
 	"net/url"
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
+	"socious-id/src/config"
+	"socious-id/src/services"
 	"time"
 
 	"github.com/gin-contrib/sessions"
@@ -25,8 +27,7 @@ func authGroup(router *gin.Engine) {
 			})
 		}
 		// NOTE: look like page sent without any session so detect it's self authorization
-		// TODO: configure account platform path
-		c.Redirect(http.StatusPermanentRedirect, "https://account.socious.io")
+		c.Redirect(http.StatusPermanentRedirect, config.Config.Platforms.Accounts)
 
 	})
 
@@ -45,7 +46,6 @@ func authGroup(router *gin.Engine) {
 		params.Add("session", authSession.ID.String())
 
 		if !form.Confirmed {
-
 			params.Add("status", "canceled")
 
 			c.Redirect(http.StatusFound, fmt.Sprintf("%s?%s", authSession.RedirectURL, params.Encode()))
@@ -113,22 +113,84 @@ func authGroup(router *gin.Engine) {
 		c.Redirect(http.StatusFound, "/auth/confirm")
 	})
 
-	g.POST("/register", auth.CheckLogin(), func(c *gin.Context) {
+	g.POST("/otp", auth.CheckLogin(), func(c *gin.Context) {
 
-		form := new(auth.RegisterForm)
+		form := new(auth.OTPConfirmForm)
+		if err := c.ShouldBind(form); err != nil {
+			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		otp, err := models.GetOTPByCode(form.Code)
+		if err != nil {
+			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		if otp.ExpireAt.Before(time.Now()) || otp.VerifiedAt != nil {
+			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
+				"error": "code has been expired",
+			})
+			return
+		}
+
+		if otp.AuthSession == nil {
+			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
+				"error": "not valid otp for this session",
+			})
+			return
+		}
+
+		if otp.AuthSession.ExpireAt.Before(time.Now()) || otp.AuthSession.VerifiedAt != nil {
+			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
+				"error": "auth session has been expired",
+			})
+			return
+		}
+
+		if err := otp.Verify(c.MustGet("ctx").(context.Context)); err != nil {
+			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		// session := sessions.Default(c)
+		// session.Set("user_id", u.ID.String())
+		// session.Save()
+		// TODO: make temp-token
+		c.Redirect(http.StatusSeeOther, "/auth/signup")
+	})
+
+	g.GET("/otp", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "otp.html", gin.H{})
+	})
+
+	g.POST("/register", auth.CheckLogin(), func(c *gin.Context) {
+		authSession := loadAuthSession(c)
+		if authSession == nil {
+			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
+				"error": "not accepted without auth session",
+			})
+			return
+		}
+
+		form := new(auth.OTPForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{
 				"error": err.Error(),
 			})
 			return
 		}
-		password, _ := auth.HashPassword(*form.Password)
+
+		//Creating user
 		u := &models.User{
-			Username:  form.Email,
-			Email:     form.Email,
-			FirstName: form.FirstName,
-			LastName:  form.LastName,
-			Password:  &password,
+			Username: form.Email, //TODO: generate username
+			Email:    form.Email,
 		}
 
 		if err := u.Create(c.MustGet("ctx").(context.Context)); err != nil {
@@ -138,15 +200,91 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
+		//Saving into session
 		session := sessions.Default(c)
 		session.Set("user_id", u.ID.String())
 		session.Save()
-		// TODO: make temp-token
-		c.Redirect(http.StatusTemporaryRedirect, "/auth/confirm")
+
+		//Save OTP
+		otp := &models.OTP{
+			UserID:        u.ID,
+			AuthSessionID: &authSession.ID,
+			Type:          models.VerificationOTP,
+		}
+
+		if err := otp.Create(c.MustGet("ctx").(context.Context)); err != nil {
+			c.HTML(http.StatusNotAcceptable, "register.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		//Email OTP
+		items := map[string]string{"code": otp.Code}
+		services.SendEmail(services.EmailConfig{
+			Approach:    services.EmailApproachTemplate,
+			Destination: u.Email,
+			Title:       "OTP Code",
+			Template:    "otp",
+			Args:        items,
+		})
+
+		c.Redirect(http.StatusSeeOther, "/auth/otp")
 	})
 
-	g.GET("/register", auth.CheckLogin(), func(c *gin.Context) {
+	g.GET("/register", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "register.html", gin.H{})
+	})
+
+	g.POST("/signup", func(c *gin.Context) {
+		authSession := loadAuthSession(c)
+		if authSession == nil {
+			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
+				"error": "not accepted without auth session",
+			})
+			return
+		}
+
+		form := new(auth.RegisterForm)
+		if err := c.ShouldBind(form); err != nil {
+			c.HTML(http.StatusBadRequest, "signup.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		password, _ := auth.HashPassword(*form.Password)
+		u, err := auth.FetchUserBySession(c)
+		if err != nil {
+			c.HTML(http.StatusBadRequest, "signup.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		u.Username = *form.Username
+		u.FirstName = form.FirstName
+		u.LastName = form.LastName
+		u.Password = &password
+
+		if err := u.UpdateProfile(c.MustGet("ctx").(context.Context)); err != nil {
+			c.HTML(http.StatusBadRequest, "signup.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		if err := u.UpdatePassword(c.MustGet("ctx").(context.Context)); err != nil {
+			c.HTML(http.StatusBadRequest, "signup.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		c.Redirect(http.StatusSeeOther, "/auth/confirm")
+	})
+
+	g.GET("/signup", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "signup.html", gin.H{})
 	})
 
 	g.DELETE("/logout", auth.LoginRequired(), func(c *gin.Context) {
@@ -223,7 +361,7 @@ func authGroup(router *gin.Engine) {
 		session.Set("auth_session_id", authSession.ID.String())
 		session.Save()
 
-		c.Redirect(http.StatusPermanentRedirect, "/auth/login")
+		c.Redirect(http.StatusPermanentRedirect, "/auth/register")
 	})
 
 	g.POST("/session/token", func(c *gin.Context) {
@@ -284,8 +422,8 @@ func authGroup(router *gin.Engine) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
+			return
 		}
-		return
 
 		if err := otp.Verify(c.MustGet("ctx").(context.Context)); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{

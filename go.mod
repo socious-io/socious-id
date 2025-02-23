@@ -20,6 +20,13 @@ require (
 )
 
 require (
+	github.com/klauspost/compress v1.17.9 // indirect
+	github.com/nats-io/nkeys v0.4.9 // indirect
+	github.com/nats-io/nuid v1.0.1 // indirect
+	github.com/sendgrid/rest v2.6.9+incompatible // indirect
+)
+
+require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/bytedance/sonic v1.12.6 // indirect
 	github.com/bytedance/sonic/loader v0.2.1 // indirect
@@ -59,8 +66,10 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/nats-io/nats.go v1.39.1
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
+	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
 	github.com/sony/gobreaker v1.0.0 // indirect
 	github.com/stripe/stripe-go/v81 v81.1.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect

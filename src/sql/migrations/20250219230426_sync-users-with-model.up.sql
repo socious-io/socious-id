@@ -9,6 +9,8 @@ ALTER TABLE users
     ALTER COLUMN status DROP DEFAULT,
     ALTER COLUMN status TYPE status_type USING status::text::status_type,
     ALTER COLUMN status SET DEFAULT 'INACTIVE',
+    ALTER COLUMN username TYPE VARCHAR(200),
+    ALTER COLUMN email TYPE VARCHAR(200),
     ALTER COLUMN first_name TYPE VARCHAR(70),
     ALTER COLUMN last_name TYPE VARCHAR(70),
     ADD COLUMN password_expired boolean DEFAULT false,
@@ -28,3 +30,6 @@ ALTER TABLE users
     ADD COLUMN email_verified_at timestamp without time zone,
     ADD COLUMN phone_verified_at timestamp without time zone,
     ADD COLUMN deleted_at timestamp without time zone;
+
+ALTER TABLE otps
+    RENAME COLUMN status TO type;
