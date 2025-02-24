@@ -1,8 +1,8 @@
 package main
 
 import (
-	"socious-id/src/apps"
 	"socious-id/src/config"
+	"socious-id/src/lib"
 	"socious-id/src/services"
 	"time"
 
@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+
 	config.Init("config.yml")
 	database.Connect(&database.ConnectOption{
 		URL:         config.Config.Database.URL,
@@ -19,7 +20,11 @@ func main() {
 		Timeout:     5 * time.Second,
 	})
 
-	services.Connect()
+	lib.InitSendGridLib(lib.SendGridType{
+		Disabled: config.Config.Sendgrid.Disabled,
+		ApiKey:   config.Config.Sendgrid.ApiKey,
+		Url:      config.Config.Sendgrid.URL,
+	})
 
-	apps.Serve()
+	services.Init()
 }

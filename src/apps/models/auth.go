@@ -41,16 +41,17 @@ type OTP struct {
 	Type OTPType   `db:"type" json:"type"`
 
 	UserID   uuid.UUID      `db:"user_id" json:"user_id"`
-	User     User           `db:"-" json:"user"`
+	User     *User          `db:"-" json:"user"`
 	UserJson types.JSONText `db:"user" json:"-"`
 
-	AuthSessionID   *uuid.UUID      `db:"auth_session_id" json:"auth_session_id"`
-	AuthSession     *AuthSession    `db:"-" json:"auth_session"`
-	AuthSessionJson *types.JSONText `db:"auth_session" json:"-"`
+	AuthSessionID   *uuid.UUID     `db:"auth_session_id" json:"auth_session_id"`
+	AuthSession     *AuthSession   `db:"-" json:"auth_session"`
+	AuthSessionJson types.JSONText `db:"auth_session" json:"-"`
 
 	ExpireAt   time.Time  `db:"expire_at" json:"expire_at"`
 	VerifiedAt *time.Time `db:"verified_at" json:"verified_at"`
 	CreatedAt  time.Time  `db:"created_at" json:"created_at"`
+	UpdatedAt  time.Time  `db:"updated_at" json:"updated_at"`
 }
 
 func (Access) TableName() string {
@@ -171,7 +172,7 @@ func (o *OTP) Verify(ctx context.Context) error {
 
 func GetAccessByClientID(clientID string) (*Access, error) {
 	a := new(Access)
-	if err := database.Get(a, "auth/fetch_access_by_client_id"); err != nil {
+	if err := database.Get(a, "auth/fetch_access_by_client_id", clientID); err != nil {
 		return nil, err
 	}
 	return a, nil
