@@ -113,8 +113,7 @@ func authGroup(router *gin.Engine) {
 		c.Redirect(http.StatusFound, "/auth/confirm")
 	})
 
-	g.POST("/otp", auth.CheckLogin(), func(c *gin.Context) {
-
+	g.POST("/otp", func(c *gin.Context) {
 		form := new(auth.OTPConfirmForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
@@ -159,10 +158,6 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		// session := sessions.Default(c)
-		// session.Set("user_id", u.ID.String())
-		// session.Save()
-		// TODO: make temp-token
 		c.Redirect(http.StatusSeeOther, "/auth/signup")
 	})
 
@@ -232,7 +227,7 @@ func authGroup(router *gin.Engine) {
 		c.Redirect(http.StatusSeeOther, "/auth/otp")
 	})
 
-	g.GET("/register", func(c *gin.Context) {
+	g.GET("/register", auth.CheckLogin(), func(c *gin.Context) {
 		c.HTML(http.StatusOK, "register.html", gin.H{})
 	})
 
@@ -340,28 +335,40 @@ func authGroup(router *gin.Engine) {
 
 	g.GET("/session/:id", func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
+		authMode := models.AuthModeType(c.Query("auth_mode"))
+
+		fmt.Println(authMode, authMode == models.AuthModeRegister)
+
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
+			return
 		}
 		authSession, err := models.GetAuthSession(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
+			return
 		}
 		if authSession.ExpireAt.Before(time.Now()) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "session has been expired",
 			})
+			return
 		}
 
 		session := sessions.Default(c)
 		session.Set("auth_session_id", authSession.ID.String())
 		session.Save()
 
-		c.Redirect(http.StatusPermanentRedirect, "/auth/register")
+		if authMode == models.AuthModeRegister {
+			c.Redirect(http.StatusPermanentRedirect, "/auth/register")
+		} else {
+			c.Redirect(http.StatusPermanentRedirect, "/auth/login")
+		}
+
 	})
 
 	g.POST("/session/token", func(c *gin.Context) {
