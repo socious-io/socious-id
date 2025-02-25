@@ -1,42 +1,40 @@
 {{template "header" .}}
 
-<div class="container">
-  <form method="post">
-    <div class="card">
-      <img
-        src="/statics/logo.svg"
-        alt="Socious Logo"
-        width="40"
-        height="40"
-        class="logo"
-      />
-      <div class="header">
-        <h2>Sign in with Socious</h2>
-        <span class="light">Sign in to continue to Shin</span>
-      </div>
-      <div class="section">
-        <input
-          placeholder="Enter your email"
-          type="email"
-          name="email"
-          autocomplete="email"
-        />
-        <input
-          placeholder="Enter your password"
-          type="password"
-          name="password"
-          autocomplete="current-password"
-        />
-      </div>
-      {{if .error}}
-      <p style="color: red">{{.error}}</p>
-      {{end}}
-      <div class="section">
-        <button type="submit" theme="primary">Sign in</button>
-        <a theme="primary-outline" href="/auth/register">Create account</a>
-      </div>
-    </div>
-  </form>
-</div>
+<body>
+	<form method="post">
+		<div class="intro">
+			<div class="card">
+				<div class="logo">
+					<img src="/statics/icons/lock.svg" alt="Login Lock" width="24" height="24" />
+				</div>
+				<div name="header" class="header">
+					<h2>Sign in with Socious ID</h2>
+					<span class="text-grey leading-6">Your access for all your impact platforms</span>
+				</div>
+				<div name="content-section" class="section">
+					<input placeholder="Enter your email" type="email" name="email" autocomplete="email" />
+					<input
+						placeholder="Enter your password"
+						type="password"
+						name="password"
+						autocomplete="current-password"
+					/>
+					<a class="self-end" href="/auth/forget-password">Forget password?</a>
+				</div>
+				<div name="button-section" class="section">
+					<button type="submit" theme="primary">Sign in</button>
+					<div class="separator">
+						<div class="separator-text">OR</div>
+					</div>
+					<button type="button" theme="secondary-outline">
+						<img src="/statics/icons/google.svg" alt="Google" width="24" height="24" />
+						Continue with Google
+					</button>
+					<a href="/auth/register"><button type="button" theme="primary-outline">Create account</button></a>
+				</div>
+			</div>
+		</div>
+	</form>
+</body>
 
 {{ template "footer" . }}

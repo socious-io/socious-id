@@ -35,7 +35,7 @@ func NewToken(id, email string) (*Token, error) {
 }
 
 func GenerateToken(id, email string, refresh bool) (string, error) {
-	expirationTime := time.Now().Add(24 * time.Hour)
+	expirationTime := time.Now().Add(30 * 24 * time.Hour)
 	claims := &Claims{
 		ID:      id,
 		Email:   email,

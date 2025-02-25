@@ -1,0 +1,62 @@
+{{template "header" .}}
+<body>
+	<div class="intro">
+		<div class="card">
+			<div class="logo">
+				<img src="/statics/icons/lock.svg" alt="Login Lock" width="24" height="24" />
+			</div>
+			<div name="header" class="header">
+				<h2>Create your Socious ID</h2>
+				<span class="text-grey leading-6">One account for all your impact platforms</span>
+			</div>
+			<div name="content-section" class="section">
+				<div class="steps">
+					<div class="step">
+						<div class="logo step-logo">
+							<img src="/statics/icons/key.svg" alt="step-1" width="24" height="24" />
+						</div>
+						<div class="step-title">
+							<span class="text-md font-semibold leading-6 text-black">Access all platforms</span>
+							Single sign-in for Talent Marketplace, Shin credentials and Socious Innovation Fund
+						</div>
+					</div>
+					<div class="step">
+						<div class="logo step-logo">
+							<img src="/statics/icons/shield-tick.svg" alt="step-1" width="24" height="24" />
+						</div>
+						<div class="step-title">
+							<span class="text-md font-semibold leading-6 text-black">Verified impact profile</span>
+							Build trust with verified credentials and impact history
+						</div>
+					</div>
+					<div class="step">
+						<div class="logo step-logo">
+							<img src="/statics/icons/chart-breakout-square.svg" alt="step-1" width="24" height="24" />
+						</div>
+						<div class="step-title">
+							<span class="text-md font-semibold leading-6 text-black">Track your impact</span>
+							Measure and showcase your social impact across all platforms
+						</div>
+					</div>
+				</div>
+			</div>
+			<div name="button-section" class="section">
+				<a href="/auth/register">
+					<button type="button" theme="primary">Continue with email</button>
+				</a>
+				<div class="separator">
+					<div class="separator-text">OR</div>
+				</div>
+				<button type="button" theme="secondary-outline">
+					<img src="/statics/icons/google.svg" alt="Google" width="24" height="24" />
+					Continue with Google
+				</button>
+				<span class="text-sm text-grey text-center"
+					>By continuing, you accept our
+					<a class="font-medium text-primary">Terms of Use and Privacy Policy.</a></span
+				>
+			</div>
+		</div>
+	</div>
+</body>
+{{template "footer" .}}
