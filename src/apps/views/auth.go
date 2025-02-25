@@ -158,7 +158,17 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		c.Redirect(http.StatusSeeOther, "/auth/signup")
+		//Saving into session
+		session := sessions.Default(c)
+		session.Set("user_id", otp.User.ID.String())
+		session.Save()
+
+		if otp.Type == models.VerificationOTP {
+			c.Redirect(http.StatusSeeOther, "/auth/signup")
+		} else if otp.Type == models.ForgetPasswordOTP {
+			c.Redirect(http.StatusSeeOther, "/auth/set-password")
+		}
+
 	})
 
 	g.GET("/otp", func(c *gin.Context) {
@@ -195,11 +205,6 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		//Saving into session
-		session := sessions.Default(c)
-		session.Set("user_id", u.ID.String())
-		session.Save()
-
 		//Save OTP
 		otp := &models.OTP{
 			UserID:        u.ID,
@@ -229,6 +234,10 @@ func authGroup(router *gin.Engine) {
 
 	g.GET("/register", auth.CheckLogin(), func(c *gin.Context) {
 		c.HTML(http.StatusOK, "register.html", gin.H{})
+	})
+
+	g.GET("/pre-register", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "pre-register.html", gin.H{})
 	})
 
 	g.POST("/signup", func(c *gin.Context) {
@@ -280,6 +289,109 @@ func authGroup(router *gin.Engine) {
 
 	g.GET("/signup", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "signup.html", gin.H{})
+	})
+
+	g.POST("/forget-password", auth.CheckLogin(), func(c *gin.Context) {
+		authSession := loadAuthSession(c)
+		if authSession == nil {
+			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
+				"error": "not accepted without auth session",
+			})
+			return
+		}
+
+		form := new(auth.OTPForm)
+		if err := c.ShouldBind(form); err != nil {
+			c.HTML(http.StatusBadRequest, "forget-password.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		//Creating user
+		u, err := models.GetUserByEmail(form.Email)
+		if err != nil {
+			c.HTML(http.StatusBadRequest, "forget-password.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		//Save OTP
+		otp := &models.OTP{
+			UserID:        u.ID,
+			AuthSessionID: &authSession.ID,
+			Type:          models.ForgetPasswordOTP,
+		}
+
+		if err := otp.Create(c.MustGet("ctx").(context.Context)); err != nil {
+			c.HTML(http.StatusNotAcceptable, "register.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		//Email OTP
+		items := map[string]string{"code": otp.Code}
+		services.SendEmail(services.EmailConfig{
+			Approach:    services.EmailApproachTemplate,
+			Destination: u.Email,
+			Title:       "Forget Password OTP Code",
+			Template:    "otp",
+			Args:        items,
+		})
+
+		c.Redirect(http.StatusSeeOther, "/auth/otp")
+	})
+
+	g.GET("/forget-password", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "forget-password.html", gin.H{})
+	})
+
+	g.POST("/set-password", auth.CheckLogin(), func(c *gin.Context) {
+		authSession := loadAuthSession(c)
+		if authSession == nil {
+			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
+				"error": "not accepted without auth session",
+			})
+			return
+		}
+
+		form := new(auth.SetPasswordForm)
+		if err := c.ShouldBind(form); err != nil {
+			c.HTML(http.StatusBadRequest, "set-password.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		//Fetching user
+		u, err := auth.FetchUserBySession(c)
+		if err != nil {
+			c.HTML(http.StatusBadRequest, "signup.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		password, _ := auth.HashPassword(form.Password)
+		u.Password = &password
+		if err := u.UpdatePassword(c.MustGet("ctx").(context.Context)); err != nil {
+			c.HTML(http.StatusBadRequest, "set-password.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		c.Redirect(http.StatusSeeOther, "/auth/post-set-password")
+	})
+
+	g.GET("/set-password", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "set-password.html", gin.H{})
+	})
+
+	g.GET("/post-set-password", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "post-set-password.html", gin.H{})
 	})
 
 	g.DELETE("/logout", auth.LoginRequired(), func(c *gin.Context) {
@@ -364,7 +476,7 @@ func authGroup(router *gin.Engine) {
 		session.Save()
 
 		if authMode == models.AuthModeRegister {
-			c.Redirect(http.StatusPermanentRedirect, "/auth/register")
+			c.Redirect(http.StatusPermanentRedirect, "/auth/pre-register")
 		} else {
 			c.Redirect(http.StatusPermanentRedirect, "/auth/login")
 		}

@@ -1,21 +1,51 @@
 {{template "header" .}}
 
-<div class="container">
-  <form method="post">
-    <div class="card">
-      <div class="header">
-        <h2>Confirm page</h2>
+<body>
+  <div class="intro">
+    <form method="post">
+      <div class="card">
+          <div class="logo">
+              <img src="/statics/icons/lock.svg" alt="Login Lock" width="24" height="24" />
+          </div>
+          <input hidden value=1 type="number" name="confirmed"/>
+          <div name="header" class="header">
+              <h2>Sign in with Socious ID</h2>
+              <span class="text-grey leading-6">Choose an account</span>
+          </div>
+          <div name="content-section" class="section">
+              <div name="individual" class="consent-account-label">
+                  Your individual profile
+                  <button type="submit" class="consent-account">
+                      <img src="/statics/images/user-avatar.png" alt="Profile Image" width="40" height="40" />
+                      <div class="consent-account-name">
+                          {{ .User.FirstName }} {{ .User.LastName }}
+                          <span class="consent-account-email">@{{ .User.Username }}</span>
+                      </div>
+                  </button>
+              </div>
+              <!-- <div name="organization" class="consent-account-label">
+                  Your organization profiles
+                  <div class="consent-accounts">
+                      <div class="consent-account">
+                          <img src="./public/images/org-avatar.png" alt="Profile Image" width="40" height="40" />
+                          <div class="consent-account-name">
+                              Ocean Protection
+                              <span class="consent-account-email">@OceanProtection</span>
+                          </div>
+                      </div>
+                      <div class="consent-account">
+                          <img src="./public/images/org-avatar.png" alt="Profile Image" width="40" height="40" />
+                          <div class="consent-account-name">
+                              Ocean Protection
+                              <span class="consent-account-email">@OceanProtection</span>
+                          </div>
+                      </div>
+                  </div>
+              </div> -->
+          </div>
       </div>
-      <div class="section">
-        <h3>User :</h3>
-        <p>{{ .User.FirstName }} {{ .User.LastName }}</p>
-      </div>
-      <h2>Access :</h2>
-      {{ .AuthSession.Access.Name }}
-    </div>
-    <input hidden value=1 type="number" name="confirmed"/>
-    <button type="submit">Confirm</button>
-  </form>
-</div>
+    </form>
+  </div>
+</body>
 
 {{ template "footer" . }}

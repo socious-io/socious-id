@@ -31,6 +31,9 @@ type OTPForm struct {
 type OTPConfirmForm struct {
 	Code string `json:"code" form:"code" validate:"required"`
 }
+type SetPasswordForm struct {
+	Password string `json:"password" form:"password" validate:"required"`
+}
 
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
