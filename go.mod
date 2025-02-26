@@ -24,6 +24,8 @@ require (
 	github.com/nats-io/nkeys v0.4.9 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
+	github.com/socious-io/gomail v0.1.3 // indirect
+	github.com/socious-io/gomq v0.1.5 // indirect
 )
 
 require (

@@ -8,12 +8,12 @@ import (
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
 	"socious-id/src/config"
-	"socious-id/src/services"
 	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/socious-io/gomail"
 )
 
 func authGroup(router *gin.Engine) {
@@ -216,11 +216,11 @@ func authGroup(router *gin.Engine) {
 
 		//Email OTP
 		items := map[string]string{"code": otp.Code}
-		services.SendEmail(services.EmailConfig{
-			Approach:    services.EmailApproachTemplate,
+		gomail.SendEmail(gomail.EmailConfig{
+			Approach:    gomail.EmailApproachTemplate,
 			Destination: u.Email,
 			Title:       "OTP Code",
-			Template:    "otp",
+			TemplateId:  "otp",
 			Args:        items,
 		})
 
@@ -336,8 +336,6 @@ func authGroup(router *gin.Engine) {
 	g.GET("/session/:id", func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		authMode := models.AuthModeType(c.Query("auth_mode"))
-
-		fmt.Println(authMode, authMode == models.AuthModeRegister)
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{

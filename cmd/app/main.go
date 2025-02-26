@@ -3,9 +3,10 @@ package main
 import (
 	"socious-id/src/apps"
 	"socious-id/src/config"
-	"socious-id/src/services"
 	"time"
 
+	"github.com/socious-io/gomail"
+	"github.com/socious-io/gomq"
 	database "github.com/socious-io/pkg_database"
 )
 
@@ -19,7 +20,18 @@ func main() {
 		Timeout:     5 * time.Second,
 	})
 
-	services.Connect()
+	//Initializing GoMQ Library
+	gomq.Setup(gomq.Config{
+		Url:        config.Config.Nats.Url,
+		Token:      config.Config.Nats.Token,
+		ChannelDir: "sociousid",
+	})
+	gomq.Connect()
+
+	gomail.Setup(gomail.Config{
+		WorkerChannel: "email",
+		MessageQueue:  gomq.Mq,
+	})
 
 	apps.Serve()
 }

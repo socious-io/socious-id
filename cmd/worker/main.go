@@ -2,10 +2,10 @@ package main
 
 import (
 	"socious-id/src/config"
-	"socious-id/src/lib"
-	"socious-id/src/services"
 	"time"
 
+	"github.com/socious-io/gomail"
+	"github.com/socious-io/gomq"
 	database "github.com/socious-io/pkg_database"
 )
 
@@ -20,11 +20,28 @@ func main() {
 		Timeout:     5 * time.Second,
 	})
 
-	lib.InitSendGridLib(lib.SendGridType{
-		Disabled: config.Config.Sendgrid.Disabled,
-		ApiKey:   config.Config.Sendgrid.ApiKey,
-		Url:      config.Config.Sendgrid.URL,
+	//Initializing GoMQ Library
+	gomq.Setup(gomq.Config{
+		Url:        config.Config.Nats.Url,
+		Token:      config.Config.Nats.Token,
+		ChannelDir: "sociousid",
+		Consumers:  map[string]func(interface{}){},
 	})
 
-	services.Init()
+	//Initializing GoMail Library and Add it as Worker
+	gomail.Setup(gomail.Config{
+		ApiKey:         config.Config.Sendgrid.ApiKey,
+		Url:            config.Config.Sendgrid.URL,
+		DefaultFrom:    "info@socious.io",
+		DefaultSubject: "Socious ID",
+		Templates: map[string]string{
+			"otp": "d-0146441b623f4cb78833c50eb1a8c813",
+		},
+		WorkerChannel: "email",
+		MessageQueue:  gomq.Mq,
+	})
+	gomq.AddConsumer(gomail.GetConfig().WorkerChannel, gomail.EmailWorker)
+
+	gomq.Init()
+
 }
