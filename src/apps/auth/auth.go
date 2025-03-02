@@ -80,7 +80,6 @@ func FetchUserByJWT(c *gin.Context) (*models.User, error) {
 func FetchUserBySession(c *gin.Context) (*models.User, error) {
 	session := sessions.Default(c)
 	id := session.Get("user_id")
-	fmt.Println(id)
 	if id == nil {
 		return nil, fmt.Errorf("not authorized")
 	}
