@@ -17,3 +17,20 @@ $ sudo docker-compose up -d
 $ go get
 $ air
 ``` 
+
+
+## Add new migration
+```
+go run cmd/migrate/main.go new MIGRATION_NAME
+```
+
+## Apply the migrations
+```
+go run cmd/migrate/main.go up
+```
+
+## Add access key
+**It will generate a access key for the auth sessions**
+```
+go run cmd/add_access/main.go
+```

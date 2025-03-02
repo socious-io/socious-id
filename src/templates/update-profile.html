@@ -1,0 +1,62 @@
+{{template "header" .}}
+<body>
+    <form method="post">
+        <div class="intro">
+            <div class="card">
+                <div name="content-section" class="section">
+                    <div name="header" class="header">
+                        <h2>Create your profile</h2>
+                        <span class="text-grey leading-6">Tell us about yourself</span>
+                    </div>
+                    <div class="upload">
+                        <img id="avatar" src="/statics/images/avatar.svg" alt="avatar" width="64" height="64" class="upload-img" />
+                        <span class="text-grey text-sm leading-5">Add a photo (optional)</span>
+                        <input id="upload" type="file" class="upload-input" oninput="onUploadProfile()" />
+                    </div>
+                    <div class="input-groups">
+                        <div class="input-label">
+                            <label for="email">First name</label>
+                            <input placeholder="Your first name" type="text" id="first" name="first_name" oninput="validateForm()" />
+                        </div>
+                        <div class="input-label">
+                            <label for="email">Last name</label>
+                            <input placeholder="Your last name" type="text" id="last" name="last_name" oninput="validateForm()" />
+                        </div>
+                    </div>
+                    <div class="input-label">
+                        <label for="email">Username</label>
+                        <input placeholder="Choose a username" type="text" id="username" name="username" oninput="validateForm()" />
+                        <span class="input-hints">This will be your unique identifier across all platforms</span>
+                    </div>
+                    <div class="input-label">
+                        <label for="email">Password</label>
+                        <div class="input-container">
+                            <input placeholder="Create a password" type="password" id="pass" name="password"
+                                autocomplete="current-password" oninput="validateForm()" />
+                            <img src="/statics/icons/eye.svg" alt="show-password" width="20" height="20"
+                                class="input-end-icon cursor-pointer" onclick="togglePassword(this)" />
+                        </div>
+                        <div class="input-hints">
+                            <div class="flex items-center gap-2">
+                                <img src="/statics/icons/check-grey.svg" width="20" height="20" id="length-hint" />
+                                Must be at least 8 characters
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <img src="/statics/icons/check-grey.svg" width="20" height="20" id="character-hint" />
+                                Must contain one special character
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{if .error}}
+                    <p style="color: red">{{.error}}</p>
+                    {{end}}
+                <div name="button-section" class="section">
+                    <button type="submit" theme="primary" disabled>Create profile</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</body>
+
+{{ template "footer" . }}

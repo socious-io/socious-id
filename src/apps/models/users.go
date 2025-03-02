@@ -72,11 +72,11 @@ func (u *User) Create(ctx context.Context) error {
 	return nil
 }
 
-func (u *User) Verify(ctx context.Context) error {
+func (u *User) Verify(ctx context.Context, vtype VerificationType) error {
 	rows, err := database.Query(
 		ctx,
 		"users/verify",
-		u.ID,
+		u.ID, vtype,
 	)
 	if err != nil {
 		return err

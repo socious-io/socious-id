@@ -1,7 +1,6 @@
 package main
 
 import (
-	"socious-id/src/apps"
 	"socious-id/src/config"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 )
 
 func main() {
+
 	config.Init("config.yml")
 	database.Connect(&database.ConnectOption{
 		URL:         config.Config.Database.URL,
@@ -25,13 +25,23 @@ func main() {
 		Url:        config.Config.Nats.Url,
 		Token:      config.Config.Nats.Token,
 		ChannelDir: "sociousid",
+		Consumers:  map[string]func(interface{}){},
 	})
-	gomq.Connect()
 
+	//Initializing GoMail Library and Add it as Worker
 	gomail.Setup(gomail.Config{
+		ApiKey:         config.Config.Sendgrid.ApiKey,
+		Url:            config.Config.Sendgrid.URL,
+		DefaultFrom:    "info@socious.io",
+		DefaultSubject: "Socious ID",
+		Templates: map[string]string{
+			"otp": "d-0146441b623f4cb78833c50eb1a8c813",
+		},
 		WorkerChannel: "email",
 		MessageQueue:  gomq.Mq,
 	})
+	gomq.AddConsumer(gomail.GetConfig().WorkerChannel, gomail.EmailWorker)
 
-	apps.Serve()
+	gomq.Init()
+
 }

@@ -1,0 +1,44 @@
+.otp-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .input-wrapper {
+        flex: 1;
+        position: relative;
+        display: flex;
+        justify-content: center;
+    }
+
+    .otp-input {
+        width: 100%;
+        max-height: 3.5rem;
+        padding: 0.375rem 0.5rem;
+        border: 1px solid var(--color-grey-300);
+        border-radius: 8px;
+        outline: none;
+        text-align: center;
+        font-size: 36px;
+        line-height: 44px;
+        color: var(--color-primary-600);
+
+        &:focus {
+            border: 2px solid var(--color-primary-600);
+            box-shadow: 0px 1px 2px 0px var(--box-shadow-grey-900);
+        }
+    }
+
+    .otp-placeholder {
+        position: absolute;
+        bottom: 10px;
+        left: 1rem;
+        right: 1rem;
+        border-bottom: 2.5px solid var(--color-grey-300);
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .otp-input:focus+.otp-placeholder {
+        border-color: var(--color-primary-600);
+    }
+}
