@@ -36,6 +36,22 @@ func (amt AuthModeType) Value() (driver.Value, error) {
 	return string(amt), nil
 }
 
+type VerificationType string
+
+const (
+	VerificationTypeEmail   VerificationType = "EMAIL"
+	VerificationTypePhone   VerificationType = "PHONE"
+	VerificationTypeIdenity VerificationType = "IDENTITY"
+)
+
+func (vt *VerificationType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(vt))
+}
+
+func (vt VerificationType) Value() (driver.Value, error) {
+	return string(vt), nil
+}
+
 func scanEnum(value interface{}, target interface{}) error {
 	switch v := value.(type) {
 	case []byte:

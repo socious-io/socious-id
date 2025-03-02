@@ -28,9 +28,7 @@ type LoginForm struct {
 type OTPForm struct {
 	Email string `json:"email" form:"email" validate:"required,email"`
 }
-type OTPConfirmForm struct {
-	Code string `json:"code" form:"code" validate:"required"`
-}
+
 type SetPasswordForm struct {
 	Password string `json:"password" form:"password" validate:"required"`
 }
