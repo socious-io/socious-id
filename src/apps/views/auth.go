@@ -113,16 +113,12 @@ func authGroup(router *gin.Engine) {
 		c.Redirect(http.StatusFound, "/auth/confirm")
 	})
 
-	g.POST("/otp", func(c *gin.Context) {
-		form := new(auth.OTPConfirmForm)
-		if err := c.ShouldBind(form); err != nil {
-			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
+	g.GET("/otp/confirm", func(c *gin.Context) {
+		email := c.Query("email")
+		code := c.Query("code")
+		ctx := c.MustGet("ctx").(context.Context)
 
-		otp, err := models.GetOTPByCode(form.Code)
+		otp, err := models.GetOTPByEmailAndCode(email, code)
 		if err != nil {
 			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
 				"error": err.Error(),
@@ -151,18 +147,33 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		if err := otp.Verify(c.MustGet("ctx").(context.Context)); err != nil {
+		if err := otp.Verify(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
 				"error": err.Error(),
 			})
 			return
 		}
 
-		c.Redirect(http.StatusSeeOther, "/auth/signup")
+		if err := otp.User.Verify(ctx, models.VerificationTypeEmail); err != nil {
+			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		session := sessions.Default(c)
+		session.Set("user_id", otp.UserID.String())
+		session.Save()
+
+		c.Redirect(http.StatusSeeOther, "/auth/update-profile")
 	})
 
 	g.GET("/otp", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "otp.html", gin.H{})
+		email := c.Query("email")
+
+		c.HTML(http.StatusOK, "otp.html", gin.H{
+			"email": email,
+		})
 	})
 
 	g.POST("/register", auth.CheckLogin(), func(c *gin.Context) {
@@ -182,7 +193,7 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		//Creating user
+		//Creating user (Default in INACTIVE state)
 		u := &models.User{
 			Username: form.Email, //TODO: generate username
 			Email:    form.Email,
@@ -194,11 +205,6 @@ func authGroup(router *gin.Engine) {
 			})
 			return
 		}
-
-		//Saving into session
-		session := sessions.Default(c)
-		session.Set("user_id", u.ID.String())
-		session.Save()
 
 		//Save OTP
 		otp := &models.OTP{
@@ -224,14 +230,14 @@ func authGroup(router *gin.Engine) {
 			Args:        items,
 		})
 
-		c.Redirect(http.StatusSeeOther, "/auth/otp")
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/auth/otp?email=%s", form.Email))
 	})
 
 	g.GET("/register", auth.CheckLogin(), func(c *gin.Context) {
 		c.HTML(http.StatusOK, "register.html", gin.H{})
 	})
 
-	g.POST("/signup", func(c *gin.Context) {
+	g.POST("/update-profile", auth.LoginRequired(), func(c *gin.Context) {
 		authSession := loadAuthSession(c)
 		if authSession == nil {
 			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
@@ -240,36 +246,30 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
+		u := c.MustGet("user").(*models.User)
+
 		form := new(auth.RegisterForm)
 		if err := c.ShouldBind(form); err != nil {
-			c.HTML(http.StatusBadRequest, "signup.html", gin.H{
+			c.HTML(http.StatusBadRequest, "update-profile.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		u.FirstName = form.FirstName
+		u.LastName = form.LastName
+		u.Username = *form.Username
+		if err := u.UpdateProfile(c.MustGet("ctx").(context.Context)); err != nil {
+			c.HTML(http.StatusBadRequest, "update-profile.html", gin.H{
 				"error": err.Error(),
 			})
 			return
 		}
 
 		password, _ := auth.HashPassword(*form.Password)
-		u, err := auth.FetchUserBySession(c)
-		if err != nil {
-			c.HTML(http.StatusBadRequest, "signup.html", gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-		u.Username = *form.Username
-		u.FirstName = form.FirstName
-		u.LastName = form.LastName
 		u.Password = &password
-
-		if err := u.UpdateProfile(c.MustGet("ctx").(context.Context)); err != nil {
-			c.HTML(http.StatusBadRequest, "signup.html", gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
 		if err := u.UpdatePassword(c.MustGet("ctx").(context.Context)); err != nil {
-			c.HTML(http.StatusBadRequest, "signup.html", gin.H{
+			c.HTML(http.StatusBadRequest, "update-profile.html", gin.H{
 				"error": err.Error(),
 			})
 			return
@@ -278,8 +278,8 @@ func authGroup(router *gin.Engine) {
 		c.Redirect(http.StatusSeeOther, "/auth/confirm")
 	})
 
-	g.GET("/signup", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "signup.html", gin.H{})
+	g.GET("/update-profile", auth.LoginRequired(), func(c *gin.Context) {
+		c.HTML(http.StatusOK, "update-profile.html", gin.H{})
 	})
 
 	g.DELETE("/logout", auth.LoginRequired(), func(c *gin.Context) {

@@ -1,6 +1,6 @@
 {{template "header" .}}
 <body onload="displayEmail()">
-    <form method="post">
+    <form action="/auth/otp/confirm" method="get">
         <div class="intro">
             <div class="card">
                 <div class="logo">
@@ -48,6 +48,8 @@
                     </div>
                 </div>
                 <input type="text" name="code" hidden value="" />
+                <input type="text" name="email" hidden value="{{.email}}" />
+
                 <div name="button-section" class="section">
                     <button type="submit" theme="primary" disabled>Verify email</button>
                 </div>

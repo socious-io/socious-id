@@ -28,9 +28,6 @@ type LoginForm struct {
 type OTPForm struct {
 	Email string `json:"email" form:"email" validate:"required,email"`
 }
-type OTPConfirmForm struct {
-	Code string `json:"code" form:"code" validate:"required"`
-}
 
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -83,6 +80,7 @@ func FetchUserByJWT(c *gin.Context) (*models.User, error) {
 func FetchUserBySession(c *gin.Context) (*models.User, error) {
 	session := sessions.Default(c)
 	id := session.Get("user_id")
+	fmt.Println(id)
 	if id == nil {
 		return nil, fmt.Errorf("not authorized")
 	}

@@ -193,3 +193,11 @@ func GetOTPByCode(code string) (*OTP, error) {
 	}
 	return o, nil
 }
+
+func GetOTPByEmailAndCode(email string, code string) (*OTP, error) {
+	o := new(OTP)
+	if err := database.Get(o, "auth/fetch_otp_by_email_code", email, code); err != nil {
+		return nil, err
+	}
+	return o, nil
+}
