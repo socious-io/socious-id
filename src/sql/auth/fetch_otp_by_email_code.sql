@@ -5,4 +5,4 @@ SELECT
 FROM otps o
 LEFT JOIN auth_sessions a ON a.id=o.auth_session_id
 JOIN users u ON u.id=o.user_id
-WHERE code=$1
+WHERE u.email=$1 AND o.code=$2

@@ -21,9 +21,22 @@ type ConfigType struct {
 		SqlDir     string `mapstructure:"sqldir"`
 		Migrations string `mapstructure:"migrations"`
 	} `mapstructure:"database"`
+	Sendgrid struct {
+		Disabled  bool              `mapstructure:"disabled"`
+		URL       string            `mapstructure:"url"`
+		ApiKey    string            `mapstructure:"apikey"`
+		Templates map[string]string `mapstructure:"templates"`
+	} `mapstructure:"sendgrid"`
 	Cors struct {
 		Origins []string `mapstructure:"origins"`
 	} `mapstructure:"cors"`
+	Nats struct {
+		Url   string `mapstructure:"url"`
+		Token string `mapstructure:"token"`
+	} `mapstructure:"nats"`
+	Platforms struct {
+		Accounts string `mapstructure:"accounts"`
+	} `mapstructure:"platforms"`
 }
 
 func Init(filename string) (*ConfigType, error) {
