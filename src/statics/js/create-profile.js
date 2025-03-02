@@ -44,13 +44,32 @@ const validateForm = () => {
 }
 
 const createProfile = () => {
-    const first = document.getElementById("first").value.trim();
-    const last = document.getElementById("last").value.trim();
+    const first_name = document.getElementById("first").value.trim();
+    const last_name = document.getElementById("last").value.trim();
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("pass").value.trim();
     const avatar = document.getElementById("avatar").src;
 
-    //BE logic with first, last, username, password, avatar
-    window.location.href = './congrats.html';
+    fetch("/users/profile", {
+        method: "PUT",
+        body: JSON.stringify({
+            first_name,
+            last_name,
+            username,
+            password,
+            avatar
+        }),
+        headers: { "Content-Type": "application/json" }
+    })
+    .then(response => {
+        if (response.ok) {
+            // Redirect after successful PUT request
+            window.location.href = "/auth/confirm";
+        } else {
+            console.error("Error:", response.statusText);
+        }
+    })
+    .catch(error => console.error("Error:", error));
+
     return false;
 }

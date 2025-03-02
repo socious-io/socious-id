@@ -34,11 +34,9 @@ func main() {
 		Url:            config.Config.Sendgrid.URL,
 		DefaultFrom:    "info@socious.io",
 		DefaultSubject: "Socious ID",
-		Templates: map[string]string{
-			"otp": "d-0146441b623f4cb78833c50eb1a8c813",
-		},
-		WorkerChannel: "email",
-		MessageQueue:  gomq.Mq,
+		Templates:      config.Config.Sendgrid.Templates,
+		WorkerChannel:  "email",
+		MessageQueue:   gomq.Mq,
 	})
 	gomq.AddConsumer(gomail.GetConfig().WorkerChannel, gomail.EmailWorker)
 

@@ -22,9 +22,10 @@ type ConfigType struct {
 		Migrations string `mapstructure:"migrations"`
 	} `mapstructure:"database"`
 	Sendgrid struct {
-		Disabled bool   `mapstructure:"disabled"`
-		URL      string `mapstructure:"url"`
-		ApiKey   string `mapstructure:"apikey"`
+		Disabled  bool              `mapstructure:"disabled"`
+		URL       string            `mapstructure:"url"`
+		ApiKey    string            `mapstructure:"apikey"`
+		Templates map[string]string `mapstructure:"templates"`
 	} `mapstructure:"sendgrid"`
 	Cors struct {
 		Origins []string `mapstructure:"origins"`

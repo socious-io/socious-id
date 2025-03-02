@@ -93,6 +93,12 @@ func authGroup(router *gin.Engine) {
 			})
 			return
 		}
+		if u.Status != "ACTIVE" {
+			c.HTML(http.StatusBadRequest, "login.html", gin.H{
+				"error": "Error: user is not verified",
+			})
+			return
+		}
 		if u.Password == nil {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
 				"error": "Error: email/password not match",
@@ -165,7 +171,7 @@ func authGroup(router *gin.Engine) {
 		session.Set("user_id", otp.UserID.String())
 		session.Save()
 
-		c.Redirect(http.StatusSeeOther, "/auth/update-profile")
+		c.Redirect(http.StatusSeeOther, "/users/profile")
 	})
 
 	g.GET("/otp", func(c *gin.Context) {
@@ -235,51 +241,6 @@ func authGroup(router *gin.Engine) {
 
 	g.GET("/register", auth.CheckLogin(), func(c *gin.Context) {
 		c.HTML(http.StatusOK, "register.html", gin.H{})
-	})
-
-	g.POST("/update-profile", auth.LoginRequired(), func(c *gin.Context) {
-		authSession := loadAuthSession(c)
-		if authSession == nil {
-			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
-				"error": "not accepted without auth session",
-			})
-			return
-		}
-
-		u := c.MustGet("user").(*models.User)
-
-		form := new(auth.RegisterForm)
-		if err := c.ShouldBind(form); err != nil {
-			c.HTML(http.StatusBadRequest, "update-profile.html", gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		u.FirstName = form.FirstName
-		u.LastName = form.LastName
-		u.Username = *form.Username
-		if err := u.UpdateProfile(c.MustGet("ctx").(context.Context)); err != nil {
-			c.HTML(http.StatusBadRequest, "update-profile.html", gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		password, _ := auth.HashPassword(*form.Password)
-		u.Password = &password
-		if err := u.UpdatePassword(c.MustGet("ctx").(context.Context)); err != nil {
-			c.HTML(http.StatusBadRequest, "update-profile.html", gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		c.Redirect(http.StatusSeeOther, "/auth/confirm")
-	})
-
-	g.GET("/update-profile", auth.LoginRequired(), func(c *gin.Context) {
-		c.HTML(http.StatusOK, "update-profile.html", gin.H{})
 	})
 
 	g.DELETE("/logout", auth.LoginRequired(), func(c *gin.Context) {
