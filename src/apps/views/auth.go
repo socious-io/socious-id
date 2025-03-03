@@ -177,7 +177,7 @@ func authGroup(router *gin.Engine) {
 		if otp.Type == models.VerificationOTP {
 			c.Redirect(http.StatusSeeOther, "/users/profile")
 		} else if otp.Type == models.ForgetPasswordOTP {
-			c.Redirect(http.StatusSeeOther, "/auth/set-password")
+			c.Redirect(http.StatusSeeOther, "/auth/password/set")
 		}
 	})
 
@@ -252,11 +252,11 @@ func authGroup(router *gin.Engine) {
 		c.HTML(http.StatusOK, "register.html", gin.H{})
 	})
 
-	g.GET("/pre-register", func(c *gin.Context) {
+	g.GET("/register/pre", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "pre-register.html", gin.H{})
 	})
 
-	g.POST("/forget-password", auth.CheckLogin(), func(c *gin.Context) {
+	g.POST("/password/forget", auth.CheckLogin(), func(c *gin.Context) {
 		authSession := loadAuthSession(c)
 		if authSession == nil {
 			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
@@ -311,11 +311,11 @@ func authGroup(router *gin.Engine) {
 		c.Redirect(http.StatusSeeOther, "/auth/otp")
 	})
 
-	g.GET("/forget-password", func(c *gin.Context) {
+	g.GET("/password/forget", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "forget-password.html", gin.H{})
 	})
 
-	g.POST("/set-password", auth.CheckLogin(), func(c *gin.Context) {
+	g.POST("/password/set", auth.CheckLogin(), func(c *gin.Context) {
 		authSession := loadAuthSession(c)
 		if authSession == nil {
 			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
@@ -337,7 +337,7 @@ func authGroup(router *gin.Engine) {
 		//Fetching user
 		u, err := auth.FetchUserBySession(c)
 		if err != nil {
-			c.HTML(http.StatusBadRequest, "signup.html", gin.H{
+			c.HTML(http.StatusBadRequest, "set-password.html", gin.H{
 				"error": err.Error(),
 			})
 			return
@@ -352,14 +352,14 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		c.Redirect(http.StatusSeeOther, "/auth/post-set-password")
+		c.Redirect(http.StatusSeeOther, "/auth/password/set/confirm")
 	})
 
-	g.GET("/set-password", func(c *gin.Context) {
+	g.GET("/password/set", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "set-password.html", gin.H{})
 	})
 
-	g.GET("/post-set-password", func(c *gin.Context) {
+	g.GET("/password/set/confirm", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "post-set-password.html", gin.H{})
 	})
 
@@ -444,7 +444,7 @@ func authGroup(router *gin.Engine) {
 		session.Save()
 
 		if authMode == models.AuthModeRegister {
-			c.Redirect(http.StatusPermanentRedirect, "/auth/pre-register")
+			c.Redirect(http.StatusPermanentRedirect, "/auth/register/pre")
 		} else {
 			c.Redirect(http.StatusPermanentRedirect, "/auth/login")
 		}
