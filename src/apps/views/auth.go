@@ -284,6 +284,14 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
+		//Checking user status
+		if u.Status == models.UserStatusInactive {
+			c.HTML(http.StatusBadRequest, "forget-password.html", gin.H{
+				"error": "Error: user is not verified",
+			})
+			return
+		}
+
 		//Save OTP
 		otp := &models.OTP{
 			UserID:        u.ID,
@@ -292,7 +300,7 @@ func authGroup(router *gin.Engine) {
 		}
 
 		if err := otp.Create(ctx); err != nil {
-			c.HTML(http.StatusNotAcceptable, "register.html", gin.H{
+			c.HTML(http.StatusNotAcceptable, "forget-password.html", gin.H{
 				"error": err.Error(),
 			})
 			return
@@ -311,11 +319,11 @@ func authGroup(router *gin.Engine) {
 		c.Redirect(http.StatusSeeOther, "/auth/otp")
 	})
 
-	g.GET("/password/forget", func(c *gin.Context) {
+	g.GET("/password/forget", auth.CheckLogin(), func(c *gin.Context) {
 		c.HTML(http.StatusOK, "forget-password.html", gin.H{})
 	})
 
-	g.POST("/password/set", auth.CheckLogin(), func(c *gin.Context) {
+	g.POST("/password/set", auth.LoginRequired(), func(c *gin.Context) {
 		authSession := loadAuthSession(c)
 		if authSession == nil {
 			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
@@ -324,6 +332,7 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
+		user := c.MustGet("user").(*models.User)
 		ctx := c.MustGet("ctx").(context.Context)
 
 		form := new(auth.SetPasswordForm)
@@ -334,18 +343,9 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		//Fetching user
-		u, err := auth.FetchUserBySession(c)
-		if err != nil {
-			c.HTML(http.StatusBadRequest, "set-password.html", gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
 		password, _ := auth.HashPassword(form.Password)
-		u.Password = &password
-		if err := u.UpdatePassword(ctx); err != nil {
+		user.Password = &password
+		if err := user.UpdatePassword(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "set-password.html", gin.H{
 				"error": err.Error(),
 			})
@@ -355,7 +355,7 @@ func authGroup(router *gin.Engine) {
 		c.Redirect(http.StatusSeeOther, "/auth/password/set/confirm")
 	})
 
-	g.GET("/password/set", func(c *gin.Context) {
+	g.GET("/password/set", auth.LoginRequired(), func(c *gin.Context) {
 		c.HTML(http.StatusOK, "set-password.html", gin.H{})
 	})
 
