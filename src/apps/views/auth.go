@@ -45,6 +45,9 @@ func authGroup(router *gin.Engine) {
 		params := url.Values{}
 		params.Add("session", authSession.ID.String())
 
+		user := c.MustGet("user").(*models.User)
+		ctx := c.MustGet("ctx").(context.Context)
+
 		if !form.Confirmed {
 			params.Add("status", "canceled")
 
@@ -53,12 +56,12 @@ func authGroup(router *gin.Engine) {
 		}
 
 		otp := &models.OTP{
-			UserID:        c.MustGet("user").(*models.User).ID,
+			UserID:        user.ID,
 			AuthSessionID: &authSession.ID,
 			Type:          models.SSOOTP,
 		}
 
-		if err := otp.Create(c.MustGet("ctx").(context.Context)); err != nil {
+		if err := otp.Create(ctx); err != nil {
 			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
 				"error": err.Error(),
 			})
@@ -77,7 +80,6 @@ func authGroup(router *gin.Engine) {
 	})
 
 	g.POST("/login", auth.CheckLogin(), func(c *gin.Context) {
-
 		form := new(auth.LoginForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
@@ -177,7 +179,6 @@ func authGroup(router *gin.Engine) {
 		} else if otp.Type == models.ForgetPasswordOTP {
 			c.Redirect(http.StatusSeeOther, "/auth/set-password")
 		}
-
 	})
 
 	g.GET("/otp", func(c *gin.Context) {
@@ -197,6 +198,8 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
+		ctx := c.MustGet("ctx").(context.Context)
+
 		form := new(auth.OTPForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{
@@ -211,7 +214,7 @@ func authGroup(router *gin.Engine) {
 			Email:    form.Email,
 		}
 
-		if err := u.Create(c.MustGet("ctx").(context.Context)); err != nil {
+		if err := u.Create(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{
 				"error": err.Error(),
 			})
@@ -225,7 +228,7 @@ func authGroup(router *gin.Engine) {
 			Type:          models.VerificationOTP,
 		}
 
-		if err := otp.Create(c.MustGet("ctx").(context.Context)); err != nil {
+		if err := otp.Create(ctx); err != nil {
 			c.HTML(http.StatusNotAcceptable, "register.html", gin.H{
 				"error": err.Error(),
 			})
@@ -262,6 +265,8 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
+		ctx := c.MustGet("ctx").(context.Context)
+
 		form := new(auth.OTPForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.HTML(http.StatusBadRequest, "forget-password.html", gin.H{
@@ -286,7 +291,7 @@ func authGroup(router *gin.Engine) {
 			Type:          models.ForgetPasswordOTP,
 		}
 
-		if err := otp.Create(c.MustGet("ctx").(context.Context)); err != nil {
+		if err := otp.Create(ctx); err != nil {
 			c.HTML(http.StatusNotAcceptable, "register.html", gin.H{
 				"error": err.Error(),
 			})
@@ -319,6 +324,8 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
+		ctx := c.MustGet("ctx").(context.Context)
+
 		form := new(auth.SetPasswordForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.HTML(http.StatusBadRequest, "set-password.html", gin.H{
@@ -338,7 +345,7 @@ func authGroup(router *gin.Engine) {
 
 		password, _ := auth.HashPassword(form.Password)
 		u.Password = &password
-		if err := u.UpdatePassword(c.MustGet("ctx").(context.Context)); err != nil {
+		if err := u.UpdatePassword(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "set-password.html", gin.H{
 				"error": err.Error(),
 			})
@@ -364,6 +371,7 @@ func authGroup(router *gin.Engine) {
 	})
 
 	g.POST("/session", func(c *gin.Context) {
+		ctx := c.MustGet("ctx").(context.Context)
 		form := new(AuthSessionForm)
 
 		if err := c.ShouldBind(form); err != nil {
@@ -394,7 +402,7 @@ func authGroup(router *gin.Engine) {
 			ExpireAt:    time.Now().Add(time.Minute * 10),
 		}
 
-		if err := authSession.Create(c.MustGet("ctx").(context.Context)); err != nil {
+		if err := authSession.Create(ctx); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
@@ -444,7 +452,7 @@ func authGroup(router *gin.Engine) {
 	})
 
 	g.POST("/session/token", func(c *gin.Context) {
-
+		ctx := c.MustGet("ctx").(context.Context)
 		form := new(GetTokenForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -504,7 +512,7 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		if err := otp.Verify(c.MustGet("ctx").(context.Context)); err != nil {
+		if err := otp.Verify(ctx); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
