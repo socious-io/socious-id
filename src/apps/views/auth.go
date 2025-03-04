@@ -95,7 +95,7 @@ func authGroup(router *gin.Engine) {
 			})
 			return
 		}
-		if u.Status == models.UserStatusInactive {
+		if u.Status == models.StatusTypeInactive {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
 				"error": "Error: user is not verified",
 			})
@@ -285,7 +285,7 @@ func authGroup(router *gin.Engine) {
 		}
 
 		//Checking user status
-		if u.Status == models.UserStatusInactive {
+		if u.Status == models.StatusTypeInactive {
 			c.HTML(http.StatusBadRequest, "forget-password.html", gin.H{
 				"error": "Error: user is not verified",
 			})

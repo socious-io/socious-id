@@ -37,3 +37,31 @@ type UserForm struct {
 	Avatar     *uuid.UUID `json:"avatar" form:"avatar"`
 	CoverImage *uuid.UUID `json:"cover_image" form:"cover_image"`
 }
+
+type OrganizationForm struct {
+	Shortname string `db:"shortname" json:"shortname"`
+
+	Email   *string `db:"email" json:"email"`
+	Phone   *string `db:"phone" json:"phone"`
+	Website *string `db:"website" json:"website"`
+
+	Name        *string `db:"name" json:"name"`
+	Bio         *string `db:"bio" json:"bio"`
+	Description *string `db:"description" json:"description"`
+	Mission     *string `db:"mission" json:"mission"`
+	Culture     *string `db:"culture" json:"culture"`
+	// Size        *string `db:"size" json:"size"`
+
+	Country *string `db:"country" json:"country"`
+	City    *string `db:"city" json:"city"`
+	Address *string `db:"address" json:"address"`
+	// GeonameId         *int    `db:"geoname_id" json:"geoname_id"`
+	// MobileCountryCode *string `db:"mobile_country_code" json:"mobile_country_code"`
+
+	// SocialCauses pq.StringArray `db:"social_causes" json:"social_causes"`
+
+	// ImpactPoints float64 `db:"impact_points" json:"impact_points"`
+
+	Image      *uuid.UUID `db:"image" json:"image"`             //logo JSONB
+	CoverImage *uuid.UUID `db:"cover_image" json:"cover_image"` //cover JSONB
+}

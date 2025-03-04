@@ -15,7 +15,7 @@ type User struct {
 	Password        *string   `db:"password" json:"-"`
 	PasswordExpired bool      `db:"password_expired" json:"password_expired"`
 
-	Status UserStatus `db:"status" json:"status"`
+	Status StatusType `db:"status" json:"status"`
 
 	Email     string  `db:"email" json:"email"`
 	EmailText *string `db:"email_text" json:"email_text"`
