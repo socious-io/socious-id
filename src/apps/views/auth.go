@@ -316,7 +316,7 @@ func authGroup(router *gin.Engine) {
 			Args:        items,
 		})
 
-		c.Redirect(http.StatusSeeOther, "/auth/otp")
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/auth/otp?email=%s", u.Email))
 	})
 
 	g.GET("/password/forget", auth.CheckLogin(), func(c *gin.Context) {
