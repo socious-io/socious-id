@@ -45,6 +45,9 @@ func authGroup(router *gin.Engine) {
 		params := url.Values{}
 		params.Add("session", authSession.ID.String())
 
+		user := c.MustGet("user").(*models.User)
+		ctx := c.MustGet("ctx").(context.Context)
+
 		if !form.Confirmed {
 			params.Add("status", "canceled")
 
@@ -53,12 +56,12 @@ func authGroup(router *gin.Engine) {
 		}
 
 		otp := &models.OTP{
-			UserID:        c.MustGet("user").(*models.User).ID,
+			UserID:        user.ID,
 			AuthSessionID: &authSession.ID,
 			Type:          models.SSOOTP,
 		}
 
-		if err := otp.Create(c.MustGet("ctx").(context.Context)); err != nil {
+		if err := otp.Create(ctx); err != nil {
 			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
 				"error": err.Error(),
 			})
@@ -77,7 +80,6 @@ func authGroup(router *gin.Engine) {
 	})
 
 	g.POST("/login", auth.CheckLogin(), func(c *gin.Context) {
-
 		form := new(auth.LoginForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
@@ -175,9 +177,8 @@ func authGroup(router *gin.Engine) {
 		if otp.Type == models.VerificationOTP {
 			c.Redirect(http.StatusSeeOther, "/users/profile")
 		} else if otp.Type == models.ForgetPasswordOTP {
-			c.Redirect(http.StatusSeeOther, "/auth/set-password")
+			c.Redirect(http.StatusSeeOther, "/auth/password/set")
 		}
-
 	})
 
 	g.GET("/otp", func(c *gin.Context) {
@@ -197,6 +198,8 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
+		ctx := c.MustGet("ctx").(context.Context)
+
 		form := new(auth.OTPForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{
@@ -211,7 +214,7 @@ func authGroup(router *gin.Engine) {
 			Email:    form.Email,
 		}
 
-		if err := u.Create(c.MustGet("ctx").(context.Context)); err != nil {
+		if err := u.Create(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{
 				"error": err.Error(),
 			})
@@ -225,7 +228,7 @@ func authGroup(router *gin.Engine) {
 			Type:          models.VerificationOTP,
 		}
 
-		if err := otp.Create(c.MustGet("ctx").(context.Context)); err != nil {
+		if err := otp.Create(ctx); err != nil {
 			c.HTML(http.StatusNotAcceptable, "register.html", gin.H{
 				"error": err.Error(),
 			})
@@ -249,11 +252,11 @@ func authGroup(router *gin.Engine) {
 		c.HTML(http.StatusOK, "register.html", gin.H{})
 	})
 
-	g.GET("/pre-register", func(c *gin.Context) {
+	g.GET("/register/pre", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "pre-register.html", gin.H{})
 	})
 
-	g.POST("/forget-password", auth.CheckLogin(), func(c *gin.Context) {
+	g.POST("/password/forget", auth.CheckLogin(), func(c *gin.Context) {
 		authSession := loadAuthSession(c)
 		if authSession == nil {
 			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
@@ -261,6 +264,8 @@ func authGroup(router *gin.Engine) {
 			})
 			return
 		}
+
+		ctx := c.MustGet("ctx").(context.Context)
 
 		form := new(auth.OTPForm)
 		if err := c.ShouldBind(form); err != nil {
@@ -279,6 +284,14 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
+		//Checking user status
+		if u.Status == models.UserStatusInactive {
+			c.HTML(http.StatusBadRequest, "forget-password.html", gin.H{
+				"error": "Error: user is not verified",
+			})
+			return
+		}
+
 		//Save OTP
 		otp := &models.OTP{
 			UserID:        u.ID,
@@ -286,8 +299,8 @@ func authGroup(router *gin.Engine) {
 			Type:          models.ForgetPasswordOTP,
 		}
 
-		if err := otp.Create(c.MustGet("ctx").(context.Context)); err != nil {
-			c.HTML(http.StatusNotAcceptable, "register.html", gin.H{
+		if err := otp.Create(ctx); err != nil {
+			c.HTML(http.StatusNotAcceptable, "forget-password.html", gin.H{
 				"error": err.Error(),
 			})
 			return
@@ -303,14 +316,14 @@ func authGroup(router *gin.Engine) {
 			Args:        items,
 		})
 
-		c.Redirect(http.StatusSeeOther, "/auth/otp")
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/auth/otp?email=%s", u.Email))
 	})
 
-	g.GET("/forget-password", func(c *gin.Context) {
+	g.GET("/password/forget", auth.CheckLogin(), func(c *gin.Context) {
 		c.HTML(http.StatusOK, "forget-password.html", gin.H{})
 	})
 
-	g.POST("/set-password", auth.CheckLogin(), func(c *gin.Context) {
+	g.POST("/password/set", auth.LoginRequired(), func(c *gin.Context) {
 		authSession := loadAuthSession(c)
 		if authSession == nil {
 			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
@@ -318,6 +331,9 @@ func authGroup(router *gin.Engine) {
 			})
 			return
 		}
+
+		user := c.MustGet("user").(*models.User)
+		ctx := c.MustGet("ctx").(context.Context)
 
 		form := new(auth.SetPasswordForm)
 		if err := c.ShouldBind(form); err != nil {
@@ -327,32 +343,23 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		//Fetching user
-		u, err := auth.FetchUserBySession(c)
-		if err != nil {
-			c.HTML(http.StatusBadRequest, "signup.html", gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
 		password, _ := auth.HashPassword(form.Password)
-		u.Password = &password
-		if err := u.UpdatePassword(c.MustGet("ctx").(context.Context)); err != nil {
+		user.Password = &password
+		if err := user.UpdatePassword(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "set-password.html", gin.H{
 				"error": err.Error(),
 			})
 			return
 		}
 
-		c.Redirect(http.StatusSeeOther, "/auth/post-set-password")
+		c.Redirect(http.StatusSeeOther, "/auth/password/set/confirm")
 	})
 
-	g.GET("/set-password", func(c *gin.Context) {
+	g.GET("/password/set", auth.LoginRequired(), func(c *gin.Context) {
 		c.HTML(http.StatusOK, "set-password.html", gin.H{})
 	})
 
-	g.GET("/post-set-password", func(c *gin.Context) {
+	g.GET("/password/set/confirm", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "post-set-password.html", gin.H{})
 	})
 
@@ -364,6 +371,7 @@ func authGroup(router *gin.Engine) {
 	})
 
 	g.POST("/session", func(c *gin.Context) {
+		ctx := c.MustGet("ctx").(context.Context)
 		form := new(AuthSessionForm)
 
 		if err := c.ShouldBind(form); err != nil {
@@ -394,7 +402,7 @@ func authGroup(router *gin.Engine) {
 			ExpireAt:    time.Now().Add(time.Minute * 10),
 		}
 
-		if err := authSession.Create(c.MustGet("ctx").(context.Context)); err != nil {
+		if err := authSession.Create(ctx); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
@@ -436,7 +444,7 @@ func authGroup(router *gin.Engine) {
 		session.Save()
 
 		if authMode == models.AuthModeRegister {
-			c.Redirect(http.StatusPermanentRedirect, "/auth/pre-register")
+			c.Redirect(http.StatusPermanentRedirect, "/auth/register/pre")
 		} else {
 			c.Redirect(http.StatusPermanentRedirect, "/auth/login")
 		}
@@ -444,7 +452,7 @@ func authGroup(router *gin.Engine) {
 	})
 
 	g.POST("/session/token", func(c *gin.Context) {
-
+		ctx := c.MustGet("ctx").(context.Context)
 		form := new(GetTokenForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -504,7 +512,7 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		if err := otp.Verify(c.MustGet("ctx").(context.Context)); err != nil {
+		if err := otp.Verify(ctx); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})

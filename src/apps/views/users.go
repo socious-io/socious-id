@@ -20,7 +20,7 @@ func usersGroup(router *gin.Engine) {
 
 	g.PUT("/", auth.LoginRequired(), func(c *gin.Context) {
 		user := c.MustGet("user").(*models.User)
-		ctx, _ := c.Get("ctx")
+		ctx := c.MustGet("ctx").(context.Context)
 
 		form := new(UserForm)
 		if err := c.ShouldBindJSON(form); err != nil {
@@ -30,7 +30,7 @@ func usersGroup(router *gin.Engine) {
 
 		utils.Copy(form, user)
 
-		if err := user.UpdateProfile(ctx.(context.Context)); err != nil {
+		if err := user.UpdateProfile(ctx); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -49,7 +49,8 @@ func usersGroup(router *gin.Engine) {
 			return
 		}
 
-		u := c.MustGet("user").(*models.User)
+		user := c.MustGet("user").(*models.User)
+		ctx := c.MustGet("ctx").(context.Context)
 
 		form := new(auth.RegisterForm)
 		if err := c.ShouldBind(form); err != nil {
@@ -59,10 +60,10 @@ func usersGroup(router *gin.Engine) {
 			return
 		}
 
-		u.FirstName = form.FirstName
-		u.LastName = form.LastName
-		u.Username = *form.Username
-		if err := u.UpdateProfile(c.MustGet("ctx").(context.Context)); err != nil {
+		user.FirstName = form.FirstName
+		user.LastName = form.LastName
+		user.Username = *form.Username
+		if err := user.UpdateProfile(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "update-profile.html", gin.H{
 				"error": err.Error(),
 			})
@@ -70,8 +71,8 @@ func usersGroup(router *gin.Engine) {
 		}
 
 		password, _ := auth.HashPassword(*form.Password)
-		u.Password = &password
-		if err := u.UpdatePassword(c.MustGet("ctx").(context.Context)); err != nil {
+		user.Password = &password
+		if err := user.UpdatePassword(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "update-profile.html", gin.H{
 				"error": err.Error(),
 			})
