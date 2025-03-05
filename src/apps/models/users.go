@@ -38,7 +38,7 @@ type User struct {
 	Avatar     *Media         `db:"-" json:"avatar"`
 	AvatarJson types.JSONText `db:"avatar" json:"-"`
 
-	CoverID   *uuid.UUID     `db:"cover__id" json:"cover_id"`
+	CoverID   *uuid.UUID     `db:"cover_id" json:"cover_id"`
 	Cover     *Media         `db:"-" json:"cover"`
 	CoverJson types.JSONText `db:"cover" json:"-"`
 
