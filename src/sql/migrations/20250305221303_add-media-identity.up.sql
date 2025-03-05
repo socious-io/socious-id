@@ -39,6 +39,8 @@ CREATE OR REPLACE TRIGGER trigger_users_sync
 AFTER INSERT OR UPDATE ON users
 FOR EACH ROW EXECUTE FUNCTION sync_identities();
 
+UPDATE users SET id=id;
+
 -- Media
 CREATE TABLE media (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
