@@ -32,6 +32,9 @@
 					</button>
 					<a href="/auth/register/pre"><button type="button" theme="primary-outline">Create account</button></a>
 				</div>
+				{{if .error}}
+                    <p style="color: red">{{.error}}</p>
+                    {{end}}
 			</div>
 		</div>
 	</form>
