@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/jmoiron/sqlx/types"
 	database "github.com/socious-io/pkg_database"
 
 	"github.com/google/uuid"
@@ -33,8 +34,13 @@ type User struct {
 	GeonameId         *int64  `db:"geoname_id" json:"geoname_id"`
 	MobileCountryCode *string `db:"mobile_country_code" json:"mobile_country_code"`
 
-	Avatar     *uuid.UUID `db:"avatar" json:"avatar"`
-	CoverImage *uuid.UUID `db:"cover_image" json:"cover_image"`
+	AvatarID   *uuid.UUID     `db:"avatar_id" json:"avatar_id"`
+	Avatar     *Media         `db:"-" json:"avatar"`
+	AvatarJson types.JSONText `db:"avatar" json:"-"`
+
+	CoverID   *uuid.UUID     `db:"cover_id" json:"cover_id"`
+	Cover     *Media         `db:"-" json:"cover"`
+	CoverJson types.JSONText `db:"cover" json:"-"`
 
 	IdentityVerifiedAt *time.Time `db:"identity_verified_at" json:"identity_verified_at"`
 	EmailVerifiedAt    *time.Time `db:"email_verified_at" json:"email_verified_at"`

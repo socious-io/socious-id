@@ -22,6 +22,9 @@
                           <span class="consent-account-email">@{{ .User.Username }}</span>
                       </div>
                   </button>
+                  {{if .error}}
+                    <p style="color: red">{{.error}}</p>
+                    {{end}}
               </div>
               <!-- <div name="organization" class="consent-account-label">
                   Your organization profiles
