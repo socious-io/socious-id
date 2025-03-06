@@ -155,7 +155,7 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		if err := otp.Verify(ctx); err != nil {
+		if err := otp.Verify(ctx, false); err != nil {
 			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
 				"error": err.Error(),
 			})
@@ -512,7 +512,7 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		if err := otp.Verify(ctx); err != nil {
+		if err := otp.Verify(ctx, true); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
