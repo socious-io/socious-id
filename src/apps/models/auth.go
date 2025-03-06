@@ -151,8 +151,8 @@ func (o *OTP) Create(ctx context.Context) error {
 	return nil
 }
 
-func (o *OTP) Verify(ctx context.Context) error {
-	if o.AuthSession != nil {
+func (o *OTP) Verify(ctx context.Context, verifySession bool) error {
+	if o.AuthSession != nil && verifySession {
 		if err := o.AuthSession.Verify(ctx); err != nil {
 			return err
 		}
@@ -197,6 +197,14 @@ func GetOTPByCode(code string) (*OTP, error) {
 func GetOTPByEmailAndCode(email string, code string) (*OTP, error) {
 	o := new(OTP)
 	if err := database.Get(o, "auth/fetch_otp_by_email_code", email, code); err != nil {
+		return nil, err
+	}
+	return o, nil
+}
+
+func GetOTPByEmail(email string) (*OTP, error) {
+	o := new(OTP)
+	if err := database.Get(o, "auth/fetch_otp_by_email", email); err != nil {
 		return nil, err
 	}
 	return o, nil
