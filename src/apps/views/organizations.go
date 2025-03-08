@@ -33,23 +33,16 @@ func organizationsGroup(router *gin.Engine) {
 		})
 	})
 
-	g.GET("/my", paginate(), auth.LoginRequired(), func(c *gin.Context) {
-		paginate, _ := c.MustGet("paginate").(database.Paginate)
+	g.GET("/my", auth.LoginRequired(), func(c *gin.Context) {
 		user := c.MustGet("user").(*models.User)
-		page, limit := c.MustGet("page"), c.MustGet("limit")
 
-		organizations, total, err := models.GetOrganizationsByMember(user.ID, paginate)
+		organizations, err := models.GetOrganizationsByMember(user.ID)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"page":    page,
-			"limit":   limit,
-			"results": organizations,
-			"total":   total,
-		})
+		c.JSON(http.StatusOK, organizations)
 	})
 
 	g.GET("/:id", func(c *gin.Context) {

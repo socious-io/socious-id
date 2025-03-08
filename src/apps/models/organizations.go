@@ -172,29 +172,13 @@ func GetAllOrganizations(p database.Paginate) ([]Organization, int, error) {
 	return organizations, fetchList[0].TotalCount, nil
 }
 
-func GetOrganizationsByMember(userId uuid.UUID, p database.Paginate) ([]Organization, int, error) {
-	var (
-		organizations = []Organization{}
-		fetchList     []database.FetchList
-		ids           []interface{}
-	)
+func GetOrganizationsByMember(userId uuid.UUID) ([]Organization, error) {
+	organizations := []Organization{}
 
-	if err := database.QuerySelect("organizations/get_all_by_member", &fetchList, userId, p.Limit, p.Offet); err != nil {
-		return nil, 0, err
+	if err := database.QuerySelect("organizations/get_all_by_member", &organizations, userId); err != nil {
+		return nil, err
 	}
-
-	if len(fetchList) < 1 {
-		return organizations, 0, nil
-	}
-
-	for _, f := range fetchList {
-		ids = append(ids, f.ID)
-	}
-
-	if err := database.Fetch(&organizations, ids...); err != nil {
-		return nil, 0, err
-	}
-	return organizations, fetchList[0].TotalCount, nil
+	return organizations, nil
 }
 
 func GetOrganization(id uuid.UUID) (*Organization, error) {

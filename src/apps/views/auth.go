@@ -21,9 +21,12 @@ func authGroup(router *gin.Engine) {
 
 	g.GET("/confirm", auth.LoginRequired(), func(c *gin.Context) {
 		if authSession := loadAuthSession(c); authSession != nil {
+			user := c.MustGet("user").(*models.User)
+			organizations, _ := models.GetOrganizationsByMember(user.ID)
 			c.HTML(http.StatusOK, "confirm.html", gin.H{
-				"User":        c.MustGet("user").(*models.User),
-				"AuthSession": authSession,
+				"User":          user,
+				"Organizations": organizations,
+				"AuthSession":   authSession,
 			})
 		}
 		// NOTE: look like page sent without any session so detect it's self authorization
