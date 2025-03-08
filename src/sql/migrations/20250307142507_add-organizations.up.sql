@@ -1,15 +1,7 @@
--- Media
-CREATE TABLE media (
-    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    identity_id uuid NOT NULL REFERENCES identities(id) ON DELETE CASCADE,
-    filename text,
-    url text,
-    created_at timestamp with time zone NOT NULL DEFAULT now()
-);
 
 -- Organizations
 CREATE TABLE organizations (
-    id UUID DEFAULT public.uuid_generate_v4() PRIMARY KEY,
+    id uuid DEFAULT public.uuid_generate_v4() PRIMARY KEY,
     shortname text NOT NULL,
     name text,
     bio text,
@@ -25,10 +17,10 @@ CREATE TABLE organizations (
     mission text,
     culture text,
     
-    logo jsonb,
-    cover jsonb,
+    logo_id uuid,
+    cover_id uuid,
     
-    status status_type DEFAULT 'INACTIVE',
+    status status_type DEFAULT 'ACTIVE',
     
     verified_impact boolean NOT NULL DEFAULT FALSE,
     verified boolean NOT NULL DEFAULT FALSE,
@@ -36,6 +28,7 @@ CREATE TABLE organizations (
     created_at timestamp with time zone NOT NULL DEFAULT NOW(),
     updated_at timestamp with time zone NOT NULL DEFAULT NOW()
 );
+
 
 CREATE TABLE org_members (
     id UUID NOT NULL DEFAULT public.uuid_generate_v4() PRIMARY KEY,
@@ -46,19 +39,6 @@ CREATE TABLE org_members (
     CONSTRAINT fk_org FOREIGN KEY (org_id) REFERENCES organizations(id) ON DELETE CASCADE
 );
 
--- Identity
-CREATE TYPE identity_type AS ENUM (
-    'users',
-    'organizations'
-);
-
-CREATE TABLE identities (
-    id uuid PRIMARY KEY,
-    type identity_type NOT NULL,
-    meta jsonb,
-    created_at timestamp  NOT NULL DEFAULT NOW(),
-    updated_at timestamp  NOT NULL DEFAULT NOW()
-);
 
 CREATE OR REPLACE FUNCTION sync_identities()
 RETURNS TRIGGER AS $$
@@ -73,8 +53,8 @@ BEGIN
             'city', NEW.city,
             'country', NEW.country,
             'address', NEW.address,
-            'avatar', NEW.avatar,
-            'cover', NEW.cover
+            'avatar', NEW.avatar_id,
+            'cover', NEW.cover_id
         ), NOW(), NOW())
         ON CONFLICT (id) DO UPDATE
         SET meta = EXCLUDED.meta, updated_at = NOW();
@@ -93,8 +73,8 @@ BEGIN
             'website', NEW.website,
             'mission', NEW.mission,
             'culture', NEW.culture,
-            'logo', NEW.logo,
-            'cover', NEW.cover,
+            'logo', NEW.logo_id,
+            'cover', NEW.cover_id,
             'status', NEW.status,
             'verified_impact', NEW.verified_impact,
             'verified', NEW.verified
@@ -115,5 +95,4 @@ AFTER INSERT OR UPDATE ON organizations
 FOR EACH ROW EXECUTE FUNCTION sync_identities();
 
 -- Triggering the updates
-UPDATE users SET id=id;
 UPDATE organizations SET id=id;

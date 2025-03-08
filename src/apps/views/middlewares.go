@@ -58,7 +58,7 @@ func isOrgMember() gin.HandlerFunc {
 		user := c.MustGet("user").(*models.User)
 		organization, err := models.GetOrganizationByMember(id, user.ID)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "No organizations found for this user"})
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "No organizations found for this user"})
 			return
 		}
 

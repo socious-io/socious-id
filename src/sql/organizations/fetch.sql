@@ -1,7 +1,7 @@
-SELECT org.*
--- row_to_json(m_image.*) AS image,
--- row_to_json(m_cover.*) AS cover_image,
+SELECT org.*,
+row_to_json(m1.*) AS logo,
+row_to_json(m2.*) AS cover
 FROM organizations org
--- LEFT JOIN media m_image ON m_image.id=org.image
--- LEFT JOIN media m_cover ON m_cover.id=org.cover_image
+LEFT JOIN media m1 ON m1.id=org.logo_id
+LEFT JOIN media m2 ON m2.id=org.cover_id
 WHERE org.id IN (?)

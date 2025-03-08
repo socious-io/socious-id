@@ -12,42 +12,34 @@ import (
 )
 
 type Organization struct {
-	ID        uuid.UUID `db:"id" json:"id"`
-	Shortname string    `db:"shortname" json:"shortname"`
+	ID          uuid.UUID `db:"id" json:"id"`
+	Shortname   string    `db:"shortname" json:"shortname"`
+	Name        *string   `db:"name" json:"name"`
+	Bio         *string   `db:"bio" json:"bio"`
+	Description *string   `db:"description" json:"description"`
+	Email       *string   `db:"email" json:"email"`
+	Phone       *string   `db:"phone" json:"phone"`
 
-	Status StatusType `db:"status" json:"status"`
-
-	Email   *string `db:"email" json:"email"`
-	Phone   *string `db:"phone" json:"phone"`
+	City    *string `db:"city" json:"city"`
+	Country *string `db:"country" json:"country"`
+	Address *string `db:"address" json:"address"`
 	Website *string `db:"website" json:"website"`
 
-	Name        *string `db:"name" json:"name"`
-	Bio         *string `db:"bio" json:"bio"`
-	Description *string `db:"description" json:"description"`
-	Mission     *string `db:"mission" json:"mission"`
-	Culture     *string `db:"culture" json:"culture"`
-	// Size        *string `db:"size" json:"size"`
+	Mission *string `db:"mission" json:"mission"`
+	Culture *string `db:"culture" json:"culture"`
 
-	Country *string `db:"country" json:"country"`
-	City    *string `db:"city" json:"city"`
-	Address *string `db:"address" json:"address"`
-	// GeonameId         *int    `db:"geoname_id" json:"geoname_id"`
-	// MobileCountryCode *string `db:"mobile_country_code" json:"mobile_country_code"`
-
-	// SocialCauses pq.StringArray `db:"social_causes" json:"social_causes"`
-
-	// ImpactPoints float64 `db:"impact_points" json:"impact_points"`
-
+	LogoID   *uuid.UUID     `db:"logo_id" json:"logo_id"`
 	Logo     *Media         `db:"-" json:"logo"`
 	LogoJson types.JSONText `db:"logo" json:"-"`
 
+	CoverID   *uuid.UUID     `db:"cover_id" json:"cover_id"`
 	Cover     *Media         `db:"-" json:"cover"`
 	CoverJson types.JSONText `db:"cover" json:"-"`
 
+	Status StatusType `db:"status" json:"status"`
+
 	VerifiedImpact bool `db:"verified_impact" json:"verified_impact"`
 	Verified       bool `db:"verified" json:"verified"`
-
-	CreatedBy *uuid.UUID `db:"created_by" json:"created_by"`
 
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
@@ -67,7 +59,7 @@ func (o *Organization) Create(ctx context.Context) error {
 		"organizations/create",
 		o.Shortname, o.Name, o.Bio, o.Description, o.Email, o.Phone,
 		o.City, o.Country, o.Address, o.Website,
-		o.Mission, o.Culture, o.Logo, o.Cover,
+		o.Mission, o.Culture,
 	)
 	if err != nil {
 		return err
@@ -87,7 +79,7 @@ func (o *Organization) Update(ctx context.Context) error {
 		"organizations/update",
 		o.ID, o.Shortname, o.Name, o.Bio, o.Description, o.Email, o.Phone,
 		o.City, o.Country, o.Address, o.Website,
-		o.Mission, o.Culture, o.Logo, o.Cover,
+		o.Mission, o.Culture,
 	)
 	if err != nil {
 		return err
@@ -140,7 +132,7 @@ func (o *Organization) RemoveMember(ctx context.Context, userId uuid.UUID) error
 func (o *Organization) Remove(ctx context.Context) error {
 	rows, err := database.Query(
 		ctx,
-		"organizations/remove_member",
+		"organizations/remove",
 		o.ID,
 	)
 	if err != nil {
@@ -155,14 +147,39 @@ func (o *Organization) Remove(ctx context.Context) error {
 	return nil
 }
 
-func GetAllOrganizations(userId uuid.UUID, p database.Paginate) ([]Organization, int, error) {
+func GetAllOrganizations(p database.Paginate) ([]Organization, int, error) {
 	var (
 		organizations = []Organization{}
 		fetchList     []database.FetchList
 		ids           []interface{}
 	)
 
-	if err := database.QuerySelect("organizations/get_all", &fetchList, userId, p.Limit, p.Offet); err != nil {
+	if err := database.QuerySelect("organizations/get_all", &fetchList, p.Limit, p.Offet); err != nil {
+		return nil, 0, err
+	}
+
+	if len(fetchList) < 1 {
+		return organizations, 0, nil
+	}
+
+	for _, f := range fetchList {
+		ids = append(ids, f.ID)
+	}
+
+	if err := database.Fetch(&organizations, ids...); err != nil {
+		return nil, 0, err
+	}
+	return organizations, fetchList[0].TotalCount, nil
+}
+
+func GetOrganizationsByMember(userId uuid.UUID, p database.Paginate) ([]Organization, int, error) {
+	var (
+		organizations = []Organization{}
+		fetchList     []database.FetchList
+		ids           []interface{}
+	)
+
+	if err := database.QuerySelect("organizations/get_all_by_member", &fetchList, userId, p.Limit, p.Offet); err != nil {
 		return nil, 0, err
 	}
 

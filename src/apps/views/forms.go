@@ -1,7 +1,7 @@
 package views
 
 import (
-	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx/types"
 )
 
 type ConfirmForm struct {
@@ -34,34 +34,26 @@ type UserForm struct {
 	Address           *string `json:"address" form:"address"`
 	MobileCountryCode *string `json:"mobile_country_code" form:"mobile_country_code"`
 
-	Avatar     *uuid.UUID `json:"avatar" form:"avatar"`
-	CoverImage *uuid.UUID `json:"cover_image" form:"cover_image"`
+	Avatar *types.JSONText `json:"avatar" form:"avatar"`
+	Cover  *types.JSONText `json:"cover" form:"cover"`
 }
 
 type OrganizationForm struct {
-	Shortname string `db:"shortname" json:"shortname"`
-
-	Email   *string `db:"email" json:"email"`
-	Phone   *string `db:"phone" json:"phone"`
-	Website *string `db:"website" json:"website"`
-
+	Shortname   string  `db:"shortname" json:"shortname"`
 	Name        *string `db:"name" json:"name"`
 	Bio         *string `db:"bio" json:"bio"`
 	Description *string `db:"description" json:"description"`
-	Mission     *string `db:"mission" json:"mission"`
-	Culture     *string `db:"culture" json:"culture"`
-	// Size        *string `db:"size" json:"size"`
+	Email       *string `db:"email" json:"email"`
+	Phone       *string `db:"phone" json:"phone"`
 
-	Country *string `db:"country" json:"country"`
 	City    *string `db:"city" json:"city"`
+	Country *string `db:"country" json:"country"`
 	Address *string `db:"address" json:"address"`
-	// GeonameId         *int    `db:"geoname_id" json:"geoname_id"`
-	// MobileCountryCode *string `db:"mobile_country_code" json:"mobile_country_code"`
+	Website *string `db:"website" json:"website"`
 
-	// SocialCauses pq.StringArray `db:"social_causes" json:"social_causes"`
+	Mission *string `db:"mission" json:"mission"`
+	Culture *string `db:"culture" json:"culture"`
 
-	// ImpactPoints float64 `db:"impact_points" json:"impact_points"`
-
-	Image      *uuid.UUID `db:"image" json:"image"`             //logo JSONB
-	CoverImage *uuid.UUID `db:"cover_image" json:"cover_image"` //cover JSONB
+	Logo  *types.JSONText `db:"logo" json:"logo"`
+	Cover *types.JSONText `db:"cover" json:"cover"`
 }
