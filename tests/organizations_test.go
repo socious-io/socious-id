@@ -35,26 +35,6 @@ func organizationsGroup() {
 		req.Header.Set("Authorization", authTokens[0])
 		router.ServeHTTP(w, req)
 
-		fmt.Println(w.Body)
-
-		body := decodeBody(w.Body)
-		Expect(w.Code).To(Equal(http.StatusOK))
-		bodyExpect(body, gin.H{
-			"page":    "<ANY>",
-			"limit":   "<ANY>",
-			"results": "<ANY>",
-			"total":   "<ANY>",
-		})
-	})
-
-	It("Should get all of the organizations that i am a member of", func() {
-		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/organizations/my", nil)
-		req.Header.Set("Authorization", authTokens[0])
-		router.ServeHTTP(w, req)
-
-		fmt.Println(w.Body)
-
 		body := decodeBody(w.Body)
 		Expect(w.Code).To(Equal(http.StatusOK))
 		bodyExpect(body, gin.H{
@@ -121,6 +101,23 @@ func organizationsGroup() {
 			Expect(w.Code).To(Equal(http.StatusOK))
 			Expect(body["id"]).To(Equal(data["id"]))
 		}
+	})
+
+	It("Should get all of the organizations that i am a member of", func() {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/organizations/my", nil)
+		req.Header.Set("Authorization", authTokens[1])
+		router.ServeHTTP(w, req)
+
+		body := []gin.H{}
+		decoder := json.NewDecoder(w.Body)
+		decoder.Decode(&body)
+
+		Expect(w.Code).To(Equal(http.StatusOK))
+		for i, data := range organizationsData {
+			Expect(body[i]["id"], data["id"])
+		}
+
 	})
 
 	It("Should remove a member from organization", func() {
