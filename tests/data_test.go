@@ -5,9 +5,17 @@ import "github.com/gin-gonic/gin"
 var (
 	intKey            = ""
 	authTokens        = []string{}
+	authOtpCodes      = []string{}
+	ssoOtpCodes       = []string{}
 	authRefreshTokens = []string{}
+	authConfig        = gin.H{
+		"client_id":     "string",
+		"client_secret": "string",
+		"redirect_url":  "string",
+	}
 
-	usersData = []gin.H{
+	sessionsData = []gin.H{}
+	usersData    = []gin.H{
 		{
 			"first_name": "TestName",
 			"last_name":  "TestLastName",

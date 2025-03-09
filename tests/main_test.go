@@ -51,6 +51,7 @@ func TestSuite(t *testing.T) {
 
 var _ = Describe("Socious Test Suite", Ordered, func() {
 	Context("Auth", authGroup)
+	Context("Users", usersGroup)
 })
 
 func init() {

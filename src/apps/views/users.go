@@ -13,12 +13,12 @@ import (
 func usersGroup(router *gin.Engine) {
 	g := router.Group("users")
 
-	g.GET("/", auth.LoginRequired(), func(c *gin.Context) {
+	g.GET("", auth.LoginRequired(), func(c *gin.Context) {
 		user := c.MustGet("user").(*models.User)
 		c.JSON(http.StatusOK, user)
 	})
 
-	g.PUT("/", auth.LoginRequired(), func(c *gin.Context) {
+	g.PUT("", auth.LoginRequired(), func(c *gin.Context) {
 		user := c.MustGet("user").(*models.User)
 		ctx := c.MustGet("ctx").(context.Context)
 
@@ -62,7 +62,9 @@ func usersGroup(router *gin.Engine) {
 
 		user.FirstName = form.FirstName
 		user.LastName = form.LastName
-		user.Username = *form.Username
+		if form.Username != nil {
+			user.Username = *form.Username
+		}
 		if err := user.UpdateProfile(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "update-profile.html", gin.H{
 				"error": err.Error(),
