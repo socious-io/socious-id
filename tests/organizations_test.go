@@ -105,7 +105,7 @@ func organizationsGroup() {
 
 	It("Should get all of the organizations that i am a member of", func() {
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/organizations/my", nil)
+		req, _ := http.NewRequest("GET", "/organizations/membered", nil)
 		req.Header.Set("Authorization", authTokens[1])
 		router.ServeHTTP(w, req)
 

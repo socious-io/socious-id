@@ -16,7 +16,7 @@ func organizationsGroup(router *gin.Engine) {
 	g := router.Group("organizations")
 
 	g.GET("", paginate(), func(c *gin.Context) {
-		paginate, _ := c.MustGet("paginate").(database.Paginate)
+		paginate := c.MustGet("paginate").(database.Paginate)
 		page, limit := c.MustGet("page"), c.MustGet("limit")
 
 		organizations, total, err := models.GetAllOrganizations(paginate)
@@ -33,7 +33,7 @@ func organizationsGroup(router *gin.Engine) {
 		})
 	})
 
-	g.GET("/my", auth.LoginRequired(), func(c *gin.Context) {
+	g.GET("/membered", auth.LoginRequired(), func(c *gin.Context) {
 		user := c.MustGet("user").(*models.User)
 
 		organizations, err := models.GetOrganizationsByMember(user.ID)
@@ -133,6 +133,11 @@ func organizationsGroup(router *gin.Engine) {
 		ctx := c.MustGet("ctx").(context.Context)
 		organization := c.MustGet("organization").(*models.Organization)
 		userId := uuid.MustParse(c.Param("user_id"))
+
+		if userId == c.MustGet("user").(*models.User).ID {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Can't remove yourself from the organization"})
+			return
+		}
 
 		if err := organization.RemoveMember(ctx, userId); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
