@@ -2,9 +2,11 @@ package utils
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"math/big"
 	"strings"
 )
@@ -88,4 +90,14 @@ func RandomString(length int) string {
 		b[i] = RandCharset[num.Int64()]
 	}
 	return string(b)
+}
+
+func GenerateChecksum(file io.Reader) (string, error) {
+	hash := sha256.New()
+	_, err := io.Copy(hash, file)
+	if err != nil {
+		return "", err
+	}
+	checksum := hash.Sum(nil)
+	return fmt.Sprintf("%x", checksum), nil
 }

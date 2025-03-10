@@ -27,6 +27,11 @@ type ConfigType struct {
 		ApiKey    string            `mapstructure:"apikey"`
 		Templates map[string]string `mapstructure:"templates"`
 	} `mapstructure:"sendgrid"`
+	Upload struct {
+		Bucket      string `mapstructure:"bucket"`
+		CDN         string `mapstructure:"cdn"`
+		Credentials string `mapstructure:"credentials"`
+	} `mapstructure:"upload"`
 	Cors struct {
 		Origins []string `mapstructure:"origins"`
 	} `mapstructure:"cors"`

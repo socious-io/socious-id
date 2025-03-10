@@ -64,6 +64,7 @@ func (u *User) Create(ctx context.Context) error {
 		ctx,
 		"users/register",
 		u.FirstName, u.LastName, u.Username, u.Email, u.Password,
+		u.CoverID, u.AvatarID,
 	)
 	if err != nil {
 		return err
@@ -74,7 +75,7 @@ func (u *User) Create(ctx context.Context) error {
 			return err
 		}
 	}
-	return nil
+	return database.Fetch(u, u.ID)
 }
 
 func (u *User) Verify(ctx context.Context, vtype VerificationType) error {
@@ -136,6 +137,7 @@ func (u *User) UpdateProfile(ctx context.Context) error {
 		ctx,
 		"users/update_profile",
 		u.ID, u.FirstName, u.LastName, u.Bio, u.Phone, u.Username,
+		u.CoverID, u.AvatarID,
 	)
 	if err != nil {
 		return err
@@ -146,7 +148,7 @@ func (u *User) UpdateProfile(ctx context.Context) error {
 			return err
 		}
 	}
-	return nil
+	return database.Fetch(u, u.ID)
 }
 
 func GetUser(id uuid.UUID) (*User, error) {

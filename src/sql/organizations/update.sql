@@ -10,6 +10,8 @@ UPDATE organizations SET
     address=$10,
     website=$11,
     mission=$12,
-    culture=$13
+    culture=$13,
+    cover_id=$14,
+    logo_id=$15
 WHERE id=$1
 RETURNING *
