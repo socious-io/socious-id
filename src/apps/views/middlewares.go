@@ -1,9 +1,12 @@
 package views
 
 import (
+	"net/http"
+	"socious-id/src/apps/models"
 	"strconv"
 	"strings"
 
+	"github.com/google/uuid"
 	database "github.com/socious-io/pkg_database"
 
 	"github.com/gin-gonic/gin"
@@ -46,5 +49,20 @@ func paginate() gin.HandlerFunc {
 		c.Set("page", page)
 		c.Next()
 
+	}
+}
+
+func isOrgMember() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := uuid.MustParse(c.Param("id")) //Org ID
+		user := c.MustGet("user").(*models.User)
+		organization, err := models.GetOrganizationByMember(id, user.ID)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "No organizations found for this user"})
+			return
+		}
+
+		c.Set("organization", organization)
+		c.Next()
 	}
 }

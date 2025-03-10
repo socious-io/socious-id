@@ -52,20 +52,20 @@ func (vt VerificationType) Value() (driver.Value, error) {
 	return string(vt), nil
 }
 
-type UserStatus string
+type StatusType string
 
 const (
-	UserStatusActive    UserStatus = "ACTIVE"
-	UserStatusInactive  UserStatus = "INACTIVE"
-	UserStatusSuspended UserStatus = "SUSPENDED"
+	StatusTypeActive    StatusType = "ACTIVE"
+	StatusTypeInactive  StatusType = "INACTIVE"
+	StatusTypeSuspended StatusType = "SUSPENDED"
 )
 
-func (us *UserStatus) Scan(value interface{}) error {
-	return scanEnum(value, (*string)(us))
+func (st *StatusType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(st))
 }
 
-func (us UserStatus) Value() (driver.Value, error) {
-	return string(us), nil
+func (st StatusType) Value() (driver.Value, error) {
+	return string(st), nil
 }
 
 func scanEnum(value interface{}, target interface{}) error {

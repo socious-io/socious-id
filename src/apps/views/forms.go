@@ -1,7 +1,7 @@
 package views
 
 import (
-	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx/types"
 )
 
 type ConfirmForm struct {
@@ -34,6 +34,26 @@ type UserForm struct {
 	Address           *string `json:"address" form:"address"`
 	MobileCountryCode *string `json:"mobile_country_code" form:"mobile_country_code"`
 
-	Avatar     *uuid.UUID `json:"avatar" form:"avatar"`
-	CoverImage *uuid.UUID `json:"cover_image" form:"cover_image"`
+	Avatar *types.JSONText `json:"avatar" form:"avatar"`
+	Cover  *types.JSONText `json:"cover" form:"cover"`
+}
+
+type OrganizationForm struct {
+	Shortname   string  `db:"shortname" json:"shortname"`
+	Name        *string `db:"name" json:"name"`
+	Bio         *string `db:"bio" json:"bio"`
+	Description *string `db:"description" json:"description"`
+	Email       *string `db:"email" json:"email"`
+	Phone       *string `db:"phone" json:"phone"`
+
+	City    *string `db:"city" json:"city"`
+	Country *string `db:"country" json:"country"`
+	Address *string `db:"address" json:"address"`
+	Website *string `db:"website" json:"website"`
+
+	Mission *string `db:"mission" json:"mission"`
+	Culture *string `db:"culture" json:"culture"`
+
+	Logo  *types.JSONText `db:"logo" json:"logo"`
+	Cover *types.JSONText `db:"cover" json:"cover"`
 }

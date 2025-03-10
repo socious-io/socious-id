@@ -31,4 +31,35 @@ var (
 			"password":   "test123456",
 		},
 	}
+
+	organizationsData = []gin.H{
+		{
+			"shortname":   "TestOrgShortName",
+			"name":        "TestOrgName",
+			"bio":         "TestBio",
+			"description": "ThisIsTestDescription",
+			"email":       "test-org@test.com",
+			"phone":       "+1111111111",
+			"city":        "TestCity",
+			"country":     "TestCountry",
+			"address":     "TestAddress",
+			"website":     "TestWebsite",
+			"mission":     "TestMission",
+			"culture":     "TestCulture",
+		},
+		{
+			"shortname":   "TestOrgShortName2",
+			"name":        "TestOrgName2",
+			"bio":         "TestBio2",
+			"description": "ThisIsTestDescription2",
+			"email":       "test-org2@test.com",
+			"phone":       "+22222222222",
+			"city":        "TestCity2",
+			"country":     "TestCountry2",
+			"address":     "TestAddress2",
+			"website":     "TestWebsite2",
+			"mission":     "TestMission2",
+			"culture":     "TestCulture2",
+		},
+	}
 )
