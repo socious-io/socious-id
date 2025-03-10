@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"socious-id/src/apps/utils"
 	"socious-id/src/apps/views"
 	"socious-id/src/config"
 	"time"
@@ -26,6 +27,18 @@ func Init() *gin.Engine {
 		c.Next()
 	})
 
+	//Uploader
+	uploader := &utils.GCSUploader{
+		CDNUrl:          config.Config.Upload.CDN,
+		BucketName:      config.Config.Upload.Bucket,
+		CredentialsFile: config.Config.Upload.Credentials,
+	}
+	router.Use(func(c *gin.Context) {
+		c.Set("uploader", uploader)
+		c.Next()
+	})
+
+	//Cors
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     config.Config.Cors.Origins,
 		AllowMethods:     []string{"*"},

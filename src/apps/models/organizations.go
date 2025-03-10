@@ -59,7 +59,7 @@ func (o *Organization) Create(ctx context.Context) error {
 		"organizations/create",
 		o.Shortname, o.Name, o.Bio, o.Description, o.Email, o.Phone,
 		o.City, o.Country, o.Address, o.Website,
-		o.Mission, o.Culture,
+		o.Mission, o.Culture, o.CoverID, o.LogoID,
 	)
 	if err != nil {
 		return err
@@ -70,7 +70,7 @@ func (o *Organization) Create(ctx context.Context) error {
 			return err
 		}
 	}
-	return nil
+	return database.Fetch(o, o.ID)
 }
 
 func (o *Organization) Update(ctx context.Context) error {
@@ -79,7 +79,7 @@ func (o *Organization) Update(ctx context.Context) error {
 		"organizations/update",
 		o.ID, o.Shortname, o.Name, o.Bio, o.Description, o.Email, o.Phone,
 		o.City, o.Country, o.Address, o.Website,
-		o.Mission, o.Culture,
+		o.Mission, o.Culture, o.CoverID, o.LogoID,
 	)
 	if err != nil {
 		return err
@@ -90,7 +90,7 @@ func (o *Organization) Update(ctx context.Context) error {
 			return err
 		}
 	}
-	return nil
+	return database.Fetch(o, o.ID)
 }
 
 func (o *Organization) AddMember(ctx context.Context, userId uuid.UUID) error {
