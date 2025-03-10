@@ -16,7 +16,11 @@
 					<div name="individual" class="consent-account-label">
 						Your individual profile
 						<button type="submit" class="consent-account">
-							<img src="/statics/images/user-avatar.png" alt="Profile Image" width="40" height="40" />
+							{{ if .User.Avatar }}
+								<img src="{{ .User.Avatar.URL }}" alt="Profile Image" width="40" height="40" />
+							{{ else }}
+								<img src="/statics/images/avatar-default.jpg" alt="Profile Image" width="40" height="40" />
+							{{ end }}
 							<div class="consent-account-name">
 								{{ .User.FirstName }} {{ .User.LastName }}
 								<span class="consent-account-email">@{{ .User.Username }}</span>
@@ -31,7 +35,11 @@
 						<div class="consent-accounts">
 							{{ range .Organizations }}
 							<div class="consent-account">
-								<img src="/statics/images/org-avatar.png" alt="Profile Image" width="40" height="40" />
+								{{ if .Logo }}
+									<img src="{{ .Logo.URL }}" alt="Profile Image" width="40" height="40" />
+								{{ else }}
+									<img src="/statics/images/logo-default.png" alt="Profile Image" width="40" height="40" />
+								{{ end }}
 								<div class="consent-account-name">
 									{{.Name}}
 									<span class="consent-account-email">@{{.Shortname}}</span>
