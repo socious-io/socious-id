@@ -173,9 +173,16 @@ func GetAllOrganizations(p database.Paginate) ([]Organization, int, error) {
 }
 
 func GetOrganizationsByMember(userId uuid.UUID) ([]Organization, error) {
-	organizations := []Organization{}
+	var (
+		organizations = []Organization{}
+		ids           []interface{}
+	)
 
-	if err := database.QuerySelect("organizations/get_all_by_member", &organizations, userId); err != nil {
+	if err := database.QuerySelect("organizations/get_all_by_member", &ids, userId); err != nil {
+		return nil, err
+	}
+
+	if err := database.Fetch(&organizations, ids...); err != nil {
 		return nil, err
 	}
 	return organizations, nil
