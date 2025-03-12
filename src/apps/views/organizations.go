@@ -2,11 +2,13 @@ package views
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
 	"socious-id/src/apps/utils"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	database "github.com/socious-io/pkg_database"
@@ -146,5 +148,74 @@ func organizationsGroup(router *gin.Engine) {
 
 		c.JSON(http.StatusOK, organization)
 		return
+	})
+
+	g.GET("/register/pre", auth.LoginRequired(), func(c *gin.Context) {
+		session := sessions.Default(c)
+
+		if session.Get("org_onboard") == nil || !session.Get("org_onboard").(bool) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid register flow"})
+			return
+		}
+
+		c.HTML(http.StatusOK, "pre-org-register.html", gin.H{})
+	})
+
+	g.GET("/register", auth.LoginRequired(), func(c *gin.Context) {
+		session := sessions.Default(c)
+		if session.Get("org_onboard") == nil || !session.Get("org_onboard").(bool) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid register flow"})
+			return
+		}
+		c.HTML(http.StatusOK, "org-register.html", gin.H{})
+	})
+
+	g.POST("/register", auth.LoginRequired(), func(c *gin.Context) {
+		ctx := c.MustGet("ctx").(context.Context)
+		user := c.MustGet("user").(*models.User)
+
+		session := sessions.Default(c)
+		if session.Get("org_onboard") != nil && !session.Get("org_onboard").(bool) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid register flow"})
+			return
+		}
+
+		fmt.Println(c.Request.Body)
+
+		form := new(OrganizationForm)
+		if err := c.ShouldBind(form); err != nil {
+			c.HTML(http.StatusBadRequest, "org-register.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		organization := new(models.Organization)
+		utils.Copy(form, organization)
+
+		if err := organization.Create(ctx); err != nil {
+			c.HTML(http.StatusBadRequest, "org-register.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		if err := organization.AddMember(ctx, user.ID); err != nil {
+			c.HTML(http.StatusBadRequest, "org-register.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		session.Delete("org_onboard")
+		session.Save()
+
+		c.JSON(http.StatusOK, gin.H{
+			"redirect": "/auth/confirm",
+		})
+	})
+
+	g.GET("/register/complete", auth.LoginRequired(), func(c *gin.Context) {
+		c.HTML(http.StatusOK, "post-org-register.html", gin.H{})
 	})
 }
