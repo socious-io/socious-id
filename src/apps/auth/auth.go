@@ -13,11 +13,12 @@ import (
 )
 
 type RegisterForm struct {
-	FirstName *string `json:"first_name" form:"first_name"`
-	LastName  *string `json:"last_name" form:"last_name"`
-	Username  *string `json:"username" form:"username"`
-	Email     string  `json:"email" form:"email" validate:"required,email"`
-	Password  *string `json:"password" form:"password"`
+	FirstName *string    `json:"first_name" form:"first_name"`
+	LastName  *string    `json:"last_name" form:"last_name"`
+	Username  *string    `json:"username" form:"username"`
+	Email     string     `json:"email" form:"email" validate:"required,email"`
+	Password  *string    `json:"password" form:"password"`
+	AvatarID  *uuid.UUID `json:"avatar_id" form:"avatar_id"`
 }
 
 type LoginForm struct {

@@ -62,6 +62,7 @@ func usersGroup(router *gin.Engine) {
 
 		user.FirstName = form.FirstName
 		user.LastName = form.LastName
+		user.AvatarID = form.AvatarID
 		if form.Username != nil {
 			user.Username = *form.Username
 		}

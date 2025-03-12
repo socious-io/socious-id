@@ -1,5 +1,6 @@
-const onUploadProfile = () => {
+const onUploadProfile = async () => {
     const input = document.getElementById("upload");
+    const avatarId = document.getElementById("avatar-id");
     const file = input.files[0];
 
     if (file) {
@@ -11,12 +12,36 @@ const onUploadProfile = () => {
             return;
         }
 
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const avatar = document.getElementById("avatar");
-            avatar.src = e.target.result; 
-        };
-        reader.readAsDataURL(file);
+        const avatar = document.getElementById("avatar");
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try{
+            const mediaUploadResponse = await fetch("/media", {
+                method: "POST",
+                body: formData,
+                headers: {},
+            })
+
+            if (mediaUploadResponse.ok) {
+                const media = await mediaUploadResponse.json()
+                avatar.src = media.url
+                avatarId.value = media.id
+            } else {
+                console.error("Error:", mediaUploadResponse.statusText);
+                return
+            }
+        }catch(e){
+            console.error("Error:", e)
+            return
+        }
+
+        // const reader = new FileReader();
+        // reader.onload = function (e) {
+        //     const avatar = document.getElementById("avatar");
+        //     avatar.src = e.target.result; 
+        // };
+        // reader.readAsDataURL(file);
     }
 
 }
@@ -48,7 +73,7 @@ const createProfile = () => {
     const last_name = document.getElementById("last").value.trim();
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("pass").value.trim();
-    const avatar = document.getElementById("avatar").src;
+    const avatarId = document.getElementById("avatar-id").value.trim();
 
     fetch("/users/profile", {
         method: "PUT",
@@ -57,7 +82,7 @@ const createProfile = () => {
             last_name,
             username,
             password,
-            avatar
+            avatar_id: avatarId,
         }),
         headers: { "Content-Type": "application/json" }
     })
