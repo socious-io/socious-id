@@ -421,6 +421,7 @@ func authGroup(router *gin.Engine) {
 	g.GET("/session/:id", func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))
 		authMode := models.AuthModeType(c.Query("auth_mode"))
+		orgOnboard := c.Query("org_onboard")
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -444,6 +445,7 @@ func authGroup(router *gin.Engine) {
 
 		session := sessions.Default(c)
 		session.Set("auth_session_id", authSession.ID.String())
+		session.Set("org_onboard", orgOnboard == "true")
 		session.Save()
 
 		if authMode == models.AuthModeRegister {
