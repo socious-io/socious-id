@@ -130,4 +130,4 @@ jobs:
         run: |
           docker pull ${{ steps.meta-worker.outputs.tags }}
           docker ps -qa --filter "name=${{ env.DOCKER_CONTAINER_NAME }}-worker" | grep -q . && docker stop ${{ env.DOCKER_CONTAINER_NAME }}-worker && docker rm -fv ${{ env.DOCKER_CONTAINER_NAME }}-worker
-          docker run -d --restart always -h ${{ env.DOCKER_CONTAINER_NAME }}-worker --network ${{ env.DOCKER_CONTAINER_NETWORK }}_default --name ${{ env.DOCKER_CONTAINER_NAME }}-worker ${{ steps.meta-worker.outputs.tags }}
+          docker run -d --restart always -h ${{ env.DOCKER_CONTAINER_NAME }}-worker --network ${{ env.DOCKER_CONTAINER_NETWORK }} --name ${{ env.DOCKER_CONTAINER_NAME }}-worker ${{ steps.meta-worker.outputs.tags }}
