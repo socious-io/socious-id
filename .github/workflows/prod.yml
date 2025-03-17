@@ -74,21 +74,21 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      # - name: Extract Worker Docker metadata
-      #   id: meta-worker
-      #   uses: docker/metadata-action@v5.5.1
-      #   with:
-      #     images: ${{ env.REGISTRY }}/${{ env.WORKER_IMAGE_NAME }}
+      - name: Extract Worker Docker metadata
+        id: meta-worker
+        uses: docker/metadata-action@v5.5.1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.WORKER_IMAGE_NAME }}
 
-      # - name: Build and push Worker Docker image
-      #   id: build-and-push-worker
-      #   uses: docker/build-push-action@v6.7.0
-      #   with:
-      #     context: .
-      #     file: "./Worker.Dockerfile"
-      #     push: ${{ github.event_name != 'pull_request' }}
-      #     tags: ${{ steps.meta-worker.outputs.tags }}
-      #     labels: ${{ steps.meta-worker.outputs.labels }}
+      - name: Build and push Worker Docker image
+        id: build-and-push-worker
+        uses: docker/build-push-action@v6.7.0
+        with:
+          context: .
+          file: "./Worker.Dockerfile"
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta-worker.outputs.tags }}
+          labels: ${{ steps.meta-worker.outputs.labels }}
 
   deploy:
     needs: [test-build]
@@ -119,14 +119,14 @@ jobs:
           docker ps -qa --filter "name=${{ env.DOCKER_CONTAINER_NAME }}" | grep -q . && docker stop ${{ env.DOCKER_CONTAINER_NAME }} && docker rm -fv ${{ env.DOCKER_CONTAINER_NAME }}
           docker run -d --restart always -p 5064:5064 -h ${{ env.DOCKER_CONTAINER_NAME }} --network ${{ env.DOCKER_CONTAINER_NETWORK }} --name ${{ env.DOCKER_CONTAINER_NAME }} ${{ steps.meta.outputs.tags }}
 
-      # - name: Extract Docker metadata
-      #   id: meta-worker
-      #   uses: docker/metadata-action@v5.5.1
-      #   with:
-      #     images: ${{ env.REGISTRY }}/${{ env.WORKER_IMAGE_NAME }}
+      - name: Extract Docker metadata
+        id: meta-worker
+        uses: docker/metadata-action@v5.5.1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.WORKER_IMAGE_NAME }}
 
-      # - name: Docker run worker
-      #   run: |
-      #     docker pull ${{ steps.meta-worker.outputs.tags }}
-      #     docker ps -qa --filter "name=${{ env.DOCKER_CONTAINER_NAME }}-worker" | grep -q . && docker stop ${{ env.DOCKER_CONTAINER_NAME }}-worker && docker rm -fv ${{ env.DOCKER_CONTAINER_NAME }}-worker
-      #     docker run -d --restart always -h ${{ env.DOCKER_CONTAINER_NAME }}-worker --network ${{ env.DOCKER_CONTAINER_NETWORK }}_default --name ${{ env.DOCKER_CONTAINER_NAME }}-worker ${{ steps.meta-worker.outputs.tags }}
+      - name: Docker run worker
+        run: |
+          docker pull ${{ steps.meta-worker.outputs.tags }}
+          docker ps -qa --filter "name=${{ env.DOCKER_CONTAINER_NAME }}-worker" | grep -q . && docker stop ${{ env.DOCKER_CONTAINER_NAME }}-worker && docker rm -fv ${{ env.DOCKER_CONTAINER_NAME }}-worker
+          docker run -d --restart always -h ${{ env.DOCKER_CONTAINER_NAME }}-worker --network ${{ env.DOCKER_CONTAINER_NETWORK }} --name ${{ env.DOCKER_CONTAINER_NAME }}-worker ${{ steps.meta-worker.outputs.tags }}
