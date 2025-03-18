@@ -28,3 +28,5 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE TRIGGER trigger_sync_organization_verification
 BEFORE INSERT OR UPDATE ON organizations
 FOR EACH ROW EXECUTE FUNCTION sync_organization_verification();
+
+UPDATE organizations SET id=id;
