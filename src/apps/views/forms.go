@@ -39,21 +39,21 @@ type UserForm struct {
 }
 
 type OrganizationForm struct {
-	Shortname   string  `db:"shortname" json:"shortname"`
-	Name        *string `db:"name" json:"name"`
-	Bio         *string `db:"bio" json:"bio"`
-	Description *string `db:"description" json:"description"`
-	Email       *string `db:"email" json:"email"`
-	Phone       *string `db:"phone" json:"phone"`
+	Shortname   string  `json:"shortname" form:"shortname"`
+	Name        *string `json:"name" form:"name"`
+	Bio         *string `json:"bio" form:"bio"`
+	Description *string `json:"description" form:"description"`
+	Email       *string `json:"email" form:"email"`
+	Phone       *string `json:"phone" form:"phone"`
 
-	City    *string `db:"city" json:"city"`
-	Country *string `db:"country" json:"country"`
-	Address *string `db:"address" json:"address"`
-	Website *string `db:"website" json:"website"`
+	City    *string `json:"city" form:"city"`
+	Country *string `json:"country" form:"country"`
+	Address *string `json:"address" form:"address"`
+	Website *string `json:"website" form:"website"`
 
-	Mission *string `db:"mission" json:"mission"`
-	Culture *string `db:"culture" json:"culture"`
+	Mission *string `json:"mission" form:"mission"`
+	Culture *string `json:"culture" form:"culture"`
 
-	LogoID  *uuid.UUID `db:"logo_id" json:"logo_id"`
-	CoverID *uuid.UUID `db:"cover_id" json:"cover_id"`
+	LogoID  *uuid.UUID `json:"logo_id" form:"logo_id"`
+	CoverID *uuid.UUID `json:"cover_id" form:"cover_id"`
 }
