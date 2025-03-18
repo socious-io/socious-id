@@ -6,6 +6,7 @@ import (
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
 	"socious-id/src/apps/utils"
+	"socious-id/src/apps/workers"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -79,7 +80,8 @@ func organizationsGroup(router *gin.Engine) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-
+		// FIXME: use nats
+		go workers.Sync(user.ID)
 		c.JSON(http.StatusCreated, organization)
 	})
 
@@ -98,9 +100,9 @@ func organizationsGroup(router *gin.Engine) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-
+		// FIXME: use nats
+		go workers.Sync(c.MustGet("user").(*models.User).ID)
 		c.JSON(http.StatusAccepted, organization)
-		return
 	})
 
 	g.DELETE("/:id", auth.LoginRequired(), isOrgMember(), func(c *gin.Context) {
@@ -124,9 +126,9 @@ func organizationsGroup(router *gin.Engine) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-
+		// FIXME: use nats
+		go workers.Sync(userId)
 		c.JSON(http.StatusOK, organization)
-		return
 	})
 
 	g.DELETE("/:id/members/:user_id", auth.LoginRequired(), isOrgMember(), func(c *gin.Context) {
@@ -145,6 +147,5 @@ func organizationsGroup(router *gin.Engine) {
 		}
 
 		c.JSON(http.StatusOK, organization)
-		return
 	})
 }

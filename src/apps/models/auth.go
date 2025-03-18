@@ -17,8 +17,13 @@ type Access struct {
 	Description  string    `db:"description" json:"description"`
 	ClientID     string    `db:"client_id" json:"client_id"`
 	ClientSecret string    `db:"client_secret" json:"-"`
-	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
-	CreatedAt    time.Time `db:"created_at" json:"created_at"`
+
+	SyncURL             *string    `db:"sync_url" json:"sync_url"`
+	DestinationSyncedAt *time.Time `db:"destination_synced_at" json:"destination_synced_at"`
+	SourceSyncedAt      *time.Time `db:"source_synced_at" json:"source_synced_at"`
+
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
 }
 
 type AuthSession struct {
@@ -168,6 +173,22 @@ func (o *OTP) Verify(ctx context.Context, verifySession bool) error {
 		}
 	}
 	return nil
+}
+
+func GetAccesses() ([]Access, error) {
+	var (
+		accesses = []Access{}
+		ids      []interface{}
+	)
+
+	if err := database.QuerySelect("all/get_all_accesses", &ids); err != nil {
+		return nil, err
+	}
+
+	if err := database.Fetch(&accesses, ids...); err != nil {
+		return nil, err
+	}
+	return accesses, nil
 }
 
 func GetAccessByClientID(clientID string) (*Access, error) {

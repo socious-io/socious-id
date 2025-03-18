@@ -6,6 +6,7 @@ import (
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
 	"socious-id/src/apps/utils"
+	"socious-id/src/apps/workers"
 
 	"github.com/gin-gonic/gin"
 )
@@ -81,7 +82,8 @@ func usersGroup(router *gin.Engine) {
 			})
 			return
 		}
-
+		// FIXME: use nats
+		go workers.Sync(user.ID)
 		c.Redirect(http.StatusSeeOther, "/auth/confirm")
 	})
 
