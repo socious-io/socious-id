@@ -5,10 +5,6 @@ CREATE TYPE status_type AS ENUM (
     'SUSPENDED'
 );
 
-UPDATE organizations 
-SET status = 'NOT_ACTIVE' 
-WHERE status = 'INACTIVE';
-
 ALTER TABLE organizations
     ALTER COLUMN status DROP DEFAULT,
     ALTER COLUMN status TYPE status_type USING status::text::status_type,
