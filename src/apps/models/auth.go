@@ -85,6 +85,24 @@ func (a *Access) Create(ctx context.Context) error {
 	return nil
 }
 
+func (a *Access) Update(ctx context.Context) error {
+	rows, err := database.Query(
+		ctx,
+		"auth/update_access",
+		a.ID, a.DestinationSyncedAt, a.SourceSyncedAt,
+	)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		if err := rows.StructScan(a); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (AuthSession) TableName() string {
 	return "auth_sessions"
 }
@@ -178,16 +196,12 @@ func (o *OTP) Verify(ctx context.Context, verifySession bool) error {
 func GetAccesses() ([]Access, error) {
 	var (
 		accesses = []Access{}
-		ids      []interface{}
 	)
 
-	if err := database.QuerySelect("all/get_all_accesses", &ids); err != nil {
+	if err := database.QuerySelect("auth/get_all_accesses", &accesses); err != nil {
 		return nil, err
 	}
 
-	if err := database.Fetch(&accesses, ids...); err != nil {
-		return nil, err
-	}
 	return accesses, nil
 }
 
