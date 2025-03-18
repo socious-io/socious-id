@@ -2,7 +2,6 @@ package views
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
@@ -151,22 +150,10 @@ func organizationsGroup(router *gin.Engine) {
 	})
 
 	g.GET("/register/pre", auth.LoginRequired(), func(c *gin.Context) {
-		session := sessions.Default(c)
-
-		if session.Get("org_onboard") == nil || !session.Get("org_onboard").(bool) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid register flow"})
-			return
-		}
-
 		c.HTML(http.StatusOK, "pre-org-register.html", gin.H{})
 	})
 
 	g.GET("/register", auth.LoginRequired(), func(c *gin.Context) {
-		session := sessions.Default(c)
-		if session.Get("org_onboard") == nil || !session.Get("org_onboard").(bool) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid register flow"})
-			return
-		}
 		c.HTML(http.StatusOK, "org-register.html", gin.H{})
 	})
 
@@ -175,12 +162,6 @@ func organizationsGroup(router *gin.Engine) {
 		user := c.MustGet("user").(*models.User)
 
 		session := sessions.Default(c)
-		if session.Get("org_onboard") != nil && !session.Get("org_onboard").(bool) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid register flow"})
-			return
-		}
-
-		fmt.Println(c.Request.Body)
 
 		form := new(OrganizationForm)
 		if err := c.ShouldBind(form); err != nil {
@@ -207,8 +188,10 @@ func organizationsGroup(router *gin.Engine) {
 			return
 		}
 
-		session.Delete("org_onboard")
-		session.Save()
+		if session.Get("org_onboard") != nil && session.Get("org_onboard").(bool) {
+			session.Delete("org_onboard")
+			session.Save()
+		}
 
 		c.JSON(http.StatusOK, gin.H{
 			"redirect": "/auth/confirm",

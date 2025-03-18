@@ -2,7 +2,6 @@ package views
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
@@ -81,7 +80,6 @@ func usersGroup(router *gin.Engine) {
 		session := sessions.Default(c)
 
 		if session.Get("org_onboard") != nil && session.Get("org_onboard").(bool) {
-			fmt.Println(session.Get("org_onboard") != nil && session.Get("org_onboard").(bool))
 			c.JSON(http.StatusOK, gin.H{
 				"redirect": "/organizations/register/pre",
 			})

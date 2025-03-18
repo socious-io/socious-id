@@ -1,6 +1,6 @@
 {{template "header" .}}
 <body>
-    <form onsubmit="createOrganization()">
+    <!-- <form method="POST" onsubmit="createOrganization()"> -->
         <div class="intro">
             <div class="card">
                 <div name="content-section" class="section">
@@ -32,11 +32,11 @@
                     <p style="color: red">{{.error}}</p>
                     {{end}}
                 <div name="button-section" class="section">
-                    <button type="submit" theme="primary" disabled>Continue</button>
+                    <button id="submit" onclick="createOrganization()" theme="primary" disabled>Continue</button>
                 </div>
             </div>
         </div>
-    </form>
+    <!-- </form> -->
 </body>
 
 {{ template "footer" . }}

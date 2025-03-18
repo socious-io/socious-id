@@ -150,7 +150,7 @@ const validateOrgForm = () => {
 	const name = document.getElementById("name").value.trim();
 	const shortname = document.getElementById("shortname").value.trim();
 	const email = document.getElementById("email").value.trim();
-	const submitBtn = document.querySelector("form button[type='submit']");
+	const submitBtn = document.querySelector("#submit");
 
 	if (name && email && shortname) {
 		submitBtn.removeAttribute("disabled");
@@ -161,7 +161,7 @@ const validateOrgForm = () => {
 	
 };
 
-const createOrganization = () => {
+const createOrganization = (e) => {
 	const name = document.getElementById("name").value.trim();
 	const shortname = document.getElementById("shortname").value.trim();
 	const email = document.getElementById("email").value.trim();
