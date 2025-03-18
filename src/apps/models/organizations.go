@@ -36,7 +36,7 @@ type Organization struct {
 	Cover     *Media         `db:"-" json:"cover"`
 	CoverJson types.JSONText `db:"cover" json:"-"`
 
-	Status StatusType `db:"status" json:"status"`
+	Status OrganizationStatusType `db:"status" json:"status"`
 
 	VerifiedImpact bool `db:"verified_impact" json:"verified_impact"`
 	Verified       bool `db:"verified" json:"verified"`
