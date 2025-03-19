@@ -68,6 +68,22 @@ func (st StatusType) Value() (driver.Value, error) {
 	return string(st), nil
 }
 
+type OrganizationStatusType string
+
+const (
+	OrganizationStatusTypeActive    OrganizationStatusType = "ACTIVE"
+	OrganizationStatusTypeInactive  OrganizationStatusType = "NOT_ACTIVE"
+	OrganizationStatusTypeSuspended OrganizationStatusType = "SUSPENDED"
+)
+
+func (ost *OrganizationStatusType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(ost))
+}
+
+func (ost OrganizationStatusType) Value() (driver.Value, error) {
+	return string(ost), nil
+}
+
 func scanEnum(value interface{}, target interface{}) error {
 	switch v := value.(type) {
 	case []byte:

@@ -6,7 +6,9 @@ import (
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
 	"socious-id/src/apps/utils"
+	"socious-id/src/apps/workers"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,8 +38,6 @@ func usersGroup(router *gin.Engine) {
 		}
 
 		c.JSON(http.StatusOK, user)
-		return
-
 	})
 
 	g.PUT("/profile", auth.LoginRequired(), func(c *gin.Context) {
@@ -60,12 +60,8 @@ func usersGroup(router *gin.Engine) {
 			return
 		}
 
-		user.FirstName = form.FirstName
-		user.LastName = form.LastName
-		user.AvatarID = form.AvatarID
-		if form.Username != nil {
-			user.Username = *form.Username
-		}
+		utils.Copy(form, user)
+
 		if err := user.UpdateProfile(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "update-profile.html", gin.H{
 				"error": err.Error(),
@@ -81,6 +77,16 @@ func usersGroup(router *gin.Engine) {
 			})
 			return
 		}
+
+		session := sessions.Default(c)
+
+		if session.Get("org_onboard") != nil && session.Get("org_onboard").(bool) {
+			c.Redirect(http.StatusSeeOther, "/organizations/register/pre")
+			return
+		}
+
+		// FIXME: use nats
+		go workers.Sync(user.ID)
 
 		c.Redirect(http.StatusSeeOther, "/auth/confirm")
 	})

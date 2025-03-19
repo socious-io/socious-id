@@ -17,8 +17,13 @@ type Access struct {
 	Description  string    `db:"description" json:"description"`
 	ClientID     string    `db:"client_id" json:"client_id"`
 	ClientSecret string    `db:"client_secret" json:"-"`
-	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
-	CreatedAt    time.Time `db:"created_at" json:"created_at"`
+
+	SyncURL             *string    `db:"sync_url" json:"sync_url"`
+	DestinationSyncedAt *time.Time `db:"destination_synced_at" json:"destination_synced_at"`
+	SourceSyncedAt      *time.Time `db:"source_synced_at" json:"source_synced_at"`
+
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
 }
 
 type AuthSession struct {
@@ -67,6 +72,24 @@ func (a *Access) Create(ctx context.Context) error {
 		ctx,
 		"auth/create_access",
 		a.Name, a.Description, a.ClientID, a.ClientSecret,
+	)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		if err := rows.StructScan(a); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (a *Access) Update(ctx context.Context) error {
+	rows, err := database.Query(
+		ctx,
+		"auth/update_access",
+		a.ID, a.DestinationSyncedAt, a.SourceSyncedAt,
 	)
 	if err != nil {
 		return err
@@ -168,6 +191,18 @@ func (o *OTP) Verify(ctx context.Context, verifySession bool) error {
 		}
 	}
 	return nil
+}
+
+func GetAccesses() ([]Access, error) {
+	var (
+		accesses = []Access{}
+	)
+
+	if err := database.QuerySelect("auth/get_all_accesses", &accesses); err != nil {
+		return nil, err
+	}
+
+	return accesses, nil
 }
 
 func GetAccessByClientID(clientID string) (*Access, error) {

@@ -1,0 +1,51 @@
+{{template "header" .}}
+<body>
+	<div class="intro">
+		<div class="card">
+			<div class="logo">
+				<img src="/statics/icons/lock.svg" alt="Login Lock" width="24" height="24" />
+			</div>
+			<div name="header" class="header">
+				<h2>Create your organization</h2>
+				<span class="text-grey leading-6">Create an organization to post jobs and hire</span>
+			</div>
+			<div name="content-section" class="section">
+				<div class="steps">
+					<div class="step">
+						<div class="logo step-logo">
+							<img src="/statics/icons/briefcase.svg" alt="step-1" width="24" height="24" />
+						</div>
+						<div class="step-title">
+							<span class="text-md font-semibold leading-6 text-black">Post opportunities</span>
+							Create and manage impact job postings
+						</div>
+					</div>
+					<div class="step">
+						<div class="logo step-logo">
+							<img src="/statics/icons/shield-tick.svg" alt="step-1" width="24" height="24" />
+						</div>
+						<div class="step-title">
+							<span class="text-md font-semibold leading-6 text-black">Issue verifiable credentials</span>
+							Create and issue verified impact credentials to your community
+						</div>
+					</div>
+					<div class="step">
+						<div class="logo step-logo">
+							<img src="/statics/icons/chart.svg" alt="step-1" width="24" height="24" />
+						</div>
+						<div class="step-title">
+							<span class="text-md font-semibold leading-6 text-black">Crowdfund your project</span>
+							Launch and manage social impact fundraising campaigns
+						</div>
+					</div>
+				</div>
+			</div>
+			<div name="button-section" class="section">
+				<a href="/organizations/register">
+					<button type="button" theme="primary">Create organization</button>
+				</a>
+			</div>
+		</div>
+	</div>
+</body>
+{{template "footer" .}}
