@@ -194,9 +194,7 @@ func organizationsGroup(router *gin.Engine) {
 			session.Save()
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"redirect": "/auth/confirm",
-		})
+		c.Redirect(http.StatusSeeOther, "/auth/confirm")
 	})
 
 	g.GET("/register/complete", auth.LoginRequired(), func(c *gin.Context) {

@@ -86,10 +86,11 @@ const createProfile = () => {
 	})
 		.then((response) => {
 			if (response.ok) {
-				// Redirect after successful PUT request
-				response.json().then((data) => {
-					window.location.href = data.redirect;
-				});
+				if (response.redirected) {  // Detect if a redirect happened
+					window.location.href = response.url;  // Redirect user
+				} else {
+					return response.text();  // Handle normal response
+				}
 			} else {
 				console.error("Error:", response.statusText);
 			}
@@ -178,12 +179,10 @@ const createOrganization = (e) => {
 		headers: { "Content-Type": "application/json" },
 	})
 		.then((response) => {
-			if (response.ok) {
-				response.json().then((data) => {
-					window.location.href = data.redirect;
-				});
+			if (response.redirected) {  // Detect if a redirect happened
+				window.location.href = response.url;  // Redirect user
 			} else {
-				console.error("Error:", response.statusText);
+				return response.text();  // Handle normal response
 			}
 		})
 		.catch((error) => console.error("Error:", error));
