@@ -167,7 +167,7 @@ func GetUserByEmail(email string) (*User, error) {
 	return u, nil
 }
 
-func GetUserByUsername(username string) (*User, error) {
+func GetUserByUsername(username *string) (*User, error) {
 	u := new(User)
 	if err := database.Get(u, "users/fetch_by_username", username); err != nil {
 		return nil, err

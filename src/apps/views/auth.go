@@ -211,6 +211,13 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
+		if _, err := models.GetUserByEmail(form.Email); err == nil {
+			c.HTML(http.StatusBadRequest, "register.html", gin.H{
+				"error": "Email is already in use. Please select different email.",
+			})
+			return
+		}
+
 		//Creating user (Default in INACTIVE state)
 		u := &models.User{
 			Username: form.Email, //TODO: generate username

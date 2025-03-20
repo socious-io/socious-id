@@ -49,12 +49,13 @@
                         </div>
                     </div>
                 </div>
-                {{if .error}}
-                    <p style="color: red">{{.error}}</p>
-                    {{end}}
+            
                 <div name="button-section" class="section">
                     <button type="submit" theme="primary" disabled>Create profile</button>
                 </div>
+                <p id="error" style="color: red">
+                    {{.error}}
+                </p>
             </div>
         </div>
     </form>

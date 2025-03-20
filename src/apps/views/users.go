@@ -60,6 +60,13 @@ func usersGroup(router *gin.Engine) {
 			return
 		}
 
+		if _, err := models.GetUserByUsername(form.Username); err == nil {
+			c.HTML(http.StatusBadRequest, "update-profile.html", gin.H{
+				"error": "Username is already in use. Please select different username.",
+			})
+			return
+		}
+
 		utils.Copy(form, user)
 
 		if err := user.UpdateProfile(ctx); err != nil {
