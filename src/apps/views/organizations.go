@@ -151,6 +151,12 @@ func organizationsGroup(router *gin.Engine) {
 	})
 
 	g.GET("/register/pre", auth.LoginRequired(), func(c *gin.Context) {
+		next := c.Query("next")
+		if next != "" {
+			session := sessions.Default(c)
+			session.Set("next", next)
+			session.Save()
+		}
 		c.HTML(http.StatusOK, "pre-org-register.html", gin.H{})
 	})
 
@@ -192,6 +198,14 @@ func organizationsGroup(router *gin.Engine) {
 		if session.Get("org_onboard") != nil && session.Get("org_onboard").(bool) {
 			session.Delete("org_onboard")
 			session.Save()
+		}
+
+		if session.Get("next") != nil {
+			next := session.Get("next").(string)
+			session.Delete("next")
+			session.Save()
+			c.Redirect(http.StatusSeeOther, next)
+			return
 		}
 
 		c.Redirect(http.StatusSeeOther, "/auth/confirm")
