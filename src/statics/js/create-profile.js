@@ -167,6 +167,8 @@ const createOrganization = (e) => {
 	const shortname = document.getElementById("shortname").value.trim();
 	const email = document.getElementById("email").value.trim();
 	const logoId = document.getElementById("logo-id").value.trim();
+
+	document.querySelector("#submit").setAttribute("disabled", "true");
 	
     fetch("/organizations/register", {
 		method: "POST",
