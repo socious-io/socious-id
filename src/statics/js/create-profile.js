@@ -92,7 +92,12 @@ const createProfile = () => {
 					return response.text();  // Handle normal response
 				}
 			} else {
-				console.error("Error:", response.statusText);
+				response.text().then(html=>{
+					const parser = new DOMParser();
+					const doc = parser.parseFromString(html, "text/html");
+					const error = window.document.getElementById("error");
+					error.innerHTML = doc.querySelector("#error").innerHTML;
+				});
 			}
 		})
 		.catch((error) => console.error("Error:", error));
@@ -187,7 +192,9 @@ const createOrganization = (e) => {
 				return response.text();  // Handle normal response
 			}
 		})
-		.catch((error) => console.error("Error:", error));
+		.catch((error) => {
+			console.error("Error:", error)
+		});
 
 	return false;
 }   
