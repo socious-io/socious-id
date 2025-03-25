@@ -373,6 +373,13 @@ func authGroup(router *gin.Engine) {
 		c.Redirect(http.StatusPermanentRedirect, "/auth/login")
 	})
 
+	g.GET("/logout", auth.LoginRequired(), func(c *gin.Context) {
+		session := sessions.Default(c)
+		session.Delete("user_id")
+		session.Save()
+		c.Redirect(http.StatusPermanentRedirect, "/auth/login")
+	})
+
 	g.POST("/session", func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
 		form := new(AuthSessionForm)
