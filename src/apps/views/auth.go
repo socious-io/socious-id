@@ -155,12 +155,13 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		if otp.AuthSession != nil && (otp.AuthSession.ExpireAt.Before(time.Now()) || otp.AuthSession.VerifiedAt != nil) {
+		// TEMPORARY organization creation need this to reverify auth session as we check OTP is new no worries
+		/* if otp.AuthSession != nil && (otp.AuthSession.ExpireAt.Before(time.Now()) || otp.AuthSession.VerifiedAt != nil) {
 			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
 				"error": "auth session has been expired",
 			})
 			return
-		}
+		} */
 
 		if err := otp.Verify(ctx, false); err != nil {
 			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
@@ -511,12 +512,13 @@ func authGroup(router *gin.Engine) {
 			})
 		}
 
-		if otp.AuthSession.ExpireAt.Before(time.Now()) || otp.AuthSession.VerifiedAt != nil {
+		// TEMPORARY organization creation need this to reverify auth session as we check OTP is new no worries
+		/* if otp.AuthSession.ExpireAt.Before(time.Now()) || otp.AuthSession.VerifiedAt != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "auth session has been expired",
 			})
 			return
-		}
+		} */
 
 		tokens, err := auth.Signin(otp.User.ID.String(), otp.User.Email)
 		if err != nil {
