@@ -200,14 +200,6 @@ func organizationsGroup(router *gin.Engine) {
 			session.Save()
 		}
 
-		if session.Get("next") != nil {
-			next := session.Get("next").(string)
-			session.Delete("next")
-			session.Save()
-			c.Redirect(http.StatusSeeOther, next)
-			return
-		}
-
 		c.Redirect(http.StatusSeeOther, "/auth/confirm")
 	})
 
