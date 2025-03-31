@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func usersGroup(router *gin.Engine) {
@@ -94,4 +95,26 @@ func usersGroup(router *gin.Engine) {
 		c.HTML(http.StatusOK, "update-profile.html", gin.H{})
 	})
 
+	g.PUT("/:id/status", func(c *gin.Context) {
+		ctx := c.MustGet("ctx").(context.Context)
+
+		form := new(UserUpdateStatusForm)
+		if err := c.ShouldBindJSON(form); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		user, err := models.GetUser(uuid.MustParse(c.Param("id")))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := user.UpdateStatus(ctx, form.Status); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, user)
+	})
 }

@@ -84,6 +84,7 @@ func authGroup(router *gin.Engine) {
 
 		params.Add("status", "success")
 		params.Add("code", otp.Code)
+		params.Add("identity_id", form.IdentityId)
 
 		c.Redirect(http.StatusFound, fmt.Sprintf("%s?%s", authSession.RedirectURL, params.Encode()))
 
@@ -536,6 +537,57 @@ func authGroup(router *gin.Engine) {
 		}
 
 		c.JSON(http.StatusAccepted, tokens)
+	})
+
+	g.POST("/refresh", func(c *gin.Context) {
+		form := new(RefreshTokenForm)
+		if err := c.ShouldBind(form); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		//Checking Client
+		access, err := models.GetAccessByClientID(form.ClientID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "client access not valid",
+			})
+			return
+		}
+
+		//Checking access token
+		claims, err := auth.VerifyToken(form.RefreshToken)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// tb := models.TokenBlacklist{
+		// 	Token: form.RefreshToken,
+		// }
+		// ctx, _ := c.Get("ctx")
+		// if err := tb.Create(ctx.(context.Context)); err != nil {
+		// 	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		// 	return
+		// }
+
+		tokens, err := auth.Signin(claims.ID, claims.Email)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, tokens)
 	})
 }
 

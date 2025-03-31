@@ -151,6 +151,24 @@ func (u *User) UpdateProfile(ctx context.Context) error {
 	return database.Fetch(u, u.ID)
 }
 
+func (u *User) UpdateStatus(ctx context.Context, status StatusType) error {
+	rows, err := database.Query(
+		ctx,
+		"users/update_status",
+		u.ID, u.Status,
+	)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		if err := rows.StructScan(u); err != nil {
+			return err
+		}
+	}
+	return database.Fetch(u, u.ID)
+}
+
 func GetUser(id uuid.UUID) (*User, error) {
 	u := new(User)
 	if err := database.Fetch(u, id.String()); err != nil {
