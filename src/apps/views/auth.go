@@ -171,7 +171,7 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		if err := otp.User.Verify(ctx, models.VerificationTypeEmail); err != nil {
+		if err := otp.User.Verify(ctx, models.UserVerificationTypeEmail); err != nil {
 			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
 				"error": err.Error(),
 			})

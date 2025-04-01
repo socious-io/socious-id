@@ -73,6 +73,24 @@ func (o *Organization) Create(ctx context.Context) error {
 	return database.Fetch(o, o.ID)
 }
 
+func (o *Organization) UpdateStatus(ctx context.Context, status OrganizationStatusType) error {
+	rows, err := database.Query(
+		ctx,
+		"organizations/update_status",
+		o.ID, status,
+	)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		if err := rows.StructScan(o); err != nil {
+			return err
+		}
+	}
+	return database.Fetch(o, o.ID)
+}
+
 func (o *Organization) Update(ctx context.Context) error {
 	rows, err := database.Query(
 		ctx,
@@ -134,6 +152,24 @@ func (o *Organization) Remove(ctx context.Context) error {
 		ctx,
 		"organizations/remove",
 		o.ID,
+	)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		if err := rows.StructScan(o); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (o *Organization) Verify(ctx context.Context, vtype OrganizationVerificationType) error {
+	rows, err := database.Query(
+		ctx,
+		"organizations/verify",
+		o.ID, vtype,
 	)
 	if err != nil {
 		return err

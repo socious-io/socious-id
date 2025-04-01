@@ -78,7 +78,7 @@ func (u *User) Create(ctx context.Context) error {
 	return database.Fetch(u, u.ID)
 }
 
-func (u *User) Verify(ctx context.Context, vtype VerificationType) error {
+func (u *User) Verify(ctx context.Context, vtype UserVerificationType) error {
 	rows, err := database.Query(
 		ctx,
 		"users/verify",
@@ -155,7 +155,7 @@ func (u *User) UpdateStatus(ctx context.Context, status StatusType) error {
 	rows, err := database.Query(
 		ctx,
 		"users/update_status",
-		u.ID, u.Status,
+		u.ID, status,
 	)
 	if err != nil {
 		return err

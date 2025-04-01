@@ -54,6 +54,16 @@ type UserUpdateStatusForm struct {
 	Status models.StatusType `json:"status" form:"status" validate:"required"`
 }
 
+type OrganizationUpdateStatusForm struct {
+	ClientSecretForm
+	Status models.OrganizationStatusType `json:"status" form:"status" validate:"required"`
+}
+
+type OrganizationVerificationForm struct {
+	ClientSecretForm
+	Status models.OrganizationStatusType `json:"status" form:"status" validate:"required"`
+}
+
 type OrganizationForm struct {
 	Shortname   string  `json:"shortname" form:"shortname"`
 	Name        *string `json:"name" form:"name"`

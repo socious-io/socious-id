@@ -104,6 +104,22 @@ func usersGroup(router *gin.Engine) {
 			return
 		}
 
+		//Checking Client
+		access, err := models.GetAccessByClientID(form.ClientID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "client access not valid",
+			})
+			return
+		}
+
 		user, err := models.GetUser(uuid.MustParse(c.Param("id")))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -111,6 +127,45 @@ func usersGroup(router *gin.Engine) {
 		}
 
 		if err := user.UpdateStatus(ctx, form.Status); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, user)
+	})
+
+	g.POST("/:id/verify", func(c *gin.Context) {
+		ctx := c.MustGet("ctx").(context.Context)
+
+		form := new(ClientSecretForm)
+		if err := c.ShouldBindJSON(form); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		//Checking Client
+		access, err := models.GetAccessByClientID(form.ClientID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "client access not valid",
+			})
+			return
+		}
+
+		user, err := models.GetUser(uuid.MustParse(c.Param("id")))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := user.Verify(ctx, models.UserVerificationTypeIdenity); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
