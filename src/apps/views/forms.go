@@ -28,7 +28,7 @@ type GetTokenForm struct {
 
 type RefreshTokenForm struct {
 	ClientSecretForm
-	RefreshToken string `json:"code" form:"code" validate:"required"`
+	RefreshToken string `json:"refresh_token" form:"refresh_token" validate:"required"`
 }
 
 type UserForm struct {
