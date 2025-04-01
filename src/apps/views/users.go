@@ -41,13 +41,6 @@ func usersGroup(router *gin.Engine) {
 	})
 
 	g.PUT("/profile", auth.LoginRequired(), func(c *gin.Context) {
-		authSession := loadAuthSession(c)
-		if authSession == nil {
-			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
-				"error": "not accepted without auth session",
-			})
-			return
-		}
 
 		user := c.MustGet("user").(*models.User)
 		ctx := c.MustGet("ctx").(context.Context)
@@ -56,6 +49,13 @@ func usersGroup(router *gin.Engine) {
 		if err := c.ShouldBind(form); err != nil {
 			c.HTML(http.StatusBadRequest, "update-profile.html", gin.H{
 				"error": err.Error(),
+			})
+			return
+		}
+
+		if _, err := models.GetUserByUsername(form.Username); err == nil {
+			c.HTML(http.StatusBadRequest, "update-profile.html", gin.H{
+				"error": "Username is already in use. Please select different username.",
 			})
 			return
 		}
@@ -84,7 +84,6 @@ func usersGroup(router *gin.Engine) {
 			c.Redirect(http.StatusSeeOther, "/organizations/register/pre")
 			return
 		}
-
 		// FIXME: use nats
 		go workers.Sync(user.ID)
 

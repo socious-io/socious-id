@@ -3,6 +3,7 @@ package views
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"socious-id/src/apps/auth"
@@ -28,6 +29,16 @@ func authGroup(router *gin.Engine) {
 				"Organizations": organizations,
 				"AuthSession":   authSession,
 			})
+		}
+
+		session := sessions.Default(c)
+
+		if session.Get("next") != nil {
+			next := session.Get("next").(string)
+			session.Delete("next")
+			session.Save()
+			c.Redirect(http.StatusSeeOther, next)
+			return
 		}
 		// NOTE: look like page sent without any session so detect it's self authorization
 		c.Redirect(http.StatusPermanentRedirect, config.Config.Platforms.Accounts)
@@ -144,19 +155,13 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		if otp.AuthSession == nil {
-			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
-				"error": "not valid otp for this session",
-			})
-			return
-		}
-
-		if otp.AuthSession.ExpireAt.Before(time.Now()) || otp.AuthSession.VerifiedAt != nil {
+		// TEMPORARY organization creation need this to reverify auth session as we check OTP is new no worries
+		/* if otp.AuthSession != nil && (otp.AuthSession.ExpireAt.Before(time.Now()) || otp.AuthSession.VerifiedAt != nil) {
 			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
 				"error": "auth session has been expired",
 			})
 			return
-		}
+		} */
 
 		if err := otp.Verify(ctx, false); err != nil {
 			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
@@ -194,12 +199,6 @@ func authGroup(router *gin.Engine) {
 
 	g.POST("/register", auth.CheckLogin(), func(c *gin.Context) {
 		authSession := loadAuthSession(c)
-		if authSession == nil {
-			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
-				"error": "not accepted without auth session",
-			})
-			return
-		}
 
 		ctx := c.MustGet("ctx").(context.Context)
 
@@ -207,6 +206,13 @@ func authGroup(router *gin.Engine) {
 		if err := c.ShouldBind(form); err != nil {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{
 				"error": err.Error(),
+			})
+			return
+		}
+
+		if _, err := models.GetUserByEmail(form.Email); err == nil {
+			c.HTML(http.StatusBadRequest, "register.html", gin.H{
+				"error": "Email is already in use. Please select different email.",
 			})
 			return
 		}
@@ -226,9 +232,12 @@ func authGroup(router *gin.Engine) {
 
 		//Save OTP
 		otp := &models.OTP{
-			UserID:        u.ID,
-			AuthSessionID: &authSession.ID,
-			Type:          models.VerificationOTP,
+			UserID: u.ID,
+			Type:   models.VerificationOTP,
+		}
+
+		if authSession != nil {
+			otp.AuthSessionID = &authSession.ID
 		}
 
 		if err := otp.Create(ctx); err != nil {
@@ -248,6 +257,8 @@ func authGroup(router *gin.Engine) {
 			Args:        items,
 		})
 
+		log.Printf("OTP for email %s is `%s` \n", u.Email, otp.Code)
+
 		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/auth/otp?email=%s", form.Email))
 	})
 
@@ -260,13 +271,6 @@ func authGroup(router *gin.Engine) {
 	})
 
 	g.POST("/password/forget", auth.CheckLogin(), func(c *gin.Context) {
-		authSession := loadAuthSession(c)
-		if authSession == nil {
-			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
-				"error": "not accepted without auth session",
-			})
-			return
-		}
 
 		ctx := c.MustGet("ctx").(context.Context)
 
@@ -297,9 +301,13 @@ func authGroup(router *gin.Engine) {
 
 		//Save OTP
 		otp := &models.OTP{
-			UserID:        u.ID,
-			AuthSessionID: &authSession.ID,
-			Type:          models.ForgetPasswordOTP,
+			UserID: u.ID,
+			Type:   models.ForgetPasswordOTP,
+		}
+
+		authSession := loadAuthSession(c)
+		if authSession != nil {
+			otp.AuthSessionID = &authSession.ID
 		}
 
 		if err := otp.Create(ctx); err != nil {
@@ -319,6 +327,8 @@ func authGroup(router *gin.Engine) {
 			Args:        items,
 		})
 
+		log.Printf("OTP for email %s is `%s` \n", u.Email, otp.Code)
+
 		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/auth/otp?email=%s", u.Email))
 	})
 
@@ -327,13 +337,6 @@ func authGroup(router *gin.Engine) {
 	})
 
 	g.POST("/password/set", auth.LoginRequired(), func(c *gin.Context) {
-		authSession := loadAuthSession(c)
-		if authSession == nil {
-			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
-				"error": "not accepted without auth session",
-			})
-			return
-		}
 
 		user := c.MustGet("user").(*models.User)
 		ctx := c.MustGet("ctx").(context.Context)
@@ -367,6 +370,13 @@ func authGroup(router *gin.Engine) {
 	})
 
 	g.DELETE("/logout", auth.LoginRequired(), func(c *gin.Context) {
+		session := sessions.Default(c)
+		session.Delete("user_id")
+		session.Save()
+		c.Redirect(http.StatusPermanentRedirect, "/auth/login")
+	})
+
+	g.GET("/logout", auth.LoginRequired(), func(c *gin.Context) {
 		session := sessions.Default(c)
 		session.Delete("user_id")
 		session.Save()
@@ -502,12 +512,13 @@ func authGroup(router *gin.Engine) {
 			})
 		}
 
-		if otp.AuthSession.ExpireAt.Before(time.Now()) || otp.AuthSession.VerifiedAt != nil {
+		// TEMPORARY organization creation need this to reverify auth session as we check OTP is new no worries
+		/* if otp.AuthSession.ExpireAt.Before(time.Now()) || otp.AuthSession.VerifiedAt != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "auth session has been expired",
 			})
 			return
-		}
+		} */
 
 		tokens, err := auth.Signin(otp.User.ID.String(), otp.User.Email)
 		if err != nil {

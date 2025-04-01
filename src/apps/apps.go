@@ -50,6 +50,11 @@ func Init() *gin.Engine {
 	store := cookie.NewStore([]byte(config.Config.Secret))
 	router.Use(sessions.Sessions("socious-id-session", store))
 
+	router.Use(func(c *gin.Context) {
+		c.Next()
+
+	})
+
 	if config.Config.Debug {
 		router.Static("/statics", config.Config.Statics)
 	}

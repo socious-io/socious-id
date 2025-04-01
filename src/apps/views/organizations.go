@@ -151,6 +151,12 @@ func organizationsGroup(router *gin.Engine) {
 	})
 
 	g.GET("/register/pre", auth.LoginRequired(), func(c *gin.Context) {
+		next := c.Query("next")
+		if next != "" {
+			session := sessions.Default(c)
+			session.Set("next", next)
+			session.Save()
+		}
 		c.HTML(http.StatusOK, "pre-org-register.html", gin.H{})
 	})
 
