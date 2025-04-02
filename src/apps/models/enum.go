@@ -36,20 +36,35 @@ func (amt AuthModeType) Value() (driver.Value, error) {
 	return string(amt), nil
 }
 
-type VerificationType string
+type UserVerificationType string
 
 const (
-	VerificationTypeEmail   VerificationType = "EMAIL"
-	VerificationTypePhone   VerificationType = "PHONE"
-	VerificationTypeIdenity VerificationType = "IDENTITY"
+	UserVerificationTypeEmail   UserVerificationType = "EMAIL"
+	UserVerificationTypePhone   UserVerificationType = "PHONE"
+	UserVerificationTypeIdenity UserVerificationType = "IDENTITY"
 )
 
-func (vt *VerificationType) Scan(value interface{}) error {
-	return scanEnum(value, (*string)(vt))
+func (uvt *UserVerificationType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(uvt))
 }
 
-func (vt VerificationType) Value() (driver.Value, error) {
-	return string(vt), nil
+func (uvt UserVerificationType) Value() (driver.Value, error) {
+	return string(uvt), nil
+}
+
+type OrganizationVerificationType string
+
+const (
+	OrganizationVerificationTypeNormal OrganizationVerificationType = "NORMAL"
+	OrganizationVerificationTypeImpact OrganizationVerificationType = "IMPACT"
+)
+
+func (ovt *OrganizationVerificationType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(ovt))
+}
+
+func (ovt OrganizationVerificationType) Value() (driver.Value, error) {
+	return string(ovt), nil
 }
 
 type StatusType string

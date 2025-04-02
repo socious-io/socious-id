@@ -86,6 +86,84 @@ func organizationsGroup(router *gin.Engine) {
 		c.JSON(http.StatusCreated, organization)
 	})
 
+	g.PUT("/:id/status", func(c *gin.Context) {
+		ctx := c.MustGet("ctx").(context.Context)
+
+		form := new(OrganizationUpdateStatusForm)
+		if err := c.ShouldBindJSON(form); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		//Checking Client
+		access, err := models.GetAccessByClientID(form.ClientID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "client access not valid",
+			})
+			return
+		}
+
+		organization, err := models.GetOrganization(uuid.MustParse(c.Param("id")))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := organization.UpdateStatus(ctx, form.Status); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, organization)
+	})
+
+	g.POST("/:id/verify", func(c *gin.Context) {
+		ctx := c.MustGet("ctx").(context.Context)
+
+		form := new(OrganizationUpdateStatusForm)
+		if err := c.ShouldBindJSON(form); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		//Checking Client
+		access, err := models.GetAccessByClientID(form.ClientID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "client access not valid",
+			})
+			return
+		}
+
+		organization, err := models.GetOrganization(uuid.MustParse(c.Param("id")))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := organization.Verify(ctx, models.OrganizationVerificationTypeNormal); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, organization)
+	})
+
 	g.PUT("/:id", auth.LoginRequired(), isOrgMember(), func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
 		organization := c.MustGet("organization").(*models.Organization)

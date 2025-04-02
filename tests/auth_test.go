@@ -182,7 +182,7 @@ func authGroup() {
 			Expect(w.Code).To(Equal(http.StatusFound))
 			location := w.Result().Header.Get("Location")
 			Expect(location).To(Equal(fmt.Sprintf(
-				"%s?code=%s&session=%s&status=success",
+				"%s?code=%s&identity_id=&session=%s&status=success",
 				authConfig["redirect_url"],
 				ssoOtpCodes[i],
 				sessionsData[i]["id"],
@@ -275,7 +275,7 @@ func authGroup() {
 			Expect(w.Code).To(Equal(http.StatusFound))
 			location := w.Result().Header.Get("Location")
 			Expect(location).To(Equal(fmt.Sprintf(
-				"%s?code=%s&session=%s&status=success",
+				"%s?code=%s&identity_id=&session=%s&status=success",
 				authConfig["redirect_url"],
 				ssoOtpCodes[i+offset],
 				sessionsData[i+offset]["id"],

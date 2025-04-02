@@ -8,6 +8,7 @@
 					<img src="/statics/icons/lock.svg" alt="Login Lock" width="24" height="24" />
 				</div>
 				<input hidden value="1" type="number" name="confirmed" />
+				<input hidden id="identity_id" type="text" name="identity_id" />
 				<div name="header" class="header">
 					<h2>Sign in with Socious ID</h2>
 					<span class="text-grey leading-6">Choose an account</span>
@@ -16,7 +17,7 @@
 				<div name="content-section" class="section">
 					<div name="individual" class="consent-account-label">
 						Your individual profile
-						<button type="submit" class="consent-account">
+						<button onclick="document.getElementById('identity_id').value = '{{ .User.ID }}'; this.form.submit();" type="submit" class="consent-account">
 							{{ if .User.Avatar }}
 								<img src="{{ .User.Avatar.URL }}" alt="Profile Image" width="40" height="40" />
 							{{ else }}
@@ -35,7 +36,7 @@
 						Your organization profiles
 						<div class="consent-accounts">
 							{{ range .Organizations }}
-							<div class="consent-account">
+							<button onclick="document.getElementById('identity_id').value = '{{ .ID }}'; this.form.submit();" class="consent-account">
 								{{ if .Logo }}
 									<img src="{{ .Logo.URL }}" alt="Profile Image" width="40" height="40" />
 								{{ else }}
@@ -45,7 +46,7 @@
 									{{.Name}}
 									<span class="consent-account-email">@{{.Shortname}}</span>
 								</div>
-							</div>
+							</button>
 							{{ end }}
 						</div>
 					</div>

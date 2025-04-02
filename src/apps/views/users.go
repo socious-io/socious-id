@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func usersGroup(router *gin.Engine) {
@@ -94,4 +95,81 @@ func usersGroup(router *gin.Engine) {
 		c.HTML(http.StatusOK, "update-profile.html", gin.H{})
 	})
 
+	g.PUT("/:id/status", func(c *gin.Context) {
+		ctx := c.MustGet("ctx").(context.Context)
+
+		form := new(UserUpdateStatusForm)
+		if err := c.ShouldBindJSON(form); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		//Checking Client
+		access, err := models.GetAccessByClientID(form.ClientID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "client access not valid",
+			})
+			return
+		}
+
+		user, err := models.GetUser(uuid.MustParse(c.Param("id")))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := user.UpdateStatus(ctx, form.Status); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, user)
+	})
+
+	g.POST("/:id/verify", func(c *gin.Context) {
+		ctx := c.MustGet("ctx").(context.Context)
+
+		form := new(ClientSecretForm)
+		if err := c.ShouldBindJSON(form); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		//Checking Client
+		access, err := models.GetAccessByClientID(form.ClientID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "client access not valid",
+			})
+			return
+		}
+
+		user, err := models.GetUser(uuid.MustParse(c.Param("id")))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := user.Verify(ctx, models.UserVerificationTypeIdenity); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, user)
+	})
 }
