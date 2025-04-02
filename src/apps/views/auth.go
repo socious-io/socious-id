@@ -572,15 +572,6 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		// tb := models.TokenBlacklist{
-		// 	Token: form.RefreshToken,
-		// }
-		// ctx, _ := c.Get("ctx")
-		// if err := tb.Create(ctx.(context.Context)); err != nil {
-		// 	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		// 	return
-		// }
-
 		tokens, err := auth.Signin(claims.ID, claims.Email)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
