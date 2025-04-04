@@ -27,6 +27,11 @@ type ConfigType struct {
 		ApiKey    string            `mapstructure:"apikey"`
 		Templates map[string]string `mapstructure:"templates"`
 	} `mapstructure:"sendgrid"`
+	Wallet struct {
+		Agent       string `mapstructure:"agent"`
+		AgentApiKey string `mapstructure:"agent_api_key"`
+		Connect     string `mapstructure:"connect"`
+	} `mapstructure:"wallet"`
 	Upload struct {
 		Bucket      string `mapstructure:"bucket"`
 		CDN         string `mapstructure:"cdn"`
