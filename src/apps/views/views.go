@@ -7,4 +7,5 @@ func Init(r *gin.Engine) {
 	usersGroup(r)
 	organizationsGroup(r)
 	mediaGroup(r)
+	verificationsGroup(r)
 }

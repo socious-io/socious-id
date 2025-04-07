@@ -62,4 +62,14 @@ var (
 			"culture":     "TestCulture2",
 		},
 	}
+
+	verificationsData = []gin.H{
+		{},
+		{},
+	}
+
+	shorteningURLs = []string{
+		"https://google.com",
+		"https://app.socious.io",
+	}
 )

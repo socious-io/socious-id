@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/url"
 	"socious-id/src/apps/wallet"
 	"socious-id/src/config"
@@ -89,11 +90,8 @@ func (v *VerificationCredential) ProofRequest(ctx context.Context) error {
 		return errors.New("connection expired")
 	}
 
-	challenge, _ := json.Marshal(wallet.H{
-		"type": v.Verification.Schema.Name,
-	})
-
-	presentID, err := wallet.ProofRequest(*v.ConnectionID, string(challenge))
+	//Challenge is same as socious work
+	presentID, err := wallet.ProofRequest(*v.ConnectionID, "A challenge for the holder to sign")
 	if err != nil {
 		return err
 	}
@@ -119,20 +117,20 @@ func (v *VerificationCredential) ProofVerify(ctx context.Context) error {
 		return err
 	}
 	vcData, _ := json.Marshal(vc)
-	if len(v.Verification.Attributes) > 0 {
-		if err := validateVC(*v.Verification.Schema, vc, v.Verification.Attributes); err != nil {
-			rows, err := database.Query(
-				ctx,
-				"verifications/update_present_failed",
-				v.ID, vcData, err.Error(),
-			)
-			if err != nil {
-				return err
-			}
-			rows.Close()
-			return nil
+	duplicateVerification, err := GetSimilar(ctx, vc)
+	if err == nil && duplicateVerification != nil {
+		rows, err := database.Query(
+			ctx,
+			"verifications/update_present_failed",
+			v.ID, vcData, fmt.Sprintf("Duplicate Identity: Verification ID: %s", (*duplicateVerification).ID),
+		)
+		if err != nil {
+			return err
 		}
+		rows.Close()
+		return nil
 	}
+
 	rows, err := database.Query(
 		ctx,
 		"verifications/update_present_verify",
@@ -145,41 +143,33 @@ func (v *VerificationCredential) ProofVerify(ctx context.Context) error {
 	return database.Fetch(v, v.ID)
 }
 
-func GetVerifications(id uuid.UUID) (*VerificationCredential, error) {
+func GetSimilar(ctx context.Context, data wallet.H) (*VerificationCredential, error) {
+	v := new(VerificationCredential)
+	err := database.Get(
+		v,
+		"verifications/get_similar",
+		data,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return v, nil
+}
+
+func GetVerificationByUser(userId uuid.UUID) (*VerificationCredential, error) {
+	v := new(VerificationCredential)
+
+	if err := database.Get(v, "verifications/get_by_user", userId); err != nil {
+		return nil, err
+	}
+	return v, nil
+}
+
+func GetVerification(id uuid.UUID) (*VerificationCredential, error) {
 	v := new(VerificationCredential)
 
 	if err := database.Fetch(v, id); err != nil {
 		return nil, err
 	}
-	verification, err := GetVerification(v.VerificationID)
-	if err != nil {
-		return nil, err
-	}
-	v.Verification = verification
 	return v, nil
-}
-
-func GetVerificationsIndividuals(userId, verificationId uuid.UUID, p database.Paginate) ([]VerificationIndividual, int, error) {
-	var (
-		verifications = []VerificationIndividual{}
-		fetchList     []database.FetchList
-		ids           []interface{}
-	)
-
-	if err := database.QuerySelect("verifications/get_individuals", &fetchList, userId, verificationId, p.Limit, p.Offet); err != nil {
-		return nil, 0, err
-	}
-
-	if len(fetchList) < 1 {
-		return verifications, 0, nil
-	}
-
-	for _, f := range fetchList {
-		ids = append(ids, f.ID)
-	}
-
-	if err := database.Fetch(&verifications, ids...); err != nil {
-		return nil, 0, err
-	}
-	return verifications, fetchList[0].TotalCount, nil
 }

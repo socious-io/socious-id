@@ -20,58 +20,8 @@ type Connect struct {
 	ShortID string
 }
 
-func CreateDID() (string, error) {
-
-	// Document template with public keys and empty services
-	documentTemplate := H{
-		"publicKeys": []H{
-			{
-				"id":      "auth-1",
-				"purpose": "authentication",
-			},
-			{
-				"id":      "issue-1",
-				"purpose": "assertionMethod",
-			},
-		},
-		"services": []interface{}{},
-	}
-
-	// First API call to create DID
-	didRes, err := makeRequest("/cloud-agent/did-registrar/dids", "POST", H{
-		"documentTemplate": documentTemplate,
-	})
-
-	if err != nil {
-		return "", err
-	}
-
-	var didResponse map[string]interface{}
-	err = json.Unmarshal(didRes, &didResponse)
-	if err != nil {
-		return "", err
-	}
-
-	longFormDid := didResponse["longFormDid"].(string)
-
-	// Second API call to publish DID
-	pubRes, err := makeRequest(fmt.Sprintf("/cloud-agent/did-registrar/dids/%s/publications", longFormDid), "POST", H{})
-	if err != nil {
-		return "", err
-	}
-
-	var publishResponse H
-	err = json.Unmarshal(pubRes, &publishResponse)
-	if err != nil {
-		return "", err
-	}
-
-	didRef := publishResponse["scheduledOperation"].(map[string]interface{})["didRef"].(string)
-	return didRef, nil
-}
-
 func CreateConnection(callback string) (*Connect, error) {
-	res, err := makeRequest("/cloud-agent/connections", "POST", H{"label": "Shin Connect"})
+	res, err := makeRequest("/cloud-agent/connections", "POST", H{"label": "Socious ID Connect"})
 	if err != nil {
 		return nil, err
 	}
@@ -150,30 +100,6 @@ func ProofVerify(presentID string) (H, error) {
 		return nil, err
 	}
 	return vc["vc"].(map[string]interface{})["credentialSubject"].(map[string]interface{}), nil
-}
-
-func SendCredential(connectionID, did string, claims interface{}) (H, error) {
-	payload := H{
-		"claims":            claims,
-		"connectionId":      connectionID,
-		"issuingDID":        did,
-		"schemaId":          nil,
-		"automaticIssuance": true,
-	}
-	res, err := makeRequest("/cloud-agent/issue-credentials/credential-offers", "POST", payload)
-	if err != nil {
-		return nil, err
-	}
-	var body map[string]interface{}
-	if err := json.Unmarshal(res, &body); err != nil {
-		return nil, err
-	}
-	return body, nil
-}
-
-func RevokeCredential(credentialID string) error {
-	_, err := makeRequest(fmt.Sprintf("/cloud-agent/credential-status/revoke-credential/%s", credentialID), "PATCH", H{})
-	return err
 }
 
 func makeRequest(path string, method string, body H) ([]byte, error) {

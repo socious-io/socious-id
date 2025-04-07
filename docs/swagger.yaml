@@ -1,0 +1,298 @@
+openapi: 3.0.0
+info:
+  title: Socious ID API
+  version: 2.2.6
+servers:
+  - url: https://dev-id.socious.io/
+    description: Development server (uses test data)
+  - url: https://id.socious.io/
+    description: Production server (uses live data)
+  - url: http://localhost:3000
+    description: Local server (for development purposes)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Media:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+          url:
+            type: string
+            format: uri
+          filename:
+            type: string
+          created_at:
+            type: string
+            format: date-time
+        required:
+          - id
+          - url
+          - filename
+          - created_at
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        first_name:
+          type: string
+        last_name:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        avatar_url:
+          type: string
+          format: uri
+        avatar_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - first_name
+        - last_name
+        - username
+        - email
+    Organization:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        shortname:
+          type: string
+        name:
+          type: string
+        bio:
+          type: string
+        description:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        address:
+          type: string
+        website:
+          type: string
+          format: uri
+        mission:
+          type: string
+        culture:
+          type: string
+        logo_id:
+          type: string
+          format: uuid
+        logo:
+          $ref: '#/components/schemas/Media'
+        cover_id:
+          type: string
+          format: uuid
+        cover:
+          $ref: '#/components/schemas/Media'
+        status:
+          type: string
+          enum: [StatusType]
+        verified_impact:
+          type: boolean
+        verified:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - shortname
+        - name
+        - bio
+        - description
+        - email
+        - phone
+        - city
+    VerificationCredential:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the verification credential
+        status:
+          type: string
+          description: Current status of the verification
+          enum:
+            - CREATED
+            - REQUESTED
+            - VERIFIED
+            - FAILED
+        user_id:
+          type: string
+          format: uuid
+          description: ID of the user this verification belongs to
+        user:
+          $ref: '#/components/schemas/User'
+          description: User object (only in responses)
+        connection_id:
+          type: string
+          nullable: true
+          description: ID for external verification connection
+        connection_url:
+          type: string
+          nullable: true
+          description: URL for verification connection
+        present_id:
+          type: string
+          nullable: true
+          description: ID for the presentation of credentials
+        body:
+          type: string
+          nullable: true
+          description: Body content of the verification
+        validation_error:
+          type: string
+          nullable: true
+          description: Error message if validation fails
+        connection_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when connection was established
+        verified_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when verification was completed
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when record was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when record was last updated
+  /verifications:
+    get:
+      summary: Get current user's verification
+      description: |
+        Retrieves the verification record for the authenticated user and verifies the proof.
+        If verification status is "verified", it will also update the user's identity verification status.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationCredential'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '422':
+          description: Unprocessable Entity - user verification status couldn't be updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "user is verified but couldn't verify user"
+    post:
+      summary: Create new verification
+      description: Creates a new verification record for the authenticated user
+      security:
+        - BearerAuth: []
+      responses:
+        '201':
+          description: Successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationCredential'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+  /verifications/{id}/connect:
+    get:
+      summary: Initiate verification connection
+      description: Initiates or retrieves an active connection for the verification process
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Verification ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Connection successful or active connection returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationCredential'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /verifications/{id}/callback:
+    get:
+      summary: Verification callback endpoint
+      description: Endpoint called during the verification process to request proof
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Verification ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Proof request successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: "success"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
