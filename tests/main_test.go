@@ -53,6 +53,8 @@ var _ = Describe("Socious Test Suite", Ordered, func() {
 	Context("Auth", authGroup)
 	Context("Users", usersGroup)
 	Context("Organizations", organizationsGroup)
+	Context("Verifications", verificationsGroup)
+	Context("Shortener", shortenerGroup)
 })
 
 func init() {

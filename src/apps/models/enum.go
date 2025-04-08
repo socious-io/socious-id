@@ -110,3 +110,28 @@ func scanEnum(value interface{}, target interface{}) error {
 	}
 	return nil
 }
+
+type VerificationStatusType string
+
+const (
+	VerificationStatusCreated   VerificationStatusType = "CREATED"
+	VerificationStatusRequested VerificationStatusType = "REQUESTED"
+	VerificationStatusVerified  VerificationStatusType = "VERIFIED"
+	VerificationStatusFailed    VerificationStatusType = "FAILED"
+)
+
+func (c *VerificationStatusType) Scan(value interface{}) error {
+	switch v := value.(type) {
+	case []byte:
+		*c = VerificationStatusType(string(v))
+	case string:
+		*c = VerificationStatusType(v)
+	default:
+		return fmt.Errorf("failed to scan credential type: %v", value)
+	}
+	return nil
+}
+
+func (c VerificationStatusType) Value() (driver.Value, error) {
+	return string(c), nil
+}
