@@ -3,8 +3,10 @@ package wallet
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"reflect"
 	"socious-id/src/apps/shortener"
 	"socious-id/src/apps/utils"
 	"socious-id/src/config"
@@ -21,7 +23,7 @@ type Connect struct {
 }
 
 func CreateConnection(callback string) (*Connect, error) {
-	res, err := makeRequest("/cloud-agent/connections", "POST", H{"label": "Socious ID Connect"})
+	res, status, err := makeRequest("/cloud-agent/connections", "POST", H{"label": "Socious ID Connect"})
 	if err != nil {
 		return nil, err
 	}
@@ -29,6 +31,15 @@ func CreateConnection(callback string) (*Connect, error) {
 	if err := json.Unmarshal(res, &body); err != nil {
 		return nil, err
 	}
+
+	fmt.Println(status, reflect.TypeOf(status), status >= 400)
+	if status >= 400 {
+		if body["detail"] == nil {
+			return nil, errors.New("cannot create connection on agent")
+		}
+		return nil, errors.New(body["detail"].(string))
+	}
+
 	url := strings.ReplaceAll(
 		body["invitation"].(map[string]interface{})["invitationUrl"].(string),
 		"https://my.domain.com/path",
@@ -39,6 +50,7 @@ func CreateConnection(callback string) (*Connect, error) {
 		ID:  body["connectionId"].(string),
 		URL: url,
 	}
+
 	short, err := shortener.New(c.URL)
 	if err != nil {
 		return nil, err
@@ -49,7 +61,7 @@ func CreateConnection(callback string) (*Connect, error) {
 
 func ProofRequest(connectionID string, challenge string) (string, error) {
 	time.Sleep(time.Second)
-	res, err := makeRequest("/cloud-agent/present-proof/presentations", "POST", H{
+	res, _, err := makeRequest("/cloud-agent/present-proof/presentations", "POST", H{
 		"connectionId": connectionID,
 		"proofs":       []H{},
 		"options": H{
@@ -102,27 +114,27 @@ func ProofVerify(presentID string) (H, error) {
 	return vc["vc"].(map[string]interface{})["credentialSubject"].(map[string]interface{}), nil
 }
 
-func makeRequest(path string, method string, body H) ([]byte, error) {
+func makeRequest(path string, method string, body H) ([]byte, int, error) {
 	client := &http.Client{}
 	url := fmt.Sprintf("%s%s", config.Config.Wallet.Agent, path)
 	jsonBody, err := json.Marshal(body)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(jsonBody))
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("apikey", config.Config.Wallet.AgentApiKey)
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer resp.Body.Close()
 	respBody := new(bytes.Buffer)
 	respBody.ReadFrom(resp.Body)
-	return respBody.Bytes(), nil
+	return respBody.Bytes(), resp.StatusCode, nil
 }
 
 func getRequest(path string) ([]byte, error) {

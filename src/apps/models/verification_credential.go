@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx/types"
 	database "github.com/socious-io/pkg_database"
 )
 
@@ -32,6 +33,8 @@ type VerificationCredential struct {
 	VerifiedAt   *time.Time `db:"verified_at" json:"verified_at"`
 	CreatedAt    time.Time  `db:"created_at" json:"created_at"`
 	UpdatedAt    time.Time  `db:"updated_at" json:"updated_at"`
+
+	UserJson types.JSONText `db:"user" json:"-"`
 }
 
 func (VerificationCredential) TableName() string {
@@ -62,7 +65,7 @@ func (v *VerificationCredential) Create(ctx context.Context) error {
 }
 
 func (v *VerificationCredential) NewConnection(ctx context.Context, callback string) error {
-	if v.Status == VerificationStatusCreated {
+	if v.Status == VerificationStatusRequested {
 		return nil
 	}
 	conn, err := wallet.CreateConnection(callback)
@@ -121,7 +124,7 @@ func (v *VerificationCredential) ProofVerify(ctx context.Context) error {
 	if err == nil && duplicateVerification != nil {
 		rows, err := database.Query(
 			ctx,
-			"verifications/update_present_failed",
+			"verification_credentials/update_present_failed",
 			v.ID, vcData, fmt.Sprintf("Duplicate Identity: Verification ID: %s", (*duplicateVerification).ID),
 		)
 		if err != nil {
@@ -133,7 +136,7 @@ func (v *VerificationCredential) ProofVerify(ctx context.Context) error {
 
 	rows, err := database.Query(
 		ctx,
-		"verifications/update_present_verify",
+		"verification_credentials/update_present_verify",
 		v.ID, vcData,
 	)
 	if err != nil {
@@ -147,7 +150,7 @@ func GetSimilar(ctx context.Context, data wallet.H) (*VerificationCredential, er
 	v := new(VerificationCredential)
 	err := database.Get(
 		v,
-		"verifications/get_similar",
+		"verification_credentials/get_similar",
 		data,
 	)
 	if err != nil {
@@ -159,7 +162,7 @@ func GetSimilar(ctx context.Context, data wallet.H) (*VerificationCredential, er
 func GetVerificationByUser(userId uuid.UUID) (*VerificationCredential, error) {
 	v := new(VerificationCredential)
 
-	if err := database.Get(v, "verifications/get_by_user", userId); err != nil {
+	if err := database.Get(v, "verification_credentials/fetch_by_user", userId); err != nil {
 		return nil, err
 	}
 	return v, nil

@@ -63,10 +63,7 @@ var (
 		},
 	}
 
-	verificationsData = []gin.H{
-		{},
-		{},
-	}
+	verificationsData = []gin.H{}
 
 	shorteningURLs = []string{
 		"https://google.com",

@@ -291,7 +291,6 @@ func authGroup() {
 				"client_secret": authConfig["client_secret"],
 				"code":          ssoOtpCodes[i+offset],
 			})
-			fmt.Println(ssoOtpCodes)
 			req, _ := http.NewRequest("POST", "/auth/session/token", bytes.NewBuffer(reqBody))
 			req.Header.Set("Content-Type", "application/json")
 			router.ServeHTTP(w, req)
