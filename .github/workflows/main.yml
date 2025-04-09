@@ -30,6 +30,9 @@ jobs:
           echo "go-build=$(go env GOCACHE)" >> $GITHUB_OUTPUT
           echo "go-mod=$(go env GOMODCACHE)" >> $GITHUB_OUTPUT
 
+      - name: Test
+        run: echo ${{ steps.go-cache-paths.outputs.go-build }}
+
       # Cache go build cache, used to speedup go test
       - name: Go Build Cache
         uses: actions/cache@v4
