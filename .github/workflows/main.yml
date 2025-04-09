@@ -20,7 +20,6 @@ jobs:
 
   test-build:
     name: Test & Build
-    if: github.ref == 'refs/heads/main'
     runs-on: ["socious-id-dev"]
     steps:
       - name: Checkout repository
