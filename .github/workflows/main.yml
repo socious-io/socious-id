@@ -76,8 +76,6 @@ jobs:
         run: |
           docker buildx build \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
-            --mount=type=bind,source="${{ steps.go-cache-paths.outputs.go-build }}",target=/root/.cache/go-build \
-            --mount=type=bind,source="${{ steps.go-cache-paths.outputs.go-mod }}",target=/go/pkg/mod \
             -t my-go-app:test .
 
       # - name: Log into registry ${{ env.REGISTRY }}
