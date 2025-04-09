@@ -9,12 +9,12 @@ WORKDIR /app
 ENV CGO_ENABLED=1
 ENV GOPROXY=https://proxy.golang.org,direct
 ENV GOMAXPROCS=4
-ENV GOCACHE=/go-cache
 ENV GOMODCACHE=/gomod-cache
+ENV GOCACHE=/go-cache
 
 COPY go.mod go.sum ./
-RUN --mount=type=cache,target=/gomod-cache \
-    --mount=type=cache,target=/go-cache \
+RUN --mount=type=cache,target=$GOMODCACHE,source=~/go/pkg/mod \
+    --mount=type=cache,target=$GOCACHE,source=~/.cache/go-build \
     go mod download
 COPY . .
 
@@ -22,10 +22,9 @@ COPY . .
 # Test Stage
 #########################
 FROM base AS test
-WORKDIR /app
-COPY . .
-COPY --from=base /gomod-cache /gomod-cache
-COPY --from=base /go-cache /go-cache
+RUN --mount=type=cache,target=$GOMODCACHE,source=~/go/pkg/mod \
+    --mount=type=cache,target=$GOCACHE,source=~/.cache/go-build \
+    go mod download
 CMD go test -v ./tests -count=1
 
 #########################
@@ -38,9 +37,10 @@ CMD go run cmd/migrate/main.go up
 # Build Stage
 #########################
 FROM base AS builder
-RUN --mount=type=cache,target=/go/pkg/mod \
-    --mount=type=cache,target=/root/.cache/go-build \
-    go build -C cmd/app -trimpath -ldflags="-s -w" -o /app/build .
+RUN --mount=type=cache,target=$GOMODCACHE,source=~/go/pkg/mod \
+    --mount=type=cache,target=$GOCACHE,source=~/.cache/go-build \
+    go mod download
+CMD go build -C cmd/app -trimpath -ldflags="-s -w" -o /app/build .
 
 #########################
 # Final Minimal Image
