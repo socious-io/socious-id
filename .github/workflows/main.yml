@@ -32,6 +32,7 @@ jobs:
           cache-dependency-path: 'go.sum'
 
       - id: go-cache-paths
+        name: Get Go Cache Paths
         run: |
           echo "go-build=$(go env GOCACHE)" >> $GITHUB_OUTPUT
           echo "go-mod=$(go env GOMODCACHE)" >> $GITHUB_OUTPUT
