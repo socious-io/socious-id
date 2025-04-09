@@ -34,6 +34,11 @@ type SetPasswordForm struct {
 	Password string `json:"password" form:"password" validate:"required"`
 }
 
+type ChangePasswordForm struct {
+	CurrentPassword string `json:"current_password" form:"current_password" validate:"required"`
+	SetPasswordForm
+}
+
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	return string(bytes), err

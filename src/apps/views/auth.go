@@ -271,6 +271,36 @@ func authGroup(router *gin.Engine) {
 		c.HTML(http.StatusOK, "pre-register.html", gin.H{})
 	})
 
+	g.PUT("/password", auth.LoginRequired(), func(c *gin.Context) {
+		ctx := c.MustGet("ctx").(context.Context)
+		u, _ := c.MustGet("user").(*models.User)
+
+		form := new(auth.ChangePasswordForm)
+		if err := c.ShouldBindJSON(form); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := auth.CheckPasswordHash(form.CurrentPassword, *u.Password); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "email/password not match"})
+			return
+		}
+
+		newPassword, err := auth.HashPassword(form.Password)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		u.Password = &newPassword
+		if err := u.UpdatePassword(ctx); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusAccepted, gin.H{"message": "success"})
+	})
+
 	g.POST("/password/forget", auth.CheckLogin(), func(c *gin.Context) {
 
 		ctx := c.MustGet("ctx").(context.Context)
