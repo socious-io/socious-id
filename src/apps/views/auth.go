@@ -136,6 +136,21 @@ func authGroup(router *gin.Engine) {
 		c.Redirect(http.StatusFound, "/auth/confirm")
 	})
 
+	g.GET("/google", func(c *gin.Context) {
+		url := fmt.Sprintf(
+			"https://accounts.google.com/o/oauth2/v2/auth?client_id=%s&redirect_uri=%s&response_type=code&scope=email profile&access_type=offline&prompt=consent",
+			config.Config.OauthPlatforms.Google.ClientID,
+			fmt.Sprintf("%s/auth/google/callback", config.Config.Host),
+		)
+
+		c.Redirect(http.StatusPermanentRedirect, url)
+	})
+
+	g.GET("/google/callback", func(c *gin.Context) {
+		authorizationCode := c.Params.Get("code")
+
+	})
+
 	g.GET("/otp/confirm", func(c *gin.Context) {
 		email := c.Query("email")
 		code := c.Query("code")
