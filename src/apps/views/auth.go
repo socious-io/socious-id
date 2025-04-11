@@ -160,11 +160,8 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		googleUserInfo.Email = googleUserInfo.Email + "new1"
-
 		u, err := models.GetUserByEmail(googleUserInfo.Email)
 		if err != nil && errors.Is(err, sql.ErrNoRows) {
-			//register
 			u = &models.User{
 				Username:  auth.GenerateUsername(googleUserInfo.Email),
 				Email:     googleUserInfo.Email,
