@@ -2,7 +2,11 @@ package auth
 
 import (
 	"fmt"
+	"math"
+	"math/rand/v2"
+	"regexp"
 	"socious-id/src/apps/models"
+	"strconv"
 	"strings"
 
 	"github.com/gin-contrib/sessions"
@@ -94,67 +98,24 @@ func FetchUserBySession(c *gin.Context) (*models.User, error) {
 	}
 	return models.GetUser(userID)
 }
-func GetGoogleToken(code, ref string) (string, error) {
-	form := url.Values{
-		"code":          {code},
-		"client_id":     {Config.oauth.google.id},
-		"client_secret": {Config.oauth.google.secret},
-		"grant_type":    {"authorization_code"},
-		"redirect_uri":  {fmt.Sprintf("%s/oauth/google", ref)},
-	}
 
-	resp, err := http.PostForm("https://oauth2.googleapis.com/token", form)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
+func GenerateUsername(email string) string {
+	var username string = email
+	var re *regexp.Regexp
 
-	var data struct {
-		AccessToken string `json:"access_token"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return "", err
-	}
+	re = regexp.MustCompile("@.*$")
+	username = re.ReplaceAllString(username, "")
 
-	return getGoogleUserInfo(data.AccessToken)
+	re = regexp.MustCompile("[^a-z0-9._-]")
+	username = re.ReplaceAllString(username, "-")
+
+	re = regexp.MustCompile("[._-]{2,}")
+	username = re.ReplaceAllString(username, "-")
+
+	username = strings.ToLower(username)
+	username = username[0:int(math.Min(float64(len(username)), 20))]
+
+	username = username + strconv.Itoa(int(1000+rand.Float64()*9000))
+
+	return username
 }
-
-var data struct {
-	Email string `json:"email"`
-	FamilyName string `json:"family_name"`
-	GivenName string `json:"given_name"`
-}
-
-func getGoogleUserInfo(accessToken string) (string, error) {
-	req, err := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v2/userinfo", nil)
-	if err != nil {
-		return "", err
-	}
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return "", err
-	}
-
-	return data.Email, nil
-}
-
-
-
-async function getGoogleUserInfo(accessToken) {
-	const response = await axios.get('', {
-	  headers: {
-		Authorization: `Bearer ${accessToken}`
-	  }
-	})
-  
-	return response.data // This contains user information
-  }
-  

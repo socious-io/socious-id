@@ -47,12 +47,12 @@ type ConfigType struct {
 	Platforms struct {
 		Accounts string `mapstructure:"accounts"`
 	} `mapstructure:"platforms"`
-	OauthPlatforms struct {
+	Oauth struct {
 		Google struct {
-			ClientID     string `mapstructure:"client_id"`
-			ClientSecret string `mapstructure:"client_secret"`
+			ID     string `mapstructure:"id"`
+			Secret string `mapstructure:"secret"`
 		} `mapstructure:"google"`
-	} `mapstructure:"oauth_platforms"`
+	} `mapstructure:"oauth"`
 }
 
 func Init(configPath string) {
