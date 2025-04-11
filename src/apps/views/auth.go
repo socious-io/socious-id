@@ -2,6 +2,8 @@ package views
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -134,6 +136,68 @@ func authGroup(router *gin.Engine) {
 		session.Save()
 		// TODO: make sso otp if it has auth session
 		c.Redirect(http.StatusFound, "/auth/confirm")
+	})
+
+	g.GET("/google", func(c *gin.Context) {
+		url := fmt.Sprintf(
+			"https://accounts.google.com/o/oauth2/v2/auth?client_id=%s&redirect_uri=%s&response_type=code&scope=email profile&access_type=offline&prompt=consent",
+			config.Config.Oauth.Google.ID,
+			fmt.Sprintf("%s/auth/google/callback", config.Config.Host),
+		)
+
+		c.Redirect(http.StatusPermanentRedirect, url)
+	})
+
+	g.GET("/google/callback", func(c *gin.Context) {
+		ctx := c.MustGet("ctx").(context.Context)
+		authorizationCode := c.Query("code")
+
+		googleUserInfo, err := auth.GoogleLoginWithCode(authorizationCode, fmt.Sprintf("%s/auth/google/callback", config.Config.Host))
+		if err != nil || googleUserInfo.Email == "" {
+			c.HTML(http.StatusBadRequest, "login.html", gin.H{
+				"error": "Error: Google login failed",
+			})
+			return
+		}
+
+		u, err := models.GetUserByEmail(googleUserInfo.Email)
+		if err != nil && errors.Is(err, sql.ErrNoRows) {
+			u = &models.User{
+				Username:  auth.GenerateUsername(googleUserInfo.Email),
+				Email:     googleUserInfo.Email,
+				FirstName: &googleUserInfo.GivenName,
+				LastName:  &googleUserInfo.FamilyName,
+			}
+			if err = u.Create(ctx); err != nil {
+				c.HTML(http.StatusBadRequest, "login.html", gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
+		}
+
+		//Make user active
+		if u.Status == models.StatusTypeInactive {
+			err := u.UpdateStatus(ctx, models.StatusTypeActive)
+			if err != nil {
+				c.HTML(http.StatusBadRequest, "login.html", gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
+		}
+
+		//Set session
+		session := sessions.Default(c)
+		session.Set("user_id", u.ID.String())
+		session.Save()
+
+		//Redirect
+		if u.Password == nil {
+			c.Redirect(http.StatusSeeOther, "/auth/password/set")
+			return
+		}
+		c.Redirect(http.StatusSeeOther, "/auth/confirm")
 	})
 
 	g.GET("/otp/confirm", func(c *gin.Context) {
