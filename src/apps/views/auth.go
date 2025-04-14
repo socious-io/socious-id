@@ -114,7 +114,7 @@ func authGroup(router *gin.Engine) {
 		}
 		if u.Status == models.StatusTypeInactive {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
-				"error": "Error: user is not verified",
+				"error": "Error: user is not active (Please re-register)",
 			})
 			return
 		}
@@ -275,24 +275,27 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		if _, err := models.GetUserByEmail(form.Email); err == nil {
+		u, err := models.GetUserByEmail(form.Email)
+		if err == nil && u != nil && u.Status == models.StatusTypeActive {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{
 				"error": "Email is already in use. Please select different email.",
 			})
 			return
 		}
 
-		//Creating user (Default in INACTIVE state)
-		u := &models.User{
-			Username: form.Email, //TODO: generate username
-			Email:    form.Email,
-		}
+		if u == nil {
+			//Creating user (Default in INACTIVE state)
+			u = &models.User{
+				Username: form.Email, //TODO: generate username
+				Email:    form.Email,
+			}
 
-		if err := u.Create(ctx); err != nil {
-			c.HTML(http.StatusBadRequest, "register.html", gin.H{
-				"error": err.Error(),
-			})
-			return
+			if err := u.Create(ctx); err != nil {
+				c.HTML(http.StatusBadRequest, "register.html", gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
 		}
 
 		//Save OTP
@@ -389,7 +392,7 @@ func authGroup(router *gin.Engine) {
 		//Checking user status
 		if u.Status == models.StatusTypeInactive {
 			c.HTML(http.StatusBadRequest, "forget-password.html", gin.H{
-				"error": "Error: user is not verified",
+				"error": "Error: user is not active (Please re-register)",
 			})
 			return
 		}
