@@ -2,7 +2,11 @@ package auth
 
 import (
 	"fmt"
+	"math"
+	"math/rand/v2"
+	"regexp"
 	"socious-id/src/apps/models"
+	"strconv"
 	"strings"
 
 	"github.com/gin-contrib/sessions"
@@ -93,4 +97,25 @@ func FetchUserBySession(c *gin.Context) (*models.User, error) {
 		return nil, fmt.Errorf("not authorized")
 	}
 	return models.GetUser(userID)
+}
+
+func GenerateUsername(email string) string {
+	var username string = email
+	var re *regexp.Regexp
+
+	re = regexp.MustCompile("@.*$")
+	username = re.ReplaceAllString(username, "")
+
+	re = regexp.MustCompile("[^a-z0-9._-]")
+	username = re.ReplaceAllString(username, "-")
+
+	re = regexp.MustCompile("[._-]{2,}")
+	username = re.ReplaceAllString(username, "-")
+
+	username = strings.ToLower(username)
+	username = username[0:int(math.Min(float64(len(username)), 20))]
+
+	username = username + strconv.Itoa(int(1000+rand.Float64()*9000))
+
+	return username
 }
