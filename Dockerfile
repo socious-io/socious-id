@@ -13,18 +13,14 @@ ENV GOMODCACHE=/gomod-cache
 ENV GOCACHE=/go-cache
 
 COPY go.mod go.sum ./
-RUN --mount=type=cache,target=$GOMODCACHE,source=$HOME/go/pkg/mod \
-    --mount=type=cache,target=$GOCACHE,source=$HOME/.cache/go-build \
-    go mod download
+RUN go mod download
 COPY . .
 
 #########################
 # Test Stage
 #########################
 FROM base AS test
-RUN --mount=type=cache,target=$GOMODCACHE,source=$HOME/go/pkg/mod \
-    --mount=type=cache,target=$GOCACHE,source=$HOME/.cache/go-build \
-    go mod download
+RUN go mod download
 CMD go test -v ./tests -count=1
 
 #########################

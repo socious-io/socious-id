@@ -17,7 +17,6 @@ env:
   CONFIG_DIR_NAME: socious-id
 
 jobs:
-
   test-build:
     name: Test & Build
     runs-on: ["socious-id-dev"]
@@ -75,9 +74,8 @@ jobs:
 
       - name: Docker Build with cache mounts
         run: |
-          docker buildx build \
-            --build-arg BUILDKIT_INLINE_CACHE=1 \
-            -t my-go-app:test .
+          docker build --target test -t socious-id:test .
+          docker run --rm socious-id:test
 
       # - name: Log into registry ${{ env.REGISTRY }}
       #   if: github.event_name != 'pull_request'
