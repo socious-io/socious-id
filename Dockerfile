@@ -9,18 +9,22 @@ WORKDIR /app
 ENV CGO_ENABLED=1
 ENV GOPROXY=https://proxy.golang.org,direct
 ENV GOMAXPROCS=4
-ENV GOMODCACHE=/gomod-cache
-ENV GOCACHE=/go-cache
+ENV GOMODCACHE=/go/pkg/mod
+ENV GOCACHE=/root/.cache/go-build
 
 COPY go.mod go.sum ./
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go mod download
 COPY . .
 
 #########################
 # Test Stage
 #########################
 FROM base AS test
-RUN go test -v ./tests
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go test -v ./tests
 # RUN ginkgo ./tests
 
 #########################
