@@ -20,7 +20,9 @@ COPY . .
 # Test Stage
 #########################
 FROM base AS test
-CMD go test -v ./tests
+# CMD go test -v ./tests
+CMD go test -v -failfast -race ./tests
+# CMD ["apache2ctl", "-DFOREGROUND"]
 
 #########################
 # Migration Stage

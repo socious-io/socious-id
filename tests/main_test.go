@@ -35,18 +35,24 @@ var (
 
 // Setup the test environment before any tests run
 var _ = BeforeSuite(func() {
+	fmt.Printf("BeforeSuite")
 	db, router = setupTestEnvironment()
+	fmt.Printf("After BeforeSuite")
 })
 
 // Drop the database after all tests have run
 var _ = AfterSuite(func() {
+	fmt.Printf("teardownTestEnvironment")
 	teardownTestEnvironment(db)
+	fmt.Printf("After teardownTestEnvironment")
 })
 
 func TestSuite(t *testing.T) {
+	fmt.Printf("TestSuite")
 	checkFocus()
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "API Suite")
+	fmt.Printf("After TestSuite")
 }
 
 var _ = Describe("Socious Test Suite", Ordered, func() {
@@ -59,9 +65,11 @@ var _ = Describe("Socious Test Suite", Ordered, func() {
 
 func init() {
 	// We back to root dir on execute tests
+	fmt.Printf("Init")
 	os.Chdir("../")
 	// Define a flag for the config path
 	flag.StringVar(&configPath, "c", "test.config.yml", "Path to the configuration file")
+	fmt.Printf("After Init")
 }
 
 func replaceAny(a, b gin.H) {
