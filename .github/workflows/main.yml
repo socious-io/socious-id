@@ -78,7 +78,7 @@ jobs:
 
       - name: Docker -> Running Test Image
         run: |
-          docker run --rm socious-id:test
+          docker run --rm --network ${{ env.DOCKER_CONTAINER_NETWORK }} socious-id:test
 
       # - name: Log into registry ${{ env.REGISTRY }}
       #   if: github.event_name != 'pull_request'
