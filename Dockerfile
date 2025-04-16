@@ -24,9 +24,7 @@ COPY . .
 # Test Stage
 #########################
 FROM base AS test
-RUN --mount=type=cache,target=/go/pkg/mod \
-    --mount=type=cache,target=/root/.cache/go-build \
-    go test -v ./tests
+CMD go test -v ./tests
 
 #########################
 # Migration Stage
