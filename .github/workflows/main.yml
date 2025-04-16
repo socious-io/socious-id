@@ -83,18 +83,17 @@ jobs:
       #   run: |
       #     go run cmd/migrate/main.go up
 
-      - name: Wait for Postgres
-        run: |
-          until pg_isready -h localhost -U test; do
-            sleep 1
-          done
-
       - name: Docker Setup Buildx
         uses: docker/setup-buildx-action@v3.6.1
 
       - name: Docker -> Building Test Image
         run: |
-          docker buildx build --build-arg BUILDKIT_INLINE_CACHE=1 --target test -t socious-id:test .
+          docker buildx build \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --target test \
+            --tag socious-id:test \
+            --load \
+            .
 
       - name: Generate test.config.yml
         run: |
