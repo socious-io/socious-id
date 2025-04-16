@@ -20,6 +20,20 @@ jobs:
   test-build:
     name: Test & Build
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -69,16 +83,44 @@ jobs:
       #   run: |
       #     go run cmd/migrate/main.go up
 
+      - name: Wait for Postgres
+        run: |
+          until pg_isready -h localhost -U test; do
+            sleep 1
+          done
+
       - name: Docker Setup Buildx
         uses: docker/setup-buildx-action@v3.6.1
 
       - name: Docker -> Building Test Image
         run: |
-          docker buildx build --build-arg BUILDKIT_INLINE_CACHE=1 --target builder -t socious-id:build .
+          docker buildx build --build-arg BUILDKIT_INLINE_CACHE=1 --target test -t socious-id:test .
 
-      - name: Docker -> Running Test Image
+      - name: Generate test.config.yml
         run: |
-          docker run --rm --network ${{ env.DOCKER_CONTAINER_NETWORK }} socious-id:build
+          cat <<EOF > test.config.yml
+          env: test
+          port: 5064
+          host: "http://localhost:5064"
+          secret: this-is-secret
+          debug: true
+          statics: src/statics
+          templates: src/templates
+          database: 
+            url: postgresql://test:test@localhost/testdb?sslmode=disable
+            sqldir: src/sql
+            migrations: src/sql/migrations
+          cors:
+            origins:
+              - '*'
+          EOF        
+
+      - name: Run Docker container with config mounted
+        run: |
+          docker run --rm \
+            --network ${{ env.DOCKER_CONTAINER_NETWORK }} \
+            -v ${{ github.workspace }}/test.config.yml:/app/test.config.yml \
+            socious-id:test
 
       # - name: Log into registry ${{ env.REGISTRY }}
       #   if: github.event_name != 'pull_request'

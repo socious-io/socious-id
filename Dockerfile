@@ -20,19 +20,19 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
 COPY . .
 
-# #########################
-# # Test Stage
-# #########################
-# FROM base AS test
-# RUN --mount=type=cache,target=/go/pkg/mod \
-#     --mount=type=cache,target=/root/.cache/go-build \
-#     go test -v ./tests
+#########################
+# Test Stage
+#########################
+FROM base AS test
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go test -v ./tests
 
-# #########################
-# # Migration Stage
-# #########################
-# FROM base AS migration
-# CMD go run cmd/migrate/main.go up
+#########################
+# Migration Stage
+#########################
+FROM base AS migration
+CMD go run cmd/migrate/main.go up
 
 #########################
 # Build Stage
