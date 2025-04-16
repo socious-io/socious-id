@@ -19,7 +19,7 @@ env:
 jobs:
   test-build:
     name: Test & Build
-    runs-on: ["socious-id-dev"]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
