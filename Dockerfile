@@ -20,9 +20,8 @@ COPY . .
 # Test Stage
 #########################
 FROM base AS test
-# CMD go test -v ./tests
-CMD go test -v -failfast -race ./tests
-# CMD ["apache2ctl", "-DFOREGROUND"]
+RUN go test -v ./tests
+# RUN ginkgo ./tests
 
 #########################
 # Migration Stage
@@ -33,10 +32,7 @@ CMD go run cmd/migrate/main.go up
 #########################
 # Build Stage
 #########################
-FROM base AS builder
-RUN --mount=type=cache,target=$GOMODCACHE,source=$HOME/go/pkg/mod \
-    --mount=type=cache,target=$GOCACHE,source=$HOME/.cache/go-build \
-    go mod download
+FROM test AS builder
 CMD go build -C cmd/app -trimpath -ldflags="-s -w" -o /app/build .
 
 #########################
