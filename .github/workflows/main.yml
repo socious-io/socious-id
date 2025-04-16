@@ -74,7 +74,7 @@ jobs:
 
       - name: Docker -> Building Test Image
         run: |
-          docker build --target builder -t socious-id:build .
+          docker buildx build --target builder -t socious-id:build .
 
       - name: Docker -> Running Test Image
         run: |
