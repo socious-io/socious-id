@@ -50,11 +50,11 @@ jobs:
           path: ${{ steps.go-cache-paths.outputs.go-mod }}
           key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
 
-      - name: Copying build & test environment
-        run: |
-          cp /etc/${{ env.CONFIG_DIR_NAME }}/config.yml .
-          cp /etc/${{ env.CONFIG_DIR_NAME }}/test.config.yml .
-          cp /etc/${{ env.CONFIG_DIR_NAME }}/gcs-service-account.json .
+      # - name: Copying build & test environment
+      #   run: |
+      #     cp /etc/${{ env.CONFIG_DIR_NAME }}/config.yml .
+      #     cp /etc/${{ env.CONFIG_DIR_NAME }}/test.config.yml .
+      #     cp /etc/${{ env.CONFIG_DIR_NAME }}/gcs-service-account.json .
 
       # - name: Downloading dependencies
       #   run: |
