@@ -113,11 +113,13 @@ jobs:
             origins:
               - '*'
           EOF        
+      
+      # - name: Create Docker Network
+      #   run: docker network create sociousid_default
 
       - name: Run Docker container with config mounted
         run: |
           docker run --rm \
-            --network ${{ env.DOCKER_CONTAINER_NETWORK }} \
             -v ${{ github.workspace }}/test.config.yml:/app/test.config.yml \
             socious-id:test
 
