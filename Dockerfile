@@ -20,8 +20,7 @@ COPY . .
 # Test Stage
 #########################
 FROM base AS test
-RUN go mod download
-CMD go test -v ./tests -count=1
+CMD go test -v ./tests
 
 #########################
 # Migration Stage
