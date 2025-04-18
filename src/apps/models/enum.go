@@ -135,3 +135,28 @@ func (c *VerificationStatusType) Scan(value interface{}) error {
 func (c VerificationStatusType) Value() (driver.Value, error) {
 	return string(c), nil
 }
+
+type ImpactPointType string
+
+const (
+	ImpactPointTypeWorkSubmit ImpactPointType = "WORKSUBMIT"
+	ImpactPointTypeDonation   ImpactPointType = "DONATION"
+	ImpactPointTypeVolunteer  ImpactPointType = "VOLUNTEER"
+	ImpactPointTypeOther      ImpactPointType = "OTHER"
+)
+
+func (c *ImpactPointType) Scan(value interface{}) error {
+	switch v := value.(type) {
+	case []byte:
+		*c = ImpactPointType(string(v))
+	case string:
+		*c = ImpactPointType(v)
+	default:
+		return fmt.Errorf("failed to scan credential type: %v", value)
+	}
+	return nil
+}
+
+func (c ImpactPointType) Value() (driver.Value, error) {
+	return string(c), nil
+}

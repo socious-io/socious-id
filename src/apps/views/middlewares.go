@@ -1,7 +1,10 @@
 package views
 
 import (
+	"bytes"
+	"io"
 	"net/http"
+	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
 	"strconv"
 	"strings"
@@ -63,6 +66,50 @@ func isOrgMember() gin.HandlerFunc {
 		}
 
 		c.Set("organization", organization)
+		c.Next()
+	}
+}
+
+func clientSecretRequired() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		bodyBytes, err := io.ReadAll(c.Request.Body)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "failed to read request body"})
+			c.Abort()
+			return
+		}
+
+		// Restore the body so it can be read by ShouldBindJSON
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+		authData := new(ClientSecretForm)
+		if err := c.ShouldBindJSON(&authData); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			c.Abort()
+			return
+		}
+		// Checking Client
+		access, err := models.GetAccessByClientID(authData.ClientID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			c.Abort()
+			return
+		}
+
+		if err := auth.CheckPasswordHash(authData.ClientSecret, access.ClientSecret); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "client access not valid",
+			})
+			c.Abort()
+			return
+		}
+		// Store the client ID in context for later use if needed
+		c.Set("access", access)
+
+		// Restore the body so it can be read by Handler
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 		c.Next()
 	}
 }

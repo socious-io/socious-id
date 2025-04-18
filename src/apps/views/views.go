@@ -9,4 +9,5 @@ func Init(r *gin.Engine) {
 	organizationsGroup(r)
 	mediaGroup(r)
 	verificationsGroup(r)
+	impactPointsGroup(r)
 }
