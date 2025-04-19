@@ -478,10 +478,9 @@ func authGroup(router *gin.Engine) {
 		c.Redirect(http.StatusPermanentRedirect, "/auth/login")
 	})
 
-	g.POST("/session", func(c *gin.Context) {
+	g.POST("/session", clientSecretRequired(), func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
 		form := new(AuthSessionForm)
-
 		if err := c.ShouldBind(form); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
@@ -489,20 +488,7 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		access, err := models.GetAccessByClientID(form.ClientID)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "client access not valid",
-			})
-			return
-		}
+		access := c.MustGet("access").(*models.Access)
 
 		authSession := &models.AuthSession{
 			RedirectURL: form.RedirectURL,
@@ -561,27 +547,12 @@ func authGroup(router *gin.Engine) {
 
 	})
 
-	g.POST("/session/token", func(c *gin.Context) {
+	g.POST("/session/token", clientSecretRequired(), func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
 		form := new(GetTokenForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
-			})
-			return
-		}
-
-		access, err := models.GetAccessByClientID(form.ClientID)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "client access not valid",
 			})
 			return
 		}
@@ -633,7 +604,7 @@ func authGroup(router *gin.Engine) {
 		c.JSON(http.StatusAccepted, tokens)
 	})
 
-	g.POST("/refresh", func(c *gin.Context) {
+	g.POST("/refresh", clientSecretRequired(), func(c *gin.Context) {
 		form := new(RefreshTokenForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -642,23 +613,6 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		//Checking Client
-		access, err := models.GetAccessByClientID(form.ClientID)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "client access not valid",
-			})
-			return
-		}
-
-		//Checking access token
 		claims, err := auth.VerifyToken(form.RefreshToken)
 
 		if err != nil {

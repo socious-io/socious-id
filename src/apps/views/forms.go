@@ -1,6 +1,7 @@
 package views
 
 import (
+	"encoding/json"
 	"socious-id/src/apps/models"
 
 	"github.com/google/uuid"
@@ -17,17 +18,14 @@ type ClientSecretForm struct {
 }
 
 type AuthSessionForm struct {
-	ClientSecretForm
 	RedirectURL string `json:"redirect_url" form:"redirect_url" validate:"required"`
 }
 
 type GetTokenForm struct {
-	ClientSecretForm
 	Code string `json:"code" form:"code" validate:"required"`
 }
 
 type RefreshTokenForm struct {
-	ClientSecretForm
 	RefreshToken string `json:"refresh_token" form:"refresh_token" validate:"required"`
 }
 
@@ -50,17 +48,14 @@ type UserForm struct {
 }
 
 type UserUpdateStatusForm struct {
-	ClientSecretForm
 	Status models.StatusType `json:"status" form:"status" validate:"required"`
 }
 
 type OrganizationUpdateStatusForm struct {
-	ClientSecretForm
 	Status models.OrganizationStatusType `json:"status" form:"status" validate:"required"`
 }
 
 type OrganizationVerificationForm struct {
-	ClientSecretForm
 	Status models.OrganizationStatusType `json:"status" form:"status" validate:"required"`
 }
 
@@ -82,4 +77,14 @@ type OrganizationForm struct {
 
 	LogoID  *uuid.UUID `json:"logo_id" form:"logo_id"`
 	CoverID *uuid.UUID `json:"cover_id" form:"cover_id"`
+}
+
+type ImpactPointForm struct {
+	UserID              uuid.UUID              `json:"user_id" form:"user_id" validate:"required"`
+	TotalPoints         int                    `json:"total_points" form:"total_points"`
+	SocialCause         string                 `json:"social_cause" form:"social_cause"`
+	SocialCauseCategory string                 `json:"social_cause_category" form:"social_cause_category"`
+	Type                models.ImpactPointType `json:"type" form:"type" validate:"required,oneof=WORKSUBMIT DONATION VOLUNTEER OTHER"`
+	AccessID            *uuid.UUID             `json:"access_id" form:"access_id"`
+	Meta                *json.RawMessage       `json:"meta" form:"meta"`
 }

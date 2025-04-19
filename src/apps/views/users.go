@@ -95,7 +95,7 @@ func usersGroup(router *gin.Engine) {
 		c.HTML(http.StatusOK, "update-profile.html", gin.H{})
 	})
 
-	g.PUT("/:id/status", func(c *gin.Context) {
+	g.PUT("/:id/status", clientSecretRequired(), func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
 
 		form := new(UserUpdateStatusForm)
@@ -103,23 +103,6 @@ func usersGroup(router *gin.Engine) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-
-		//Checking Client
-		access, err := models.GetAccessByClientID(form.ClientID)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "client access not valid",
-			})
-			return
-		}
-
 		user, err := models.GetUser(uuid.MustParse(c.Param("id")))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -134,28 +117,12 @@ func usersGroup(router *gin.Engine) {
 		c.JSON(http.StatusOK, user)
 	})
 
-	g.POST("/:id/verify", func(c *gin.Context) {
+	g.POST("/:id/verify", clientSecretRequired(), func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
 
 		form := new(ClientSecretForm)
 		if err := c.ShouldBindJSON(form); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		//Checking Client
-		access, err := models.GetAccessByClientID(form.ClientID)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "client access not valid",
-			})
 			return
 		}
 
