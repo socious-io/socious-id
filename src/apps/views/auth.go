@@ -286,7 +286,7 @@ func authGroup(router *gin.Engine) {
 		if u == nil {
 			//Creating user (Default in INACTIVE state)
 			u = &models.User{
-				Username: form.Email, //TODO: generate username
+				Username: auth.GenerateUsername(form.Email),
 				Email:    form.Email,
 			}
 
