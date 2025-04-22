@@ -97,7 +97,7 @@ jobs:
 
       - name: Generate test.config.yml
         run: |
-          cat <<EOF > test.config.yml
+          tee test.config.yml > /dev/null <<EOF
           env: test
           port: 5064
           host: "http://localhost:5064"
@@ -106,13 +106,13 @@ jobs:
           statics: src/statics
           templates: src/templates
           database: 
-            url: postgresql://test:test@localhost/testdb?sslmode=disable
+            url: postgresql://test:test@localhost:5432/testdb?sslmode=disable
             sqldir: src/sql
             migrations: src/sql/migrations
           cors:
             origins:
               - '*'
-          EOF        
+          EOF
       
       # - name: Create Docker Network
       #   run: docker network create sociousid_default
