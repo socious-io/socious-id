@@ -5,7 +5,7 @@ FROM golang:1.22.5-alpine AS base
 
 WORKDIR /app
 
-# Set for max concurrent downloads
+# Set for max concurrent downloadss
 ENV CGO_ENABLED=0
 ENV GOOS=linux
 ENV GOARCH=amd64
