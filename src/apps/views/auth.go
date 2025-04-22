@@ -2,6 +2,8 @@ package views
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -134,6 +136,68 @@ func authGroup(router *gin.Engine) {
 		session.Save()
 		// TODO: make sso otp if it has auth session
 		c.Redirect(http.StatusFound, "/auth/confirm")
+	})
+
+	g.GET("/google", func(c *gin.Context) {
+		url := fmt.Sprintf(
+			"https://accounts.google.com/o/oauth2/v2/auth?client_id=%s&redirect_uri=%s&response_type=code&scope=email profile&access_type=offline&prompt=consent",
+			config.Config.Oauth.Google.ID,
+			fmt.Sprintf("%s/auth/google/callback", config.Config.Host),
+		)
+
+		c.Redirect(http.StatusPermanentRedirect, url)
+	})
+
+	g.GET("/google/callback", func(c *gin.Context) {
+		ctx := c.MustGet("ctx").(context.Context)
+		authorizationCode := c.Query("code")
+
+		googleUserInfo, err := auth.GoogleLoginWithCode(authorizationCode, fmt.Sprintf("%s/auth/google/callback", config.Config.Host))
+		if err != nil || googleUserInfo.Email == "" {
+			c.HTML(http.StatusBadRequest, "login.html", gin.H{
+				"error": "Error: Google login failed",
+			})
+			return
+		}
+
+		u, err := models.GetUserByEmail(googleUserInfo.Email)
+		if err != nil && errors.Is(err, sql.ErrNoRows) {
+			u = &models.User{
+				Username:  auth.GenerateUsername(googleUserInfo.Email),
+				Email:     googleUserInfo.Email,
+				FirstName: &googleUserInfo.GivenName,
+				LastName:  &googleUserInfo.FamilyName,
+			}
+			if err = u.Create(ctx); err != nil {
+				c.HTML(http.StatusBadRequest, "login.html", gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
+		}
+
+		//Make user active
+		if u.Status == models.StatusTypeInactive {
+			err := u.UpdateStatus(ctx, models.StatusTypeActive)
+			if err != nil {
+				c.HTML(http.StatusBadRequest, "login.html", gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
+		}
+
+		//Set session
+		session := sessions.Default(c)
+		session.Set("user_id", u.ID.String())
+		session.Save()
+
+		//Redirect
+		if u.Password == nil {
+			c.Redirect(http.StatusSeeOther, "/auth/password/set")
+			return
+		}
+		c.Redirect(http.StatusSeeOther, "/auth/confirm")
 	})
 
 	g.GET("/otp/confirm", func(c *gin.Context) {
@@ -271,6 +335,36 @@ func authGroup(router *gin.Engine) {
 		c.HTML(http.StatusOK, "pre-register.html", gin.H{})
 	})
 
+	g.PUT("/password", auth.LoginRequired(), func(c *gin.Context) {
+		ctx := c.MustGet("ctx").(context.Context)
+		u, _ := c.MustGet("user").(*models.User)
+
+		form := new(auth.ChangePasswordForm)
+		if err := c.ShouldBindJSON(form); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := auth.CheckPasswordHash(form.CurrentPassword, *u.Password); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "email/password not match"})
+			return
+		}
+
+		newPassword, err := auth.HashPassword(form.Password)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		u.Password = &newPassword
+		if err := u.UpdatePassword(ctx); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusAccepted, gin.H{"message": "success"})
+	})
+
 	g.POST("/password/forget", auth.CheckLogin(), func(c *gin.Context) {
 
 		ctx := c.MustGet("ctx").(context.Context)
@@ -384,10 +478,9 @@ func authGroup(router *gin.Engine) {
 		c.Redirect(http.StatusPermanentRedirect, "/auth/login")
 	})
 
-	g.POST("/session", func(c *gin.Context) {
+	g.POST("/session", clientSecretRequired(), func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
 		form := new(AuthSessionForm)
-
 		if err := c.ShouldBind(form); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
@@ -395,20 +488,7 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		access, err := models.GetAccessByClientID(form.ClientID)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "client access not valid",
-			})
-			return
-		}
+		access := c.MustGet("access").(*models.Access)
 
 		authSession := &models.AuthSession{
 			RedirectURL: form.RedirectURL,
@@ -467,27 +547,12 @@ func authGroup(router *gin.Engine) {
 
 	})
 
-	g.POST("/session/token", func(c *gin.Context) {
+	g.POST("/session/token", clientSecretRequired(), func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
 		form := new(GetTokenForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
-			})
-			return
-		}
-
-		access, err := models.GetAccessByClientID(form.ClientID)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "client access not valid",
 			})
 			return
 		}
@@ -539,7 +604,7 @@ func authGroup(router *gin.Engine) {
 		c.JSON(http.StatusAccepted, tokens)
 	})
 
-	g.POST("/refresh", func(c *gin.Context) {
+	g.POST("/refresh", clientSecretRequired(), func(c *gin.Context) {
 		form := new(RefreshTokenForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -548,23 +613,6 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		//Checking Client
-		access, err := models.GetAccessByClientID(form.ClientID)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		if err := auth.CheckPasswordHash(form.ClientSecret, access.ClientSecret); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "client access not valid",
-			})
-			return
-		}
-
-		//Checking access token
 		claims, err := auth.VerifyToken(form.RefreshToken)
 
 		if err != nil {

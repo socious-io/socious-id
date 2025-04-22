@@ -63,6 +63,27 @@ var (
 		},
 	}
 
+	impactPointsData = []gin.H{
+		{
+			"type":                  "DONATION",
+			"total_points":          100,
+			"social_cause":          "HEALTH",
+			"social_cause_category": "HEALTH",
+			"meta": gin.H{
+				"test": "test",
+			},
+		},
+		{
+			"type":                  "DONATION",
+			"total_points":          200,
+			"social_cause":          "SOCIAL",
+			"social_cause_category": "LIFE",
+			"meta": gin.H{
+				"test": "test",
+			},
+		},
+	}
+
 	verificationsData = []gin.H{}
 
 	shorteningURLs = []string{

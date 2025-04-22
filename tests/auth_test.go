@@ -2,15 +2,12 @@ package tests_test
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
-	"socious-id/src/apps/utils"
 
 	"github.com/gin-gonic/gin"
 	. "github.com/onsi/ginkgo/v2"
@@ -24,33 +21,6 @@ func authGroup() {
 	var sessionCookies []*http.Cookie
 	const cookieName = "socious-id-session"
 	offset := len(usersData)
-
-	BeforeAll(func() {
-
-		ctx := context.Background()
-
-		//Set access config
-		secret := utils.RandomString(24)
-		clientID := utils.RandomString(8)
-		clientSecret, _ := auth.HashPassword(secret)
-
-		access := &models.Access{
-			Name:         "test",
-			Description:  "test description",
-			ClientID:     clientID,
-			ClientSecret: clientSecret,
-		}
-
-		if err := access.Create(ctx); err != nil {
-			log.Fatal(err)
-		}
-		authConfig = gin.H{
-			"client_id":     clientID,
-			"client_secret": secret,
-			"redirect_url":  "http://example.com",
-		}
-
-	})
 
 	It("It should create session (login+register)", func() {
 		for range len(usersData) * 2 {

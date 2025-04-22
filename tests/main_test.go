@@ -1,6 +1,7 @@
 package tests_test
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -9,6 +10,9 @@ import (
 	"net/url"
 	"os"
 	"socious-id/src/apps"
+	"socious-id/src/apps/auth"
+	"socious-id/src/apps/models"
+	"socious-id/src/apps/utils"
 	"socious-id/src/config"
 	"strings"
 	"testing"
@@ -31,13 +35,37 @@ var (
 	db           *sqlx.DB
 	focused      = false
 	authExecuted = false
+	access       *models.Access
+	secret       string
 )
 
 // Setup the test environment before any tests run
 var _ = BeforeSuite(func() {
 	fmt.Printf("BeforeSuite")
 	db, router = setupTestEnvironment()
-	fmt.Printf("After BeforeSuite")
+
+	ctx := context.Background()
+
+	//Set access config
+	secret = utils.RandomString(24)
+	clientID := utils.RandomString(8)
+	clientSecret, _ := auth.HashPassword(secret)
+
+	access = &models.Access{
+		Name:         "test",
+		Description:  "test description",
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+	}
+
+	if err := access.Create(ctx); err != nil {
+		log.Fatal(err)
+	}
+	authConfig = gin.H{
+		"client_id":     clientID,
+		"client_secret": secret,
+		"redirect_url":  "http://example.com",
+	}
 })
 
 // Drop the database after all tests have run
@@ -61,6 +89,7 @@ var _ = Describe("Socious Test Suite", Ordered, func() {
 	Context("Organizations", organizationsGroup)
 	Context("Verifications", verificationsGroup)
 	Context("Shortener", shortenerGroup)
+	Context("Impact Points", impactPointsGroup)
 })
 
 func init() {
