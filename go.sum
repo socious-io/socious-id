@@ -271,6 +271,8 @@ github.com/socious-io/gomq v0.1.5 h1:pbl4D3H99f8MhOiS1bF1d4JZbYAiIZXN6psCglMt2kw
 github.com/socious-io/gomq v0.1.5/go.mod h1:1id1vbRoza/j6BQGuXYYrzwbOOeq2Ii97U2bkwuSIoQ=
 github.com/socious-io/gomq v0.2.0 h1:v5lhtfHHK1VAOkMvXJOnSJNBRuThA9zT5HvfA3lGx6A=
 github.com/socious-io/gomq v0.2.0/go.mod h1:1id1vbRoza/j6BQGuXYYrzwbOOeq2Ii97U2bkwuSIoQ=
+github.com/socious-io/gomq v0.2.1 h1:AhjpRugviY+dm+74TnUiopLs+l3eACKW3wasjW5HEPE=
+github.com/socious-io/gomq v0.2.1/go.mod h1:1id1vbRoza/j6BQGuXYYrzwbOOeq2Ii97U2bkwuSIoQ=
 github.com/socious-io/gopay v0.0.12 h1:Cr35a8H3HEVZWjXzGm1g7qytaz46qWC/wAUY64r3Hlw=
 github.com/socious-io/gopay v0.0.12/go.mod h1:aG4FFONDbP7AepJ5arN6ga72Kk/CFc9PIpbJGaJYHMw=
 github.com/socious-io/pkg_database v1.0.0 h1:y7VNH6IDE49qGBgiseCsMA0h3FRWvmR5jpwtMryl5ow=
