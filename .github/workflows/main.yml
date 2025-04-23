@@ -236,4 +236,4 @@ jobs:
 
       - name: Docker run worker
         run: |
-          docker run -d --restart always -h ${{ env.DOCKER_CONTAINER_NAME }}-worker --network ${{ env.DOCKER_CONTAINER_NETWORK }} --name ${{ env.DOCKER_CONTAINER_NAME }}-worker ${{ steps.meta-worker.outputs.tags }}
+          docker run -d --restart always -h ${{ env.DOCKER_CONTAINER_NAME }}-worker --network ${{ env.DOCKER_CONTAINER_NETWORK }} --name ${{ env.DOCKER_CONTAINER_NAME }}-worker ${{ steps.meta.outputs.tags }}
