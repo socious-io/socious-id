@@ -151,6 +151,19 @@ jobs:
       #       --load \
       #       .
 
+      - name: Log into registry ${{ env.REGISTRY }}
+        uses: docker/login-action@v3.2.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ env.REGISTRY_PASSWORD }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5.5.1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
       - name: Pull Docker image
         run: |
           docker pull ${{ steps.meta.outputs.tags }}
@@ -163,49 +176,3 @@ jobs:
         run: |
           docker ps -qa --filter "name=${{ env.DOCKER_CONTAINER_NAME }}" | grep -q . && docker stop ${{ env.DOCKER_CONTAINER_NAME }} && docker rm -fv ${{ env.DOCKER_CONTAINER_NAME }}
           docker run -d --restart always -p 5064:5064 -h ${{ env.DOCKER_CONTAINER_NAME }} --network ${{ env.DOCKER_CONTAINER_NETWORK }} --name ${{ env.DOCKER_CONTAINER_NAME }} ${{ steps.meta.outputs.tags }}
-
-
-      # - name: Log into registry ${{ env.REGISTRY }}
-      #   if: github.event_name != 'pull_request'
-      #   uses: docker/login-action@v3.2.0
-      #   with:
-      #     registry: ${{ env.REGISTRY }}
-      #     username: ${{ env.REGISTRY_USERNAME }}
-      #     password: ${{ env.REGISTRY_PASSWORD }}
-
-      # - name: Extract Docker metadata
-      #   id: meta
-      #   uses: docker/metadata-action@v5.5.1
-      #   with:
-      #     images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-      # - name: Build and push Docker image
-      #   id: build-and-push
-      #   uses: docker/build-push-action@v6.7.0
-      #   with:
-      #     context: .
-      #     push: ${{ github.event_name != 'pull_request' }}
-      #     tags: ${{ steps.meta.outputs.tags }}
-      #     labels: ${{ steps.meta.outputs.labels }}
-
-      # - name: Extract Worker Docker metadata
-      #   id: meta-worker
-      #   uses: docker/metadata-action@v5.5.1
-      #   with:
-      #     images: ${{ env.REGISTRY }}/${{ env.WORKER_IMAGE_NAME }}
-
-      # - name: Build and push Worker Docker image
-      #   id: build-and-push-worker
-      #   uses: docker/build-push-action@v6.7.0
-      #   with:
-      #     context: .
-      #     file: "./Worker.Dockerfile"
-      #     push: ${{ github.event_name != 'pull_request' }}
-      #     tags: ${{ steps.meta-worker.outputs.tags }}
-      #     labels: ${{ steps.meta-worker.outputs.labels }}
-
-      # - name: Docker run worker
-      #   run: |
-      #     docker pull ${{ steps.meta-worker.outputs.tags }}
-      #     docker ps -qa --filter "name=${{ env.DOCKER_CONTAINER_NAME }}-worker" | grep -q . && docker stop ${{ env.DOCKER_CONTAINER_NAME }}-worker && docker rm -fv ${{ env.DOCKER_CONTAINER_NAME }}-worker
-      #     docker run -d --restart always -h ${{ env.DOCKER_CONTAINER_NAME }}-worker --network ${{ env.DOCKER_CONTAINER_NETWORK }} --name ${{ env.DOCKER_CONTAINER_NAME }}-worker ${{ steps.meta-worker.outputs.tags }}
