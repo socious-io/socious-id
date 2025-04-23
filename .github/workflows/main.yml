@@ -160,20 +160,18 @@ jobs:
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ env.REGISTRY_PASSWORD }}
 
-      - name: Extract Docker metadata
-        id: meta
+      - name: Extract Worker Docker metadata
+        id: meta-worker
         uses: docker/metadata-action@v5.5.1
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.WORKER_IMAGE_NAME }}
 
-      - name: Build and push Docker image
-        id: build-and-push
+      - name: Build and push Worker Docker image
         uses: docker/build-push-action@v6.7.0
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-worker.outputs.tags }}
+          labels: ${{ steps.meta-worker.outputs.labels }}
           target: 'worker-runner'
           
   deploy:
