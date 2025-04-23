@@ -2,9 +2,9 @@ name: CI/CD Development Env
 
 on:
   push:
-    branches: ["main", "ci/improvement"]
-  # pull_request:
-  #   branches: ["main"]
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
 env:
   REGISTRY: ghcr.io
