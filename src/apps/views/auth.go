@@ -114,7 +114,7 @@ func authGroup(router *gin.Engine) {
 		}
 		if u.Status == models.StatusTypeInactive {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
-				"error": "Error: user is not verified",
+				"error": "Error: User couldn't be found/is not registered on Socious",
 			})
 			return
 		}
@@ -274,14 +274,6 @@ func authGroup(router *gin.Engine) {
 			})
 			return
 		}
-
-		if _, err := models.GetUserByEmail(form.Email); err == nil {
-			c.HTML(http.StatusBadRequest, "register.html", gin.H{
-				"error": "Email is already in use. Please select different email.",
-			})
-			return
-		}
-
 		//Creating user (Default in INACTIVE state)
 		u := &models.User{
 			Username: form.Email, //TODO: generate username
@@ -290,8 +282,9 @@ func authGroup(router *gin.Engine) {
 
 		if err := u.Create(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{
-				"error": err.Error(),
+				"error": "Email is already in use. Please select different email.",
 			})
+			log.Printf("Error creating user: %s\n", err)
 			return
 		}
 
@@ -389,7 +382,7 @@ func authGroup(router *gin.Engine) {
 		//Checking user status
 		if u.Status == models.StatusTypeInactive {
 			c.HTML(http.StatusBadRequest, "forget-password.html", gin.H{
-				"error": "Error: user is not verified",
+				"error": "Error: User couldn't be found/is not registered on Socious",
 			})
 			return
 		}
