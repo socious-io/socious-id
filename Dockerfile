@@ -4,7 +4,6 @@
 FROM golang:1.22.5-alpine AS base
 WORKDIR /app
 
-# Set for max concurrent downloadss
 ENV CGO_ENABLED=0
 ENV GOOS=linux
 ENV GOARCH=amd64
@@ -19,7 +18,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
 COPY . .
 
-
+########## Runner Stage ##########
 FROM base AS runner
 WORKDIR /app
 RUN --mount=type=cache,target=/go/pkg/mod \
@@ -27,6 +26,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     go build -C cmd/app -trimpath -ldflags="-s -w" -o ../../build .
 CMD ["/app/build"]
 
+########## Worker Stage ##########
 FROM base AS worker-runner
 WORKDIR /app
 RUN --mount=type=cache,target=/go/pkg/mod \
