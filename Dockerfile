@@ -25,11 +25,11 @@ WORKDIR /app
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     go build -C cmd/app -trimpath -ldflags="-s -w" -o ../../build .
-ENTRYPOINT ["/app/build"]
+CMD ["/app/build"]
 
 FROM base AS worker-runner
 WORKDIR /app
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     go build -C cmd/worker -trimpath -ldflags="-s -w" -o ../../worker .
-ENTRYPOINT ["/app/worker"]
+CMD ["/app/worker"]

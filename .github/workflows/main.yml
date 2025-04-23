@@ -170,7 +170,7 @@ jobs:
 
       - name: Apply Migrations
         run: |
-          docker run --rm --network ${{ env.DOCKER_CONTAINER_NETWORK }} ${{ steps.meta.outputs.tags }} go run /app/cmd/app/migrate up
+          docker run --rm --network ${{ env.DOCKER_CONTAINER_NETWORK }} ${{ steps.meta.outputs.tags }} go run /app/cmd/migrate/main.go up
 
       - name: Docker run
         run: |
