@@ -81,7 +81,7 @@ jobs:
           statics: src/statics
           templates: src/templates
           database: 
-            url: postgresql://test:test@localhost:5432/test?sslmode=disable
+            url: postgresql://test:test@localhost:5432/testdb?sslmode=disable
             sqldir: src/sql
             migrations: src/sql/migrations
           cors:
