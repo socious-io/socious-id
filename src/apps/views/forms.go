@@ -1,23 +1,32 @@
 package views
 
 import (
+	"encoding/json"
+	"socious-id/src/apps/models"
+
 	"github.com/google/uuid"
 )
 
 type ConfirmForm struct {
-	Confirmed bool `json:"confirmed" form:"confirmed"`
+	Confirmed  bool   `json:"confirmed" form:"confirmed"`
+	IdentityId string `json:"identity_id" form:"identity_id"`
+}
+
+type ClientSecretForm struct {
+	ClientSecret string `json:"client_secret" form:"client_secret" validate:"required"`
+	ClientID     string `json:"client_id" form:"client_id" validate:"required"`
 }
 
 type AuthSessionForm struct {
-	ClientSecret string `json:"client_secret" form:"client_secret" validate:"required"`
-	ClientID     string `json:"client_id" form:"client_id" validate:"required"`
-	RedirectURL  string `json:"redirect_url" form:"redirect_url" validate:"required"`
+	RedirectURL string `json:"redirect_url" form:"redirect_url" validate:"required"`
 }
 
 type GetTokenForm struct {
-	ClientSecret string `json:"client_secret" form:"client_secret" validate:"required"`
-	ClientID     string `json:"client_id" form:"client_id" validate:"required"`
-	Code         string `json:"code" form:"code" validate:"required"`
+	Code string `json:"code" form:"code" validate:"required"`
+}
+
+type RefreshTokenForm struct {
+	RefreshToken string `json:"refresh_token" form:"refresh_token" validate:"required"`
 }
 
 type UserForm struct {
@@ -38,6 +47,18 @@ type UserForm struct {
 	CoverID  *uuid.UUID `json:"cover_id" form:"cover_id"`
 }
 
+type UserUpdateStatusForm struct {
+	Status models.StatusType `json:"status" form:"status" validate:"required"`
+}
+
+type OrganizationUpdateStatusForm struct {
+	Status models.OrganizationStatusType `json:"status" form:"status" validate:"required"`
+}
+
+type OrganizationVerificationForm struct {
+	Status models.OrganizationStatusType `json:"status" form:"status" validate:"required"`
+}
+
 type OrganizationForm struct {
 	Shortname   string  `json:"shortname" form:"shortname"`
 	Name        *string `json:"name" form:"name"`
@@ -56,4 +77,14 @@ type OrganizationForm struct {
 
 	LogoID  *uuid.UUID `json:"logo_id" form:"logo_id"`
 	CoverID *uuid.UUID `json:"cover_id" form:"cover_id"`
+}
+
+type ImpactPointForm struct {
+	UserID              uuid.UUID              `json:"user_id" form:"user_id" validate:"required"`
+	TotalPoints         int                    `json:"total_points" form:"total_points"`
+	SocialCause         string                 `json:"social_cause" form:"social_cause"`
+	SocialCauseCategory string                 `json:"social_cause_category" form:"social_cause_category"`
+	Type                models.ImpactPointType `json:"type" form:"type" validate:"required,oneof=WORKSUBMIT DONATION VOLUNTEER OTHER"`
+	AccessID            *uuid.UUID             `json:"access_id" form:"access_id"`
+	Meta                *json.RawMessage       `json:"meta" form:"meta"`
 }

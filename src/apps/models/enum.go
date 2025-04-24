@@ -36,20 +36,35 @@ func (amt AuthModeType) Value() (driver.Value, error) {
 	return string(amt), nil
 }
 
-type VerificationType string
+type UserVerificationType string
 
 const (
-	VerificationTypeEmail   VerificationType = "EMAIL"
-	VerificationTypePhone   VerificationType = "PHONE"
-	VerificationTypeIdenity VerificationType = "IDENTITY"
+	UserVerificationTypeEmail   UserVerificationType = "EMAIL"
+	UserVerificationTypePhone   UserVerificationType = "PHONE"
+	UserVerificationTypeIdenity UserVerificationType = "IDENTITY"
 )
 
-func (vt *VerificationType) Scan(value interface{}) error {
-	return scanEnum(value, (*string)(vt))
+func (uvt *UserVerificationType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(uvt))
 }
 
-func (vt VerificationType) Value() (driver.Value, error) {
-	return string(vt), nil
+func (uvt UserVerificationType) Value() (driver.Value, error) {
+	return string(uvt), nil
+}
+
+type OrganizationVerificationType string
+
+const (
+	OrganizationVerificationTypeNormal OrganizationVerificationType = "NORMAL"
+	OrganizationVerificationTypeImpact OrganizationVerificationType = "IMPACT"
+)
+
+func (ovt *OrganizationVerificationType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(ovt))
+}
+
+func (ovt OrganizationVerificationType) Value() (driver.Value, error) {
+	return string(ovt), nil
 }
 
 type StatusType string
@@ -94,4 +109,54 @@ func scanEnum(value interface{}, target interface{}) error {
 		return fmt.Errorf("failed to scan type: %v", value) // Error on unsupported type.
 	}
 	return nil
+}
+
+type VerificationStatusType string
+
+const (
+	VerificationStatusCreated   VerificationStatusType = "CREATED"
+	VerificationStatusRequested VerificationStatusType = "REQUESTED"
+	VerificationStatusVerified  VerificationStatusType = "VERIFIED"
+	VerificationStatusFailed    VerificationStatusType = "FAILED"
+)
+
+func (c *VerificationStatusType) Scan(value interface{}) error {
+	switch v := value.(type) {
+	case []byte:
+		*c = VerificationStatusType(string(v))
+	case string:
+		*c = VerificationStatusType(v)
+	default:
+		return fmt.Errorf("failed to scan credential type: %v", value)
+	}
+	return nil
+}
+
+func (c VerificationStatusType) Value() (driver.Value, error) {
+	return string(c), nil
+}
+
+type ImpactPointType string
+
+const (
+	ImpactPointTypeWorkSubmit ImpactPointType = "WORKSUBMIT"
+	ImpactPointTypeDonation   ImpactPointType = "DONATION"
+	ImpactPointTypeVolunteer  ImpactPointType = "VOLUNTEER"
+	ImpactPointTypeOther      ImpactPointType = "OTHER"
+)
+
+func (c *ImpactPointType) Scan(value interface{}) error {
+	switch v := value.(type) {
+	case []byte:
+		*c = ImpactPointType(string(v))
+	case string:
+		*c = ImpactPointType(v)
+	default:
+		return fmt.Errorf("failed to scan credential type: %v", value)
+	}
+	return nil
+}
+
+func (c ImpactPointType) Value() (driver.Value, error) {
+	return string(c), nil
 }

@@ -2,15 +2,12 @@ package tests_test
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
-	"socious-id/src/apps/utils"
 
 	"github.com/gin-gonic/gin"
 	. "github.com/onsi/ginkgo/v2"
@@ -24,33 +21,6 @@ func authGroup() {
 	var sessionCookies []*http.Cookie
 	const cookieName = "socious-id-session"
 	offset := len(usersData)
-
-	BeforeAll(func() {
-
-		ctx := context.Background()
-
-		//Set access config
-		secret := utils.RandomString(24)
-		clientID := utils.RandomString(8)
-		clientSecret, _ := auth.HashPassword(secret)
-
-		access := &models.Access{
-			Name:         "test",
-			Description:  "test description",
-			ClientID:     clientID,
-			ClientSecret: clientSecret,
-		}
-
-		if err := access.Create(ctx); err != nil {
-			log.Fatal(err)
-		}
-		authConfig = gin.H{
-			"client_id":     clientID,
-			"client_secret": secret,
-			"redirect_url":  "http://example.com",
-		}
-
-	})
 
 	It("It should create session (login+register)", func() {
 		for range len(usersData) * 2 {
@@ -182,7 +152,7 @@ func authGroup() {
 			Expect(w.Code).To(Equal(http.StatusFound))
 			location := w.Result().Header.Get("Location")
 			Expect(location).To(Equal(fmt.Sprintf(
-				"%s?code=%s&session=%s&status=success",
+				"%s?code=%s&identity_id=&session=%s&status=success",
 				authConfig["redirect_url"],
 				ssoOtpCodes[i],
 				sessionsData[i]["id"],
@@ -275,7 +245,7 @@ func authGroup() {
 			Expect(w.Code).To(Equal(http.StatusFound))
 			location := w.Result().Header.Get("Location")
 			Expect(location).To(Equal(fmt.Sprintf(
-				"%s?code=%s&session=%s&status=success",
+				"%s?code=%s&identity_id=&session=%s&status=success",
 				authConfig["redirect_url"],
 				ssoOtpCodes[i+offset],
 				sessionsData[i+offset]["id"],
@@ -291,7 +261,6 @@ func authGroup() {
 				"client_secret": authConfig["client_secret"],
 				"code":          ssoOtpCodes[i+offset],
 			})
-			fmt.Println(ssoOtpCodes)
 			req, _ := http.NewRequest("POST", "/auth/session/token", bytes.NewBuffer(reqBody))
 			req.Header.Set("Content-Type", "application/json")
 			router.ServeHTTP(w, req)

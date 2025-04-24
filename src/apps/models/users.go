@@ -78,7 +78,7 @@ func (u *User) Create(ctx context.Context) error {
 	return database.Fetch(u, u.ID)
 }
 
-func (u *User) Verify(ctx context.Context, vtype VerificationType) error {
+func (u *User) Verify(ctx context.Context, vtype UserVerificationType) error {
 	rows, err := database.Query(
 		ctx,
 		"users/verify",
@@ -138,6 +138,24 @@ func (u *User) UpdateProfile(ctx context.Context) error {
 		"users/update_profile",
 		u.ID, u.FirstName, u.LastName, u.Bio, u.Phone, u.Username,
 		u.CoverID, u.AvatarID,
+	)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		if err := rows.StructScan(u); err != nil {
+			return err
+		}
+	}
+	return database.Fetch(u, u.ID)
+}
+
+func (u *User) UpdateStatus(ctx context.Context, status StatusType) error {
+	rows, err := database.Query(
+		ctx,
+		"users/update_status",
+		u.ID, status,
 	)
 	if err != nil {
 		return err

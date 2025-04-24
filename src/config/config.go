@@ -1,9 +1,9 @@
 package config
 
 import (
-	"os"
+	"log"
 
-	"gopkg.in/yaml.v2"
+	"github.com/spf13/viper"
 )
 
 var Config *ConfigType
@@ -27,6 +27,11 @@ type ConfigType struct {
 		ApiKey    string            `mapstructure:"apikey"`
 		Templates map[string]string `mapstructure:"templates"`
 	} `mapstructure:"sendgrid"`
+	Wallet struct {
+		Agent       string `mapstructure:"agent"`
+		AgentApiKey string `mapstructure:"agent_api_key"`
+		Connect     string `mapstructure:"connect"`
+	} `mapstructure:"wallet"`
 	Upload struct {
 		Bucket      string `mapstructure:"bucket"`
 		CDN         string `mapstructure:"cdn"`
@@ -42,19 +47,27 @@ type ConfigType struct {
 	Platforms struct {
 		Accounts string `mapstructure:"accounts"`
 	} `mapstructure:"platforms"`
+	Oauth struct {
+		Google struct {
+			ID     string `mapstructure:"id"`
+			Secret string `mapstructure:"secret"`
+		} `mapstructure:"google"`
+	} `mapstructure:"oauth"`
 }
 
-func Init(filename string) (*ConfigType, error) {
-	file, err := os.Open(filename)
-	if err != nil {
-		return nil, err
+func Init(configPath string) {
+	viper.SetConfigFile(configPath)
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			log.Fatalf("Config file not found: %s", err)
+		} else {
+			log.Fatalf("Error reading config file: %s", err)
+		}
 	}
-	defer file.Close()
-	decoder := yaml.NewDecoder(file)
-	conf := new(ConfigType)
-	if err := decoder.Decode(conf); err != nil {
-		return nil, err
+
+	if err := viper.Unmarshal(&Config); err != nil {
+		log.Fatal(err)
 	}
-	Config = conf
-	return conf, err
+
+	log.Printf("Using config file: %s\n", viper.ConfigFileUsed())
 }
