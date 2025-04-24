@@ -56,6 +56,11 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
+		//Auth session is completed further redirection will go through account center
+		session := sessions.Default(c)
+		session.Delete("auth_session_id")
+		session.Save()
+
 		form := new(ConfirmForm)
 		c.ShouldBind(form)
 		params := url.Values{}
@@ -526,6 +531,8 @@ func authGroup(router *gin.Engine) {
 			})
 			return
 		}
+
+		fmt.Println("setting auth session id", authSession.ID.String())
 
 		session := sessions.Default(c)
 		session.Set("auth_session_id", authSession.ID.String())
