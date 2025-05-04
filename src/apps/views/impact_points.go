@@ -45,8 +45,8 @@ func impactPointsGroup(router *gin.Engine) {
 		c.JSON(http.StatusOK, gin.H{
 			"impact_points": impactPoints,
 			"total_count":   total,
-			"page":          c.Query("page"),
-			"limit":         c.Query("limit"),
+			"page":          c.MustGet("page"),
+			"limit":         c.MustGet("limit"),
 		})
 	})
 
