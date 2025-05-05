@@ -23,11 +23,11 @@ type VerificationCredential struct {
 	UserID uuid.UUID `db:"user_id" json:"user_id"`
 	User   *User     `db:"-" json:"user"`
 
-	ConnectionID    *string `db:"connection_id" json:"connection_id"`
-	ConnectionURL   *string `db:"connection_url" json:"connection_url"`
-	PresentID       *string `db:"present_id" json:"present_id"`
-	Body            *string `db:"body" json:"body"`
-	ValidationError *string `db:"validation_error" json:"validation_error"`
+	ConnectionID    *string         `db:"connection_id" json:"connection_id"`
+	ConnectionURL   *string         `db:"connection_url" json:"connection_url"`
+	PresentID       *string         `db:"present_id" json:"present_id"`
+	Body            *types.JSONText `db:"body" json:"body"`
+	ValidationError *string         `db:"validation_error" json:"validation_error"`
 
 	ConnectionAt *time.Time `db:"connection_at" json:"connection_at"`
 	VerifiedAt   *time.Time `db:"verified_at" json:"verified_at"`
@@ -120,7 +120,7 @@ func (v *VerificationCredential) ProofVerify(ctx context.Context) error {
 		return err
 	}
 	vcData, _ := json.Marshal(vc)
-	duplicateVerification, err := GetSimilar(ctx, vc)
+	duplicateVerification, err := GetSimilar(ctx, v, vc)
 	if err == nil && duplicateVerification != nil {
 		rows, err := database.Query(
 			ctx,
@@ -131,7 +131,7 @@ func (v *VerificationCredential) ProofVerify(ctx context.Context) error {
 			return err
 		}
 		rows.Close()
-		return nil
+		return database.Fetch(v, v.ID)
 	}
 
 	rows, err := database.Query(
@@ -146,12 +146,17 @@ func (v *VerificationCredential) ProofVerify(ctx context.Context) error {
 	return database.Fetch(v, v.ID)
 }
 
-func GetSimilar(ctx context.Context, data wallet.H) (*VerificationCredential, error) {
+func GetSimilar(ctx context.Context, currentVC *VerificationCredential, data wallet.H) (*VerificationCredential, error) {
 	v := new(VerificationCredential)
 	err := database.Get(
 		v,
 		"verification_credentials/get_similar",
-		data,
+		currentVC.ID,
+		data["document_number"],
+		data["country"],
+		data["first_name"],
+		data["last_name"],
+		data["date_of_birth"],
 	)
 	if err != nil {
 		return nil, err
