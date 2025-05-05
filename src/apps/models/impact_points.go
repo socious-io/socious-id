@@ -3,10 +3,12 @@ package models
 import (
 	"context"
 	"encoding/json"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx/types"
+	"github.com/lib/pq"
 	database "github.com/socious-io/pkg_database"
 )
 
@@ -73,9 +75,18 @@ func GetImpactPoints(userID uuid.UUID, p database.Paginate) ([]ImpactPoint, int,
 		impactPoints = []ImpactPoint{}
 		fetchList    []database.FetchList
 		ids          []interface{}
+		typeFilter   []string = []string{}
 	)
 
-	if err := database.QuerySelect("impact_points/get_all", &fetchList, userID, p.Limit, p.Offet); err != nil {
+	if len(p.Filters) > 0 {
+		for _, filter := range p.Filters {
+			if filter.Key == "type" {
+				typeFilter = strings.Split(filter.Value, ",")
+			}
+		}
+	}
+
+	if err := database.QuerySelect("impact_points/get_all", &fetchList, userID, pq.Array(typeFilter), p.Limit, p.Offet); err != nil {
 		return nil, 0, err
 	}
 

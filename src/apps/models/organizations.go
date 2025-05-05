@@ -2,7 +2,6 @@ package models
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/jmoiron/sqlx/types"
@@ -218,9 +217,14 @@ func GetOrganizationsByMember(userId uuid.UUID) ([]Organization, error) {
 		return nil, err
 	}
 
+	if len(ids) < 1 {
+		return organizations, nil
+	}
+
 	if err := database.Fetch(&organizations, ids...); err != nil {
 		return nil, err
 	}
+
 	return organizations, nil
 }
 
@@ -240,24 +244,10 @@ func GetOrganizationByMember(id uuid.UUID, userId uuid.UUID) (*Organization, err
 	return o, nil
 }
 
-func getManyOrganizations(ids []uuid.UUID, identity uuid.UUID) ([]Organization, error) {
-	result := []Organization{}
-	return result, fmt.Errorf("Not Implemented")
-}
-
 func GetOrganizationByShortname(shortname string, identity uuid.UUID) (*Organization, error) {
 	o := new(Organization)
 	if err := database.Fetch(o, identity.String()); err != nil {
 		return nil, err
 	}
 	return o, nil
-}
-
-func shortnameExistsOrganization(shortname string) (bool, error) {
-	return false, fmt.Errorf("Not Implemented")
-}
-
-func searchOrganizations(query string) ([]Organization, error) { // Do we need to implement this?
-	result := []Organization{}
-	return result, fmt.Errorf("Not Implemented")
 }

@@ -1,11 +1,13 @@
 SELECT * FROM verification_credentials
-WHERE 
+WHERE
 (
-    body->>'document_number' = :document_number AND
-    body->>'country' = :country
-) OR
-(
-    body->>'first_name' = :first_name AND 
-    body->>'last_name' = :last_name AND 
-    body->>'date_of_birth' = :date_of_birth
-);
+    (
+        body->>'document_number' = $2 AND
+        body->>'country' = $3
+    ) OR
+    (
+        body->>'first_name' = $4 AND 
+        body->>'last_name' = $5 AND 
+        body->>'date_of_birth' = $6
+    )
+) AND id!=$1 AND status='VERIFIED';

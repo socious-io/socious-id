@@ -33,6 +33,7 @@ type User struct {
 	Address           *string `db:"address" json:"address"`
 	GeonameId         *int64  `db:"geoname_id" json:"geoname_id"`
 	MobileCountryCode *string `db:"mobile_country_code" json:"mobile_country_code"`
+	ImpactPoints      *int    `db:"impact_points" json:"impact_points"`
 
 	AvatarID   *uuid.UUID     `db:"avatar_id" json:"avatar_id"`
 	Avatar     *Media         `db:"-" json:"avatar"`
