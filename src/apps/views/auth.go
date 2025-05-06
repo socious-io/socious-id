@@ -43,7 +43,7 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 		// NOTE: look like page sent without any session so detect it's self authorization
-		c.Redirect(http.StatusPermanentRedirect, config.Config.Platforms.Accounts)
+		c.Redirect(http.StatusTemporaryRedirect, config.Config.Platforms.Accounts)
 
 	})
 
@@ -150,7 +150,7 @@ func authGroup(router *gin.Engine) {
 			fmt.Sprintf("%s/auth/google/callback", config.Config.Host),
 		)
 
-		c.Redirect(http.StatusPermanentRedirect, url)
+		c.Redirect(http.StatusTemporaryRedirect, url)
 	})
 
 	g.GET("/google/callback", func(c *gin.Context) {
@@ -466,14 +466,14 @@ func authGroup(router *gin.Engine) {
 		session := sessions.Default(c)
 		session.Delete("user_id")
 		session.Save()
-		c.Redirect(http.StatusPermanentRedirect, "/auth/login")
+		c.Redirect(http.StatusSeeOther, "/auth/login")
 	})
 
 	g.GET("/logout", auth.LoginRequired(), func(c *gin.Context) {
 		session := sessions.Default(c)
 		session.Delete("user_id")
 		session.Save()
-		c.Redirect(http.StatusPermanentRedirect, "/auth/login")
+		c.Redirect(http.StatusSeeOther, "/auth/login")
 	})
 
 	g.POST("/session", clientSecretRequired(), func(c *gin.Context) {
@@ -540,9 +540,9 @@ func authGroup(router *gin.Engine) {
 		session.Save()
 
 		if authMode == models.AuthModeRegister {
-			c.Redirect(http.StatusPermanentRedirect, "/auth/register/pre")
+			c.Redirect(http.StatusTemporaryRedirect, "/auth/register/pre")
 		} else {
-			c.Redirect(http.StatusPermanentRedirect, "/auth/login")
+			c.Redirect(http.StatusTemporaryRedirect, "/auth/login")
 		}
 
 	})
