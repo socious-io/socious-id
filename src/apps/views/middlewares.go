@@ -114,18 +114,13 @@ func clientSecretRequired() gin.HandlerFunc {
 	}
 }
 
-func NoCacheForRedirects() gin.HandlerFunc {
+func NoCache() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Continue to handler
 		c.Next()
 
-		// Check response status
-		status := c.Writer.Status()
-		if status >= 300 && status < 400 {
-			// Add no-cache headers to prevent caching redirects
-			c.Writer.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
-			c.Writer.Header().Set("Pragma", "no-cache")
-			c.Writer.Header().Set("Expires", "0")
-		}
+		c.Writer.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
+		c.Writer.Header().Set("Pragma", "no-cache")
+		c.Writer.Header().Set("Expires", "0")
 	}
 }

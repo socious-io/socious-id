@@ -51,7 +51,7 @@ func Init() *gin.Engine {
 	router.Use(sessions.Sessions("socious-id-session", store))
 
 	//Cache
-	router.Use(views.NoCacheForRedirects())
+	router.Use(views.NoCache())
 
 	if config.Config.Debug {
 		router.Static("/statics", config.Config.Statics)
