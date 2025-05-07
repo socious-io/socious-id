@@ -38,6 +38,9 @@ func usersGroup(router *gin.Engine) {
 			return
 		}
 
+		// FIXME: use nats
+		go workers.Sync(user.ID)
+
 		c.JSON(http.StatusOK, user)
 	})
 

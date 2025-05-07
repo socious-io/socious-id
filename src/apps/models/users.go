@@ -94,7 +94,7 @@ func (u *User) Verify(ctx context.Context, vtype UserVerificationType) error {
 			return err
 		}
 	}
-	return nil
+	return database.Fetch(u, u.ID)
 }
 
 func (u *User) ExpirePassword(ctx context.Context) error {
