@@ -77,7 +77,7 @@ func Routers(router *gin.RouterGroup) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		c.Redirect(http.StatusPermanentRedirect, s.LongURL)
+		c.Redirect(http.StatusSeeOther, s.LongURL)
 	})
 
 	router.POST("", func(c *gin.Context) {

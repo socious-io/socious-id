@@ -15,7 +15,8 @@ import (
 type ImpactPoint struct {
 	ID uuid.UUID `db:"id" json:"id"`
 
-	TotalPoints int `db:"total_points" json:"total_points"`
+	TotalPoints int     `db:"total_points" json:"total_points"`
+	Value       float64 `db:"value" json:"value"`
 
 	UserID   uuid.UUID      `db:"user_id" json:"user_id"`
 	UserJson types.JSONText `db:"user" json:"-"`
@@ -36,6 +37,12 @@ type Badges struct {
 	TotalPoints         int    `db:"total_points" json:"total_points"`
 	Count               int    `db:"count" json:"count"`
 	SocialCauseCategory string `db:"social_cause_category" json:"social_cause_category"`
+}
+
+type ImpactPointOverview struct {
+	TotalPoints int             `db:"total_points" json:"total_points"`
+	TotalValues float64         `db:"total_values" json:"total_values"`
+	Type        ImpactPointType `db:"type" json:"type"`
 }
 
 func (ImpactPoint) TableName() string {
@@ -101,6 +108,14 @@ func GetImpactPoints(userID uuid.UUID, p database.Paginate) ([]ImpactPoint, int,
 		return nil, 0, err
 	}
 	return impactPoints, fetchList[0].TotalCount, nil
+}
+
+func GetImpactPointsCountsPerType(userID uuid.UUID) ([]ImpactPointOverview, error) {
+	countsByType := []ImpactPointOverview{}
+	if err := database.QuerySelect("impact_points/get_count_per_type", &countsByType, userID); err != nil {
+		return nil, err
+	}
+	return countsByType, nil
 }
 
 func GetImpactBadges(userID uuid.UUID) ([]Badges, error) {

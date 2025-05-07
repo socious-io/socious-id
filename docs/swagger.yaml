@@ -11,61 +11,408 @@ servers:
     description: Local server (for development purposes)
 components:
   securitySchemes:
-    bearerAuth:
+    BearerAuth:
       type: http
       scheme: bearer
+      bearerFormat: JWT
+      description: JWT token required for user authentication
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: socious-id-session
+      description: Cookie-based authentication for web sessions
+    ClientSecret:
+      type: apiKey
+      in: header
+      name: X-Client-Secret
+      description: Client secret key required for accessing protected endpoints
   schemas:
-    Media:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uuid
-          url:
-            type: string
-            format: uri
-          filename:
-            type: string
-          created_at:
-            type: string
-            format: date-time
-        required:
-          - id
-          - url
-          - filename
-          - created_at
-    User:
+    StatusType:
+        type: string
+        enum:
+          - pending
+          - active
+          - inactive
+          - suspended
+          - deleted
+        description: Status of the user
+    VerificationCredentialStatus:
+        type: string
+        enum:
+          - CREATED
+          - REQUESTED
+          - VERIFIED
+          - FAILED
+        description: Current status of the verification
+    ImpactPointType:
+        type: string
+        enum:
+          - WORKSUBMIT
+          - DONATION
+          - VOLUNTEER
+          - OTHER
+        description: Type of impact point
+    UserVerificationType:
+      type: string
+      enum:
+        - identity
+        - email
+        - phone
+      description: Type of user verification
+    OrganizationStatusType:
+      type: string
+      enum:
+        - pending
+        - active
+        - inactive
+        - suspended
+        - deleted
+      description: Status of the organization
+    OrganizationVerificationType:
+      type: string
+      enum:
+        - normal
+        - impact
+      description: Type of verification for the organization
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+      required:
+        - error
+
+    AuthSessionForm:
+      type: object
+      required:
+        - redirect_url
+      properties:
+        redirect_url:
+          type: string
+          format: uri
+          description: URL to redirect after authentication
+    ChangePasswordForm:
+      type: object
+      required:
+        - current_password
+        - password
+        - password_confirmation
+      properties:
+        current_password:
+          type: string
+          format: password
+          description: User's current password
+        password:
+          type: string
+          format: password
+          description: New password
+        password_confirmation:
+          type: string
+          format: password
+          description: Confirmation of new password
+    GetTokenForm:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          description: OTP code for authentication
+    RefreshTokenForm:
+      type: object
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          type: string
+          description: JWT refresh token
+    ImpactPointForm:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: ID of the user earning the impact point
+        total_points:
+          type: integer
+          description: Total number of points earned
+        social_cause:
+          type: string
+          description: Social cause related to the impact point
+        social_cause_category:
+          type: string
+          description: Category of the social cause
+        value:
+          type: number
+          format: float
+          description: Category of the social cause
+        type:
+          $ref: '#/components/schemas/StatusType'
+          description: Type of impact point
+        access_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional ID referencing related access
+        meta:
+          type: object
+          nullable: true
+          description: Additional metadata about the impact point
+      required:
+        - user_id
+        - type
+    UserForm:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username for the user account
+        email:
+          type: string
+          format: email
+          description: User's email address
+        phone:
+          type: string
+          nullable: true
+          description: User's phone number
+        first_name:
+          type: string
+          nullable: true
+          description: User's first name
+        last_name:
+          type: string
+          nullable: true
+          description: User's last name
+        mission:
+          type: string
+          nullable: true
+          description: User's mission statement
+        bio:
+          type: string
+          nullable: true
+          description: User's biography
+        city:
+          type: string
+          nullable: true
+          description: City where the user is located
+        country:
+          type: string
+          nullable: true
+          description: Country where the user is located
+        address:
+          type: string
+          nullable: true
+          description: User's physical address
+        avatar_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: ID of the avatar media
+        cover_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: ID of the cover media
+      required:
+        - username
+        - email
+    RegisterForm:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username for the user account
+        password:
+          type: string
+          format: password
+          description: User's password
+        email:
+          type: string
+          format: email
+          description: User's email address
+        phone:
+          type: string
+          nullable: true
+          description: User's phone number
+        first_name:
+          type: string
+          nullable: true
+          description: User's first name
+        last_name:
+          type: string
+          nullable: true
+          description: User's last name
+      required:
+        - username
+        - password
+        - email
+    OrganizationForm:
+      type: object
+      properties:
+        shortname:
+          type: string
+          description: Short name used as identifier for the organization
+        name:
+          type: string
+          nullable: true
+          description: Full name of the organization
+        bio:
+          type: string
+          nullable: true
+          description: Brief biography of the organization
+        description:
+          type: string
+          nullable: true
+          description: Detailed description of the organization
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: Contact email for the organization
+        phone:
+          type: string
+          nullable: true
+          description: Contact phone number for the organization
+        city:
+          type: string
+          nullable: true
+          description: City where the organization is located
+        country:
+          type: string
+          nullable: true
+          description: Country where the organization is located
+        address:
+          type: string
+          nullable: true
+          description: Physical address of the organization
+        website:
+          type: string
+          format: uri
+          nullable: true
+          description: Website URL of the organization
+        mission:
+          type: string
+          nullable: true
+          description: Mission statement of the organization
+        culture:
+          type: string
+          nullable: true
+          description: Description of the organization's culture
+        logo_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: ID of the logo media
+        cover_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: ID of the cover media
+      required:
+        - shortname
+    OrganizationUpdateStatusForm:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/OrganizationStatusType'
+          description: New status to set for the organization
+      required:
+        - status
+    UserUpdateStatusForm:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/StatusType'
+          description: New status to set for the user
+      required:
+        - status
+    ClientSecretForm:
+      type: object
+      properties:
+        client_secret:
+          type: string
+          description: Client secret for authentication
+      required:
+        - client_secret
+
+    AuthSession:
       type: object
       properties:
         id:
           type: string
           format: uuid
-        first_name:
-          type: string
-        last_name:
-          type: string
-        username:
-          type: string
-        email:
-          type: string
-          format: email
-        avatar_url:
+          description: Unique identifier for the auth session
+        redirect_url:
           type: string
           format: uri
-        avatar_id:
+          description: URL to redirect after authentication
+        access_id:
           type: string
+          format: uuid
+          description: ID of the access record
+        expire_at:
+          type: string
+          format: date-time
+          description: Expiration time of the session (10 minutes from creation)
+        verified_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Time when the session was verified, if verified
         created_at:
           type: string
           format: date-time
+          description: Time when the session was created
         updated_at:
           type: string
           format: date-time
-      required:
-        - id
-        - first_name
-        - last_name
-        - username
-        - email
+          description: Time when the session was last updated
+    Tokens:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: JWT access token
+        refresh_token:
+          type: string
+          description: JWT refresh token
+        expires_in:
+          type: integer
+          description: Token expiration time in seconds
+    Media:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the media
+        filename:
+          type: string
+          description: Original filename of the uploaded file
+        url:
+          type: string
+          format: uri
+          description: URL where the file can be accessed
+        identity_id:
+          type: string
+          format: uuid
+          description: ID of the user who uploaded the file
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the media was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the media was last updated
+      example:
+        id: "123e4567-e89b-12d3-a456-426614174000"
+        filename: "example.jpg"
+        url: "https://storage.googleapis.com/bucket-name/abc123.jpg"
+        identity_id: "123e4567-e89b-12d3-a456-426614174000"
+        created_at: "2025-05-02T10:30:00Z"
+        updated_at: "2025-05-02T10:30:00Z"
     Organization:
       type: object
       properties:
@@ -101,16 +448,18 @@ components:
         logo_id:
           type: string
           format: uuid
+          nullable: true
         logo:
           $ref: '#/components/schemas/Media'
         cover_id:
           type: string
           format: uuid
+          nullable: true
         cover:
           $ref: '#/components/schemas/Media'
         status:
-          type: string
-          enum: [StatusType]
+          $ref: '#/components/schemas/StatusType'
+          description: Current status of the user
         verified_impact:
           type: boolean
         verified:
@@ -130,6 +479,125 @@ components:
         - email
         - phone
         - city
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the user
+        username:
+          type: string
+          description: Username for the user account
+        password_expired:
+          type: boolean
+          description: Whether the user's password has expired
+        status:
+          $ref: '#/components/schemas/StatusType'
+          description: Current status of the user
+        email:
+          type: string
+          format: email
+          description: User's email address
+        email_text:
+          type: string
+          nullable: true
+          description: Text representation of email
+        phone:
+          type: string
+          nullable: true
+          description: User's phone number
+        first_name:
+          type: string
+          nullable: true
+          description: User's first name
+        last_name:
+          type: string
+          nullable: true
+          description: User's last name
+        mission:
+          type: string
+          nullable: true
+          description: User's mission statement
+        bio:
+          type: string
+          nullable: true
+          description: User's biography
+        description_search:
+          type: string
+          nullable: true
+          description: Searchable description
+        city:
+          type: string
+          nullable: true
+          description: City where the user is located
+        country:
+          type: string
+          nullable: true
+          description: Country where the user is located
+        address:
+          type: string
+          nullable: true
+          description: User's physical address
+        geoname_id:
+          type: integer
+          format: int64
+          nullable: true
+          description: Geoname identifier for location
+        mobile_country_code:
+          type: string
+          nullable: true
+          description: Mobile country code
+        impact_points:
+          type: integer
+          nullable: true
+          description: User's impact points
+        avatar_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: ID of the avatar media
+        avatar:
+          $ref: '#/components/schemas/Media'
+          nullable: true
+          description: Avatar media object
+        cover_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: ID of the cover media
+        cover:
+          $ref: '#/components/schemas/Media'
+          nullable: true
+          description: Cover media object
+        identity_verified_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the user's identity was verified
+        email_verified_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the user's email was verified
+        phone_verified_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the user's phone was verified
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the user was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the user was last updated
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the user was deleted (if applicable)
     VerificationCredential:
       type: object
       properties:
@@ -138,20 +606,15 @@ components:
           format: uuid
           description: Unique identifier for the verification credential
         status:
-          type: string
+          $ref: '#/components/schemas/StatusType'
           description: Current status of the verification
-          enum:
-            - CREATED
-            - REQUESTED
-            - VERIFIED
-            - FAILED
         user_id:
           type: string
           format: uuid
           description: ID of the user this verification belongs to
         user:
           $ref: '#/components/schemas/User'
-          description: User object (only in responses)
+          description: User entity
         connection_id:
           type: string
           nullable: true
@@ -165,7 +628,7 @@ components:
           nullable: true
           description: ID for the presentation of credentials
         body:
-          type: string
+          type: object
           nullable: true
           description: Body content of the verification
         validation_error:
@@ -190,14 +653,283 @@ components:
           type: string
           format: date-time
           description: Timestamp when record was last updated
+    ImpactPoint:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the impact point
+        user_id:
+          type: string
+          format: uuid
+          description: ID of the user who earned the impact point
+        total_points:
+          type: integer
+          description: Total number of points earned
+        social_cause:
+          type: string
+          description: Social cause related to the impact point
+        social_cause_category:
+          type: string
+          description: Category of the social cause
+        type:
+          $ref: '#/components/schemas/StatusType'
+          description: Type of impact point
+        access_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional ID referencing related access
+        meta:
+          type: object
+          nullable: true
+          description: Additional metadata about the impact point
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the impact point was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the impact point was last updated
+      example:
+        id: "123e4567-e89b-12d3-a456-426614174000"
+        user_id: "123e4567-e89b-12d3-a456-426614174000"
+        total_points: 50
+        social_cause: "Climate Action"
+        social_cause_category: "Environmental"
+        type: "VOLUNTEER"
+        access_id: "123e4567-e89b-12d3-a456-426614174000"
+        meta: {
+          "location": "San Francisco",
+          "hours": 5,
+          "organization": "Community Clean-up Initiative"
+        }
+        created_at: "2025-05-02T10:30:00Z"
+        updated_at: "2025-05-02T10:30:00Z"
+    ImpactPointOverview:
+      type: object
+      properties:
+        total_points:
+          type: integer
+          description: Total number of impact points
+        total_values:
+          type: number
+          format: float
+          description: Total value of impact points
+        type:
+          type: string
+          $ref: '#/components/schemas/ImpactPointType'
+    ImpactBadge:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the badge
+        name:
+          type: string
+          description: Name of the badge
+        description:
+          type: string
+          description: Description of how the badge was earned
+        image_url:
+          type: string
+          format: uri
+          description: URL to the badge image
+        level:
+          type: integer
+          description: Level of the badge (if applicable)
+        achieved_at:
+          type: string
+          format: date-time
+          description: When the badge was earned
+      example:
+        id: "123e4567-e89b-12d3-a456-426614174000"
+        name: "Recycling Hero"
+        description: "Recycled over 100kg of materials"
+        image_url: "https://example.com/badges/recycling-hero.png"
+        level: 2
+        achieved_at: "2025-05-01T15:30:00Z"
+
+paths:
+  /auth/password:
+    put:
+      summary: Change user password
+      description: Updates the current user's password. Requires user authentication.
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordForm'
+      responses:
+        '202':
+          description: Password changed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: success
+        '400':
+          description: Bad request or incorrect current password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - user not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/session:
+    post:
+      summary: Create a new authentication session (Inter-Service Only)
+      description: Creates a new authentication session with a redirect URL. Requires client secret authorization.
+      security:
+        - ClientSecret: []
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthSessionForm'
+      responses:
+        '201':
+          description: Authentication session created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auth_session:
+                    $ref: '#/components/schemas/AuthSession'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/session/{id}:
+    get:
+      summary: Get authentication session by ID
+      description: Retrieves an authentication session by its ID and redirects to login or registration page
+      tags:
+        - Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: UUID of the authentication session
+          schema:
+            type: string
+            format: uuid
+        - name: auth_mode
+          in: query
+          required: false
+          description: Authentication mode (login or register)
+          schema:
+            type: string
+            enum: [login, register]
+        - name: org_onboard
+          in: query
+          required: false
+          description: Flag to indicate if this is an organization onboarding
+          schema:
+            type: string
+            enum: ['true', 'false']
+      responses:
+        '301':
+          description: Redirect to login or registration page
+        '400':
+          description: Bad request or expired session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/session/token:
+    post:
+      summary: Exchange auth code for tokens (Inter-Service Only)
+      description: Exchanges an authentication code for access and refresh tokens. Requires client secret authorization.
+      security:
+        - ClientSecret: []
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetTokenForm'
+      responses:
+        '202':
+          description: Tokens generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tokens'
+        '400':
+          description: Bad request or invalid code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/refresh:
+    post:
+      summary: Refresh access token (Inter-Service Only)
+      description: Uses a refresh token to generate a new set of access and refresh tokens. Requires client secret authorization.
+      security:
+        - ClientSecret: []
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenForm'
+      responses:
+        '200':
+          description: Tokens refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tokens'
+        '400':
+          description: Bad request or invalid refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /verifications:
     get:
       summary: Get current user's verification
+      tags:
+        - Verification
       description: |
         Retrieves the verification record for the authenticated user and verifies the proof.
         If verification status is "verified", it will also update the user's identity verification status.
       security:
         - BearerAuth: []
+        - CookieAuth: []
       responses:
         '200':
           description: Successful operation
@@ -223,9 +955,12 @@ components:
                 error: "user is verified but couldn't verify user"
     post:
       summary: Create new verification
+      tags:
+        - Verification
       description: Creates a new verification record for the authenticated user
       security:
         - BearerAuth: []
+        - CookieAuth: []
       responses:
         '201':
           description: Successfully created
@@ -244,6 +979,8 @@ components:
   /verifications/{id}/connect:
     get:
       summary: Initiate verification connection
+      tags:
+        - Verification
       description: Initiates or retrieves an active connection for the verification process
       parameters:
         - name: id
@@ -266,32 +1003,745 @@ components:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /verifications/{id}/callback:
+  /media:
+    post:
+      summary: Upload a media file
+      tags:
+        - Media
+      description: Uploads a file to the server, generates a checksum, stores it in GCS, and creates a media record
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The file to upload
+              required:
+                - file
+      responses:
+        '201':
+          description: Media file successfully uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Media'
+        '400':
+          description: No file received
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "No file received"
+        '401':
+          description: Unauthorized
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                cannotOpenFile:
+                  value:
+                    error: "Cannot open file"
+                  summary: Error when opening file
+                uploadError:
+                  value:
+                    error: "Error uploading file to storage"
+                  summary: Error during upload to GCS
+                createError:
+                  value:
+                    error: "Error creating media record"
+                  summary: Error creating database record
+  /media/{id}:
     get:
-      summary: Verification callback endpoint
-      description: Endpoint called during the verification process to request proof
+      summary: Get media by ID
+      tags:
+        - Media
+      description: Retrieves media information by ID
       parameters:
         - name: id
           in: path
           required: true
-          description: Verification ID
+          description: ID of the media to retrieve
           schema:
             type: string
             format: uuid
       responses:
         '200':
-          description: Proof request successful
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Media'
+        '400':
+          description: Invalid ID or media not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Media not found"
+  /impact-points:
+    post:
+      summary: Create impact point (Inter-Service Only)
+      tags:
+        - Impact Points
+      description: Creates a new impact point in the system
+      security:
+        - ClientSecret: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImpactPointForm'
+      responses:
+        '201':
+          description: Impact point successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImpactPoint'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - invalid client secret
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      summary: List impact points
+      tags:
+        - Impact Points
+      description: Retrieves a paginated list of impact points for the authenticated user
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Successful operation
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
+                  impact_points:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ImpactPoint'
+                  total_count:
+                    type: integer
+                    description: Total number of impact points
+                  page:
                     type: string
-                example:
-                  message: "success"
+                    description: Current page number
+                  limit:
+                    type: string
+                    description: Number of items per page
+        '401':
+          description: Unauthorized
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /impact-points/overview:
+    get:
+      summary: Get user impact points overview
+      description: Retrieves counts of impact points grouped by type for the authenticated user
+      tags:
+        - Impact Points
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Overview data retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  overviews:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ImpactPointOverview'
+        '401':
+          description: Unauthorized - user not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /impact-points/badges:
+    get:
+      summary: Get impact badges
+      tags:
+        - Impact Points
+      description: Retrieves all impact badges for the authenticated user
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  badges:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ImpactBadge'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /organizations:
+    get:
+      summary: List organizations
+      tags:
+        - Organization
+      description: Returns a paginated list of organizations
+      operationId: listOrganizations
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Maximum number of organizations to return per page
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Organization'
+                  total:
+                    type: integer
         '400':
           description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Create a new organization
+      tags:
+        - Organization
+      description: Creates a new organization (requires authentication)
+      operationId: createOrganization
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      requestBody:
+        description: Organization to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationForm'
+      responses:
+        '201':
+          description: Organization created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /organizations/membered:
+    get:
+      summary: Get organizations where the current user is a member
+      tags:
+        - Organization
+      description: Returns a list of organizations where the authenticated user is a member
+      operationId: getOrganizationsByMember
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Organization'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /organizations/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get organization by ID
+      tags:
+        - Organization
+      description: Returns a single organization by its ID
+      operationId: getOrganization
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update an organization
+      tags:
+        - Organization
+      description: Updates an organization (requires authentication and membership)
+      operationId: updateOrganization
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      requestBody:
+        description: Updated organization data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationForm'
+      responses:
+        '202':
+          description: Organization updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete an organization
+      tags:
+        - Organization
+      description: Deletes an organization (requires authentication and membership)
+      operationId: deleteOrganization
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Organization deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error' 
+  /organizations/{id}/status:
+    parameters:
+      - name: id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      summary: Update organization status (Inter-Service Only)
+      tags:
+        - Organization
+      description: Updates an organization's status (requires client secret)
+      operationId: updateOrganizationStatus
+      security:
+        - ClientSecret: []
+      requestBody:
+        description: Status update data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationUpdateStatusForm'
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /organizations/{id}/verify:
+    parameters:
+      - name: id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      summary: Verify an organization (Inter-Service Only)
+      tags:
+        - Organization
+      description: Verifies an organization (requires client secret)
+      operationId: verifyOrganization
+      security:
+        - ClientSecret: []
+      requestBody:
+        description: Verification data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationUpdateStatusForm'
+      responses:
+        '200':
+          description: Organization verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /organizations/{id}/members/{user_id}:
+    parameters:
+      - name: id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: user_id
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      summary: Add a member to an organization
+      tags:
+        - Organization
+      description: Adds a user as a member to an organization (requires authentication and membership)
+      operationId: addOrganizationMember
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Member added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Remove a member from an organization
+      tags:
+        - Organization
+      description: Removes a user from an organization (requires authentication and membership)
+      operationId: removeOrganizationMember
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Member removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '400':
+          description: Bad request (cannot remove self)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users:
+    get:
+      summary: Get current user
+      tags:
+        - User
+      description: Returns the profile of the currently authenticated user
+      operationId: getCurrentUser
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update current user
+      tags:
+        - User
+      description: Updates the profile of the currently authenticated user
+      operationId: updateCurrentUser
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      requestBody:
+        description: Updated user data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserForm'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/{id}/status:
+    parameters:
+      - name: id
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      summary: Update user status (Inter-Service Only)
+      tags:
+        - User
+      description: Updates a user's status (requires client secret)
+      operationId: updateUserStatus
+      security:
+        - ClientSecret: []
+      requestBody:
+        description: Status update data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateStatusForm'
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/{id}/verify:
+    parameters:
+      - name: id
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      summary: Verify a user's identity (Inter-Service Only)
+      tags:
+        - User
+      description: Verifies a user's identity (requires client secret)
+      operationId: verifyUser
+      security:
+        - ClientSecret: []
+      requestBody:
+        description: Verification data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientSecretForm'
+      responses:
+        '200':
+          description: User verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema:

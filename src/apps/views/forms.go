@@ -84,6 +84,7 @@ type ImpactPointForm struct {
 	TotalPoints         int                    `json:"total_points" form:"total_points"`
 	SocialCause         string                 `json:"social_cause" form:"social_cause"`
 	SocialCauseCategory string                 `json:"social_cause_category" form:"social_cause_category"`
+	Value               float64                `json:"value" form:"value"`
 	Type                models.ImpactPointType `json:"type" form:"type" validate:"required,oneof=WORKSUBMIT DONATION VOLUNTEER OTHER"`
 	AccessID            *uuid.UUID             `json:"access_id" form:"access_id"`
 	Meta                *json.RawMessage       `json:"meta" form:"meta"`

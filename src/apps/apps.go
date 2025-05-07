@@ -50,10 +50,8 @@ func Init() *gin.Engine {
 	store := cookie.NewStore([]byte(config.Config.Secret))
 	router.Use(sessions.Sessions("socious-id-session", store))
 
-	router.Use(func(c *gin.Context) {
-		c.Next()
-
-	})
+	//Cache
+	router.Use(views.NoCache())
 
 	if config.Config.Debug {
 		router.Static("/statics", config.Config.Statics)
@@ -64,7 +62,7 @@ func Init() *gin.Engine {
 	views.Init(router)
 
 	//docs
-	opts := middleware.SwaggerUIOpts{SpecURL: "/api/v3/swagger.yaml"}
+	opts := middleware.SwaggerUIOpts{SpecURL: "/swagger.yaml"}
 	router.GET("/docs", gin.WrapH(middleware.SwaggerUI(opts, nil)))
 	router.GET("/swagger.yaml", gin.WrapH(http.FileServer(http.Dir("./docs"))))
 

@@ -58,7 +58,7 @@ func authGroup() {
 			)
 			router.ServeHTTP(w, req)
 
-			Expect(w.Code).To(Equal(http.StatusPermanentRedirect))
+			Expect(w.Code).To(Equal(http.StatusTemporaryRedirect))
 			location, exists := w.Result().Header["Location"]
 			Expect(exists).To(Equal(true))
 			Expect(location[0]).To(Equal("/auth/register/pre"))
@@ -192,7 +192,7 @@ func authGroup() {
 			)
 			router.ServeHTTP(w, req)
 
-			Expect(w.Code).To(Equal(http.StatusPermanentRedirect))
+			Expect(w.Code).To(Equal(http.StatusTemporaryRedirect))
 			location, exists := w.Result().Header["Location"]
 			Expect(exists).To(Equal(true))
 			Expect(location[0]).To(Equal("/auth/login"))

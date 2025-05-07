@@ -113,3 +113,14 @@ func clientSecretRequired() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func NoCache() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Continue to handler
+		c.Next()
+
+		c.Writer.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
+		c.Writer.Header().Set("Pragma", "no-cache")
+		c.Writer.Header().Set("Expires", "0")
+	}
+}

@@ -39,7 +39,7 @@ func shortenerGroup() {
 			w := httptest.NewRecorder()
 			req, _ := http.NewRequest("GET", fmt.Sprintf("/%s", short.ShortID), nil)
 			router.ServeHTTP(w, req)
-			Expect(w.Code).To(Equal(308))
+			Expect(w.Code).To(Equal(http.StatusSeeOther))
 		}
 	})
 }

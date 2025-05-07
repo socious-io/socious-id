@@ -1,0 +1,4 @@
+ALTER TABLE impact_points
+ADD COLUMN value FLOAT DEFAULT 0 NOT NULL;
+
+ALTER TYPE impact_points_type ADD VALUE 'SERVICE';
