@@ -2,10 +2,12 @@ package views
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
+	"socious-id/src/apps/workers"
 	"socious-id/src/config"
 	"strings"
 	"time"
@@ -20,6 +22,7 @@ func verificationsGroup(router *gin.Engine) {
 	g.GET("", auth.LoginRequired(), func(c *gin.Context) {
 		ctx, _ := c.MustGet("ctx").(context.Context)
 		u, _ := c.MustGet("user").(*models.User)
+		currentVerificationStatus := u.IdentityVerifiedAt
 
 		v, err := models.GetVerificationByUser(u.ID)
 		if err != nil {
@@ -35,6 +38,11 @@ func verificationsGroup(router *gin.Engine) {
 				})
 				return
 			}
+		}
+
+		if currentVerificationStatus == nil && u.IdentityVerifiedAt != nil {
+			fmt.Println("Syncing User Verification")
+			go workers.Sync(u.ID)
 		}
 
 		c.JSON(http.StatusOK, v)

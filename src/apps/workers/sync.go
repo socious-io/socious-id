@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
 
 	"github.com/gin-gonic/gin"
@@ -40,13 +39,13 @@ func syncClient(access *models.Access, user *models.User, organizations []models
 		"organizations": organizations,
 	})
 
-	clientKey, _ := auth.HashPassword(fmt.Sprintf("%s:%s", access.ClientID, access.ClientSecret))
 	client := &http.Client{}
 	req, err := http.NewRequest(http.MethodPut, *access.SyncURL, bytes.NewReader(body))
 	if err != nil {
 		return
 	}
-	req.Header.Set("x-account-center", clientKey)
+	req.Header.Set("x-account-center-id", access.ClientID)
+	req.Header.Set("x-account-center-secret", access.ClientSecret)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := client.Do(req)

@@ -3,7 +3,6 @@ package tests_test
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 
@@ -25,7 +24,6 @@ func impactPointsGroup() {
 			body := decodeBody(w.Body)
 			Expect(w.Code).To(Equal(http.StatusCreated))
 			impactPointsData[i]["id"] = body["id"]
-			fmt.Println(body)
 		}
 	})
 
