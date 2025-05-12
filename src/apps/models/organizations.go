@@ -44,6 +44,13 @@ type Organization struct {
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
 
+type OrganizationMember struct {
+	ID             uuid.UUID `db:"id" json:"id"`
+	OrganizationID uuid.UUID `db:"org_id" json:"org_id"`
+	UserID         uuid.UUID `db:"user_id" json:"user_id"`
+	CreatedAt      time.Time `db:"created_at" json:"created_at"`
+}
+
 func (Organization) TableName() string {
 	return "organizations"
 }
@@ -72,31 +79,13 @@ func (o *Organization) Create(ctx context.Context) error {
 	return database.Fetch(o, o.ID)
 }
 
-func (o *Organization) UpdateStatus(ctx context.Context, status OrganizationStatusType) error {
-	rows, err := database.Query(
-		ctx,
-		"organizations/update_status",
-		o.ID, status,
-	)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		if err := rows.StructScan(o); err != nil {
-			return err
-		}
-	}
-	return database.Fetch(o, o.ID)
-}
-
 func (o *Organization) Update(ctx context.Context) error {
 	rows, err := database.Query(
 		ctx,
 		"organizations/update",
 		o.ID, o.Shortname, o.Name, o.Bio, o.Description, o.Email, o.Phone,
 		o.City, o.Country, o.Address, o.Website,
-		o.Mission, o.Culture, o.CoverID, o.LogoID,
+		o.Mission, o.Culture, o.CoverID, o.LogoID, o.Status, o.Verified, o.VerifiedImpact,
 	)
 	if err != nil {
 		return err
@@ -164,24 +153,6 @@ func (o *Organization) Remove(ctx context.Context) error {
 	return nil
 }
 
-func (o *Organization) Verify(ctx context.Context, vtype OrganizationVerificationType) error {
-	rows, err := database.Query(
-		ctx,
-		"organizations/verify",
-		o.ID, vtype,
-	)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		if err := rows.StructScan(o); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func GetAllOrganizations(p database.Paginate) ([]Organization, int, error) {
 	var (
 		organizations = []Organization{}
@@ -205,6 +176,15 @@ func GetAllOrganizations(p database.Paginate) ([]Organization, int, error) {
 		return nil, 0, err
 	}
 	return organizations, fetchList[0].TotalCount, nil
+}
+
+func GetOrganizationMembers(organizationId uuid.UUID) ([]OrganizationMember, error) {
+	var members = []OrganizationMember{}
+	if err := database.QuerySelect("organizations/get_members", &members, organizationId); err != nil {
+		return nil, err
+	}
+
+	return members, nil
 }
 
 func GetOrganizationsByMember(userId uuid.UUID) ([]Organization, error) {

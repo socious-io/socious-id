@@ -53,6 +53,10 @@ type ConfigType struct {
 			Secret string `mapstructure:"secret"`
 		} `mapstructure:"google"`
 	} `mapstructure:"oauth"`
+	AdminToken string `mapstructure:"admin_token"`
+	Discord    struct {
+		Channel string `mapstructure:"channel"`
+	} `mapstructure:"discord"`
 }
 
 func Init(configPath string) {

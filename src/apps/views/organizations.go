@@ -101,7 +101,8 @@ func organizationsGroup(router *gin.Engine) {
 			return
 		}
 
-		if err := organization.UpdateStatus(ctx, form.Status); err != nil {
+		organization.Status = form.Status
+		if err := organization.Update(ctx); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -124,7 +125,8 @@ func organizationsGroup(router *gin.Engine) {
 			return
 		}
 
-		if err := organization.Verify(ctx, models.OrganizationVerificationTypeNormal); err != nil {
+		organization.Verified = true
+		if err := organization.Update(ctx); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
