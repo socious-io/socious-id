@@ -89,3 +89,7 @@ type ImpactPointForm struct {
 	AccessID            *uuid.UUID             `json:"access_id" form:"access_id"`
 	Meta                *json.RawMessage       `json:"meta" form:"meta"`
 }
+
+type KYBVerificationForm struct {
+	Documents []string `json:"documents"`
+}

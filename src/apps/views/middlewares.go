@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
+	"socious-id/src/config"
 	"strconv"
 	"strings"
 
@@ -122,5 +123,22 @@ func NoCache() gin.HandlerFunc {
 		c.Writer.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
 		c.Writer.Header().Set("Pragma", "no-cache")
 		c.Writer.Header().Set("Expires", "0")
+	}
+}
+
+// Administration
+func adminAccessRequired() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		access_token := c.Query("admin_access_token")
+		isAdmin := access_token == config.Config.AdminToken
+
+		if !isAdmin {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Admin access required"})
+			c.Abort()
+			return
+		}
+
+		c.Next()
 	}
 }
