@@ -126,6 +126,7 @@ func kybVerificationGroup(router *gin.Engine) {
 			return
 		}
 
+		org.Status = models.OrganizationStatusTypeNotActive
 		if err := org.Update(ctx); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
