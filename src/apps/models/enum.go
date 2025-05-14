@@ -87,7 +87,7 @@ type OrganizationStatusType string
 
 const (
 	OrganizationStatusTypeActive    OrganizationStatusType = "ACTIVE"
-	OrganizationStatusTypeInactive  OrganizationStatusType = "NOT_ACTIVE"
+	OrganizationStatusTypeNotActive OrganizationStatusType = "NOT_ACTIVE"
 	OrganizationStatusTypeSuspended OrganizationStatusType = "SUSPENDED"
 	OrganizationStatusTypePending   OrganizationStatusType = "PENDING"
 )

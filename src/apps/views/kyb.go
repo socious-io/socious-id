@@ -120,6 +120,27 @@ func kybVerificationGroup(router *gin.Engine) {
 			return
 		}
 
+		org, _ := models.GetOrganization(verification.OrgID)
+		if org.Status != models.OrganizationStatusTypePending {
+			c.JSON(http.StatusOK, gin.H{"message": "success"})
+			return
+		}
+
+		if err := org.Update(ctx); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		orgMembers, err := models.GetOrganizationMembers(org.ID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		for _, m := range orgMembers {
+			//TODO: use nats
+			go workers.Sync(m.UserID)
+		}
+
 		c.JSON(http.StatusOK, gin.H{"message": "success"})
 	})
 

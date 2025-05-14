@@ -113,12 +113,6 @@ func organizationsGroup(router *gin.Engine) {
 	g.POST("/:id/verify", clientSecretRequired(), func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
 
-		form := new(OrganizationUpdateStatusForm)
-		if err := c.ShouldBindJSON(form); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
 		organization, err := models.GetOrganization(uuid.MustParse(c.Param("id")))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
