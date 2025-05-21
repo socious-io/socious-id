@@ -71,6 +71,7 @@ func organizationsGroup(router *gin.Engine) {
 
 		organization := new(models.Organization)
 		utils.Copy(form, organization)
+		organization.ReferredBy = user.ReferredBy
 
 		if err := organization.Create(ctx); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -222,6 +223,7 @@ func organizationsGroup(router *gin.Engine) {
 
 		organization := new(models.Organization)
 		utils.Copy(form, organization)
+		organization.ReferredBy = user.ReferredBy
 
 		if err := organization.Create(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "org-register.html", gin.H{
