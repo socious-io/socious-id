@@ -3,7 +3,6 @@ package tests_test
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 
@@ -77,18 +76,20 @@ func paymentsGroup() {
 		}
 	})
 
-	PIt("Should get all the wallets", func() {
-		for _, data := range walletsData {
-			w := httptest.NewRecorder()
-			req, _ := http.NewRequest("GET", "/payments/wallets", nil)
-			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Authorization", authTokens[0])
-			router.ServeHTTP(w, req)
+	It("Should get all the wallets", func() {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/payments/wallets", nil)
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", authTokens[0])
+		router.ServeHTTP(w, req)
 
-			body := decodeBody(w.Body)
-			Expect(w.Code).To(Equal(http.StatusOK))
-			fmt.Println("body", body)
-			Expect(data["id"]).To(Equal(body["id"]))
+		body := []gin.H{}
+		decoder := json.NewDecoder(w.Body)
+		decoder.Decode(&body)
+
+		Expect(w.Code).To(Equal(http.StatusOK))
+		for i, data := range walletsData {
+			Expect(body[i]["id"], data["id"])
 		}
 	})
 

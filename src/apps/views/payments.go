@@ -17,11 +17,8 @@ func paymentsGroup(router *gin.Engine) {
 	g := router.Group("payments")
 
 	g.GET("cards", auth.LoginRequired(), func(c *gin.Context) {
-		// paginate := c.MustGet("paginate").(database.Paginate)
 		identity := c.MustGet("identity").(*models.Identity)
 
-		// page, limit := c.MustGet("page"), c.MustGet("limit")
-		fmt.Println("identity", identity)
 		stripeCustomerID := identity.Meta["stripe_customer_id"]
 		if stripeCustomerID == nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Customer ID has not been set on this identity"})
@@ -143,6 +140,7 @@ func paymentsGroup(router *gin.Engine) {
 	g.POST("/wallets", auth.LoginRequired(), func(c *gin.Context) {
 		identity := c.MustGet("identity").(*models.Identity)
 		ctx := c.MustGet("ctx").(context.Context)
+		fmt.Println("POST identity", identity)
 
 		form := new(AddWalletForm)
 		if err := c.BindJSON(form); err != nil {
