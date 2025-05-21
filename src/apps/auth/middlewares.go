@@ -31,7 +31,6 @@ func LoginRequired() gin.HandlerFunc {
 		} else {
 			identity, _ = models.GetIdentity(user.ID)
 		}
-
 		c.Set("identity", identity)
 
 		c.Next()

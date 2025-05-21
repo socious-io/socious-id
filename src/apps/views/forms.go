@@ -101,5 +101,5 @@ type AddWalletForm struct {
 }
 
 type AddCardForm struct {
-	Token string `json:"token" form:"token"`
+	Token *string `json:"token" form:"token"`
 }
