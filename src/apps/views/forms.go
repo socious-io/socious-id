@@ -5,6 +5,7 @@ import (
 	"socious-id/src/apps/models"
 
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx/types"
 )
 
 type ConfirmForm struct {
@@ -92,4 +93,10 @@ type ImpactPointForm struct {
 
 type KYBVerificationForm struct {
 	Documents []string `json:"documents"`
+}
+
+type ReferralAchievementForm struct {
+	IdentityID string         `json:"identity_id"`
+	Type       string         `json:"type"`
+	Meta       types.JSONText `json:"meta"`
 }
