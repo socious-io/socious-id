@@ -40,8 +40,6 @@ type Organization struct {
 	VerifiedImpact bool `db:"verified_impact" json:"verified_impact"`
 	Verified       bool `db:"verified" json:"verified"`
 
-	StripeCustomerID *string `db:"stripe_customer_id" json:"stripe_customer_id"`
-
 	ReferredBy *uuid.UUID `db:"referred_by" json:"referred_by"`
 
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
