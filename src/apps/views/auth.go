@@ -290,11 +290,11 @@ func authGroup(router *gin.Engine) {
 		//Set Referred By
 		referredBy := session.Get("referred_by")
 		if referredBy != nil && referredBy.(string) != "" {
-			refererUser, err := models.GetUserByEmail(referredBy.(string))
+			refererIdentity, err := models.GetIdentityByUsernameOrShortname(referredBy.(string))
 			if err != nil {
 				log.Printf("Couldn't find the referer user : %s\n", err.Error())
 			} else {
-				u.ReferredBy = &refererUser.ID
+				u.ReferredBy = &refererIdentity.ID
 			}
 			session.Delete("referred_by")
 			session.Save()
