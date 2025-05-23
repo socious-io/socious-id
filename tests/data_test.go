@@ -86,6 +86,27 @@ var (
 
 	verificationsData = []gin.H{}
 
+	cardsData = []gin.H{
+		{
+			"token": "test1",
+		},
+		{
+			"token": "test2",
+		},
+	}
+	walletsData = []gin.H{
+		{
+			"chain":    "Cardano",
+			"chain_id": "chain_id_1",
+			"address":  "0xexample",
+		},
+		{
+			"chain":    "Ethereum",
+			"chain_id": "chain_id_2",
+			"address":  "0xexample1",
+		},
+	}
+
 	shorteningURLs = []string{
 		"https://google.com",
 		"https://app.socious.io",

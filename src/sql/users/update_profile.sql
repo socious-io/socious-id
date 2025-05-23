@@ -6,6 +6,7 @@ SET
     phone=$5,
     username=$6,
     cover_id=$7,
-    avatar_id=$8
+    avatar_id=$8,
+    stripe_customer_id=COALESCE($9, stripe_customer_id)
 WHERE id=$1
 RETURNING *

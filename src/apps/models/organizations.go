@@ -40,6 +40,8 @@ type Organization struct {
 	VerifiedImpact bool `db:"verified_impact" json:"verified_impact"`
 	Verified       bool `db:"verified" json:"verified"`
 
+	StripeCustomerID *string `db:"stripe_customer_id" json:"stripe_customer_id"`
+
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
@@ -86,6 +88,7 @@ func (o *Organization) Update(ctx context.Context) error {
 		o.ID, o.Shortname, o.Name, o.Bio, o.Description, o.Email, o.Phone,
 		o.City, o.Country, o.Address, o.Website,
 		o.Mission, o.Culture, o.CoverID, o.LogoID, o.Status, o.Verified, o.VerifiedImpact,
+		o.StripeCustomerID,
 	)
 	if err != nil {
 		return err
