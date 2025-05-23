@@ -271,6 +271,7 @@ func authGroup(router *gin.Engine) {
 		authSession := loadAuthSession(c)
 
 		ctx := c.MustGet("ctx").(context.Context)
+		session := sessions.Default(c)
 
 		form := new(auth.OTPForm)
 		if err := c.ShouldBind(form); err != nil {
@@ -279,17 +280,30 @@ func authGroup(router *gin.Engine) {
 			})
 			return
 		}
+
 		//Creating user (Default in INACTIVE state)
 		u := &models.User{
-			Username: form.Email, //TODO: generate username
+			Username: auth.GenerateUsername(form.Email),
 			Email:    form.Email,
+		}
+
+		//Set Referred By
+		referredBy := session.Get("referred_by")
+		if referredBy != nil && referredBy.(string) != "" {
+			refererIdentity, err := models.GetIdentityByUsernameOrShortname(referredBy.(string))
+			if err != nil {
+				log.Printf("Couldn't find the referer user : %s\n", err.Error())
+			} else {
+				u.ReferredBy = &refererIdentity.ID
+			}
+			session.Delete("referred_by")
+			session.Save()
 		}
 
 		if err := u.Create(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{
 				"error": "Email is already in use. Please select different email.",
 			})
-			log.Printf("Error creating user: %s\n", err)
 			return
 		}
 
@@ -511,6 +525,7 @@ func authGroup(router *gin.Engine) {
 		id, err := uuid.Parse(c.Param("id"))
 		authMode := models.AuthModeType(c.Query("auth_mode"))
 		orgOnboard := c.Query("org_onboard")
+		referredBy := c.Query("referred_by")
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -537,6 +552,9 @@ func authGroup(router *gin.Engine) {
 		session := sessions.Default(c)
 		session.Set("auth_session_id", authSession.ID.String())
 		session.Set("org_onboard", orgOnboard == "true")
+		if referredBy != "" {
+			session.Set("referred_by", referredBy)
+		}
 		session.Save()
 
 		if authMode == models.AuthModeRegister {
