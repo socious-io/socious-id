@@ -2,7 +2,6 @@ package views
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/url"
 	"socious-id/src/apps/auth"
@@ -41,7 +40,6 @@ func verificationsGroup(router *gin.Engine) {
 		}
 
 		if currentVerificationStatus == nil && u.IdentityVerifiedAt != nil {
-			fmt.Println("Syncing User Verification")
 			go workers.Sync(u.ID)
 		}
 

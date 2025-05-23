@@ -9,11 +9,12 @@ import (
 )
 
 type Identity struct {
-	ID        uuid.UUID      `db:"id" json:"id"`
-	Type      IdentityType   `db:"type" json:"type"`
-	Meta      types.JSONText `db:"meta" json:"meta"`
-	CreatedAt time.Time      `db:"created_at" json:"created_at"`
-	UpdatedAt time.Time      `db:"updated_at" json:"updated_at"`
+	ID        uuid.UUID              `db:"id" json:"id"`
+	Type      IdentityType           `db:"type" json:"type"`
+	Meta      map[string]interface{} `db:"-" json:"meta"`
+	MetaJson  types.JSONText         `db:"meta" json:"-"`
+	UpdatedAt time.Time              `db:"updated_at" json:"updated_at"`
+	CreatedAt time.Time              `db:"created_at" json:"created_at"`
 }
 
 func (Identity) TableName() string {
@@ -27,6 +28,9 @@ func (Identity) FetchQuery() string {
 func GetIdentity(id uuid.UUID) (*Identity, error) {
 	i := new(Identity)
 	if err := database.Fetch(i, id); err != nil {
+		return nil, err
+	}
+	if err := i.MetaJson.Unmarshal(&i.Meta); err != nil {
 		return nil, err
 	}
 	return i, nil

@@ -47,6 +47,8 @@ type User struct {
 	EmailVerifiedAt    *time.Time `db:"email_verified_at" json:"email_verified_at"`
 	PhoneVerifiedAt    *time.Time `db:"phone_verified_at" json:"phone_verified_at"`
 
+	StripeCustomerID *string `db:"stripe_customer_id" json:"stripe_customer_id"`
+
 	ReferredBy *uuid.UUID `db:"referred_by" json:"referred_by"`
 
 	CreatedAt time.Time  `db:"created_at" json:"created_at"`
@@ -140,7 +142,7 @@ func (u *User) UpdateProfile(ctx context.Context) error {
 		ctx,
 		"users/update_profile",
 		u.ID, u.FirstName, u.LastName, u.Bio, u.Phone, u.Username,
-		u.CoverID, u.AvatarID,
+		u.CoverID, u.AvatarID, u.StripeCustomerID,
 	)
 	if err != nil {
 		return err

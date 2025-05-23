@@ -1,3 +1,3 @@
 SELECT *
-FROM identities
+FROM wallets
 WHERE id IN (?);
