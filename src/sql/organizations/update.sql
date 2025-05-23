@@ -12,6 +12,11 @@ UPDATE organizations SET
     mission=$12,
     culture=$13,
     cover_id=$14,
-    logo_id=$15
+    logo_id=$15,
+    status=COALESCE($16, status),
+    verified=COALESCE($17, verified),
+    verified_impact=COALESCE($18, verified_impact),
+    stripe_customer_id=COALESCE($19, stripe_customer_id),
+    updated_at=NOW()
 WHERE id=$1
 RETURNING *

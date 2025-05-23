@@ -87,8 +87,9 @@ type OrganizationStatusType string
 
 const (
 	OrganizationStatusTypeActive    OrganizationStatusType = "ACTIVE"
-	OrganizationStatusTypeInactive  OrganizationStatusType = "NOT_ACTIVE"
+	OrganizationStatusTypeNotActive OrganizationStatusType = "NOT_ACTIVE"
 	OrganizationStatusTypeSuspended OrganizationStatusType = "SUSPENDED"
+	OrganizationStatusTypePending   OrganizationStatusType = "PENDING"
 )
 
 func (ost *OrganizationStatusType) Scan(value interface{}) error {
@@ -159,4 +160,43 @@ func (c *ImpactPointType) Scan(value interface{}) error {
 
 func (c ImpactPointType) Value() (driver.Value, error) {
 	return string(c), nil
+}
+
+type KybVerificationStatusType string
+
+const (
+	KYBStatusPending  KybVerificationStatusType = "PENDING"
+	KYBStatusApproved KybVerificationStatusType = "APPROVED"
+	KYBStatusRejected KybVerificationStatusType = "REJECTED"
+)
+
+func (kvst *KybVerificationStatusType) Scan(value interface{}) error {
+	switch v := value.(type) {
+	case []byte:
+		*kvst = KybVerificationStatusType(string(v))
+	case string:
+		*kvst = KybVerificationStatusType(v)
+	default:
+		return fmt.Errorf("failed to scan credential type: %v", value)
+	}
+	return nil
+}
+
+func (kvst KybVerificationStatusType) Value() (driver.Value, error) {
+	return string(kvst), nil
+}
+
+type IdentityType string
+
+const (
+	IdentityTypeUsers         IdentityType = "users"
+	IdentityTypeOrganizations IdentityType = "organizations"
+)
+
+func (it *IdentityType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(it))
+}
+
+func (it IdentityType) Value() (driver.Value, error) {
+	return string(it), nil
 }

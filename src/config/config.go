@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 
+	"github.com/socious-io/gopay"
 	"github.com/spf13/viper"
 )
 
@@ -53,6 +54,14 @@ type ConfigType struct {
 			Secret string `mapstructure:"secret"`
 		} `mapstructure:"google"`
 	} `mapstructure:"oauth"`
+	AdminToken string `mapstructure:"admin_token"`
+	Discord    struct {
+		Channel string `mapstructure:"channel"`
+	} `mapstructure:"discord"`
+	Payment struct {
+		Chains gopay.Chains `mapstructure:"chains"`
+		Fiats  gopay.Fiats  `mapstructure:"fiats"`
+	} `mapstructure:"payment"`
 }
 
 func Init(configPath string) {

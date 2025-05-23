@@ -101,7 +101,8 @@ func organizationsGroup(router *gin.Engine) {
 			return
 		}
 
-		if err := organization.UpdateStatus(ctx, form.Status); err != nil {
+		organization.Status = form.Status
+		if err := organization.Update(ctx); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -112,19 +113,14 @@ func organizationsGroup(router *gin.Engine) {
 	g.POST("/:id/verify", clientSecretRequired(), func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
 
-		form := new(OrganizationUpdateStatusForm)
-		if err := c.ShouldBindJSON(form); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
 		organization, err := models.GetOrganization(uuid.MustParse(c.Param("id")))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		if err := organization.Verify(ctx, models.OrganizationVerificationTypeNormal); err != nil {
+		organization.Verified = true
+		if err := organization.Update(ctx); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}

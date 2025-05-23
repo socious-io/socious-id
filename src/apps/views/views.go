@@ -10,4 +10,6 @@ func Init(r *gin.Engine) {
 	mediaGroup(r)
 	verificationsGroup(r)
 	impactPointsGroup(r)
+	kybVerificationGroup(r)
+	paymentsGroup(r)
 }
