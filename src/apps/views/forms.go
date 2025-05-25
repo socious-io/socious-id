@@ -95,6 +95,16 @@ type KYBVerificationForm struct {
 	Documents []string `json:"documents"`
 }
 
+type AddWalletForm struct {
+	Chain   string  `json:"chain" form:"chain"`
+	ChainID *string `json:"chain_id" form:"chain_id"`
+	Address string  `json:"address" form:"address"`
+}
+
+type AddCardForm struct {
+	Token *string `json:"token" form:"token"`
+}
+
 type ReferralAchievementForm struct {
 	IdentityID string         `json:"identity_id"`
 	Type       string         `json:"type"`

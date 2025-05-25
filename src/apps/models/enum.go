@@ -185,3 +185,18 @@ func (kvst *KybVerificationStatusType) Scan(value interface{}) error {
 func (kvst KybVerificationStatusType) Value() (driver.Value, error) {
 	return string(kvst), nil
 }
+
+type IdentityType string
+
+const (
+	IdentityTypeUsers         IdentityType = "users"
+	IdentityTypeOrganizations IdentityType = "organizations"
+)
+
+func (it *IdentityType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(it))
+}
+
+func (it IdentityType) Value() (driver.Value, error) {
+	return string(it), nil
+}
