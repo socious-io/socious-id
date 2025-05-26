@@ -1,6 +1,9 @@
 package tests_test
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/jmoiron/sqlx/types"
+)
 
 var (
 	intKey            = ""
@@ -104,6 +107,19 @@ var (
 			"chain":    "Ethereum",
 			"chain_id": "chain_id_2",
 			"address":  "0xexample1",
+		},
+	}
+
+	referralAchievementsData = []gin.H{
+		{
+			"referee_id":       "auto:<referee_id>",
+			"achievement_type": "VOTE",
+			"meta":             types.JSONText(`{"meta_key": "test"}`),
+		},
+		{
+			"referee_id":       "auto:<referee_id>",
+			"achievement_type": "CREATE_ACCOUNT",
+			"meta":             types.JSONText(`{"meta_key": "test2"}`),
 		},
 	}
 

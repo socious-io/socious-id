@@ -547,8 +547,6 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		fmt.Println("setting auth session id", authSession.ID.String())
-
 		session := sessions.Default(c)
 		session.Set("auth_session_id", authSession.ID.String())
 		session.Set("org_onboard", orgOnboard == "true")

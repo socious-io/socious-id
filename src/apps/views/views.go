@@ -12,4 +12,5 @@ func Init(r *gin.Engine) {
 	impactPointsGroup(r)
 	kybVerificationGroup(r)
 	paymentsGroup(r)
+	referralAchievementsGroup(r)
 }
