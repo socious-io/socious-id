@@ -98,9 +98,7 @@ func paymentsGroup(router *gin.Engine) {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"card": paymentMethod,
-		})
+		c.JSON(http.StatusOK, paymentMethod)
 	})
 
 	g.DELETE("/cards/:id", auth.LoginRequired(), func(c *gin.Context) {
