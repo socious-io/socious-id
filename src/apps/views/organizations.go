@@ -244,6 +244,9 @@ func organizationsGroup(router *gin.Engine) {
 			session.Save()
 		}
 
+		// FIXME: use nats
+		go workers.Sync(user.ID)
+
 		c.Redirect(http.StatusSeeOther, "/auth/confirm")
 	})
 
