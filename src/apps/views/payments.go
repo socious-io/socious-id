@@ -89,6 +89,7 @@ func paymentsGroup(router *gin.Engine) {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				return
 			}
+			stripeCustomerID = customer.ID
 		}
 
 		paymentMethod, err = fiatService.AttachPaymentMethod(customer.ID, *form.Token)
@@ -98,9 +99,7 @@ func paymentsGroup(router *gin.Engine) {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"card":     paymentMethod,
-			"customer": customer,
-			"identity": identity,
+			"card": paymentMethod,
 		})
 	})
 
