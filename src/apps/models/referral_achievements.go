@@ -12,11 +12,12 @@ import (
 )
 
 type ReferralAchievement struct {
-	ID         uuid.UUID      `db:"id" json:"id"`
-	IdentityID uuid.UUID      `db:"identity_id" json:"identity_id"`
-	Type       string         `db:"type" json:"type"`
-	Meta       types.JSONText `db:"meta" json:"meta"`
-	CreatedAt  time.Time      `db:"created_at" json:"created_at"`
+	ID              uuid.UUID      `db:"id" json:"id"`
+	ReferrerID      uuid.UUID      `db:"referrer_id" json:"referrer_id"`
+	RefereeID       string         `db:"referee_id" json:"referee_id"`
+	AchievementType string         `db:"achievement_type" json:"achievement_type"`
+	Meta            types.JSONText `db:"meta" json:"meta"`
+	CreatedAt       time.Time      `db:"created_at" json:"created_at"`
 }
 
 func (ReferralAchievement) TableName() string {
@@ -35,7 +36,7 @@ func (ra *ReferralAchievement) Create(ctx context.Context) error {
 	rows, err := database.Query(
 		ctx,
 		"referral_achievements/create",
-		ra.IdentityID, ra.Type, ra.Meta,
+		ra.ReferrerID, ra.RefereeID, ra.AchievementType, ra.Meta,
 	)
 	if err != nil {
 		return err
@@ -49,26 +50,26 @@ func (ra *ReferralAchievement) Create(ctx context.Context) error {
 	return nil
 }
 
-func GetReferralAchievements(identityID uuid.UUID, p database.Paginate) ([]ImpactPoint, int, error) {
+func GetReferralAchievements(ReferrerID uuid.UUID, p database.Paginate) ([]ReferralAchievement, int, error) {
 	var (
-		impactPoints = []ImpactPoint{}
-		fetchList    []database.FetchList
-		ids          []interface{}
+		referralAchievements = []ReferralAchievement{}
+		fetchList            []database.FetchList
+		ids                  []interface{}
 	)
 
-	if err := database.QuerySelect("referral_achievements/get_all", &fetchList, identityID, p.Limit, p.Offet); err != nil {
+	if err := database.QuerySelect("referral_achievements/get_all", &fetchList, ReferrerID, p.Limit, p.Offet); err != nil {
 		return nil, 0, err
 	}
 
 	if len(fetchList) < 1 {
-		return impactPoints, 0, nil
+		return referralAchievements, 0, nil
 	}
 
 	for _, f := range fetchList {
 		ids = append(ids, f.ID)
 	}
-	if err := database.Fetch(&impactPoints, ids...); err != nil {
+	if err := database.Fetch(&referralAchievements, ids...); err != nil {
 		return nil, 0, err
 	}
-	return impactPoints, fetchList[0].TotalCount, nil
+	return referralAchievements, fetchList[0].TotalCount, nil
 }

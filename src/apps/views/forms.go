@@ -106,7 +106,7 @@ type AddCardForm struct {
 }
 
 type ReferralAchievementForm struct {
-	IdentityID string         `json:"identity_id"`
-	Type       string         `json:"type"`
-	Meta       types.JSONText `json:"meta"`
+	RefereeID       uuid.UUID      `json:"referee_id"`
+	AchievementType string         `json:"achievement_type"`
+	Meta            types.JSONText `json:"meta"`
 }

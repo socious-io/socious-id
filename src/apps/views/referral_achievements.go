@@ -13,9 +13,9 @@ import (
 )
 
 func referralAchievementsGroup(router *gin.Engine) {
-	g := router.Group("referral_achievements")
+	g := router.Group("referral-achievements")
 
-	g.POST("/", clientSecretRequired(), func(c *gin.Context) {
+	g.POST("", clientSecretRequired(), func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
 
 		form := new(ReferralAchievementForm)
@@ -28,12 +28,12 @@ func referralAchievementsGroup(router *gin.Engine) {
 		utils.Copy(form, referralAchievement)
 
 		//Search for the referer
-		refererUser, err := models.GetUserByRefferer(form.IdentityID) // Consider Organization
+		referrerIdentity, err := models.GetReferrerIdentity(form.RefereeID)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("couldn't find the referrer user, err: %w\n", err)})
+			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("couldn't find the referrer user, err: %s\n", err.Error())})
 			return
 		}
-		referralAchievement.IdentityID = refererUser.ID
+		referralAchievement.ReferrerID = referrerIdentity.ID
 
 		if err := referralAchievement.Create(ctx); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -43,13 +43,13 @@ func referralAchievementsGroup(router *gin.Engine) {
 		c.JSON(http.StatusCreated, referralAchievement)
 	})
 
-	g.GET("/", auth.LoginRequired(), paginate(), func(c *gin.Context) {
+	g.GET("", auth.LoginRequired(), paginate(), func(c *gin.Context) {
 		identity := c.MustGet("identity").(*models.Identity)
 		paginate := c.MustGet("paginate").(database.Paginate)
 
 		referralAchievements, total, err := models.GetReferralAchievements(identity.ID, paginate)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 

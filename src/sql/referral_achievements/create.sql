@@ -1,4 +1,5 @@
 INSERT INTO referral_achievements
-    (identity_id, type, meta)
+    (referrer_id, referee_id, achievement_type, meta)
 VALUES
-    ($1, $2, $3)
+    ($1, $2, $3, $4)
+RETURNING *;

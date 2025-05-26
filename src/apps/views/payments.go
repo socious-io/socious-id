@@ -2,7 +2,6 @@ package views
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
@@ -140,7 +139,6 @@ func paymentsGroup(router *gin.Engine) {
 	g.POST("/wallets", auth.LoginRequired(), func(c *gin.Context) {
 		identity := c.MustGet("identity").(*models.Identity)
 		ctx := c.MustGet("ctx").(context.Context)
-		fmt.Println("POST identity", identity)
 
 		form := new(AddWalletForm)
 		if err := c.BindJSON(form); err != nil {
