@@ -2,7 +2,6 @@ package views
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
@@ -90,24 +89,21 @@ func paymentsGroup(router *gin.Engine) {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				return
 			}
+			stripeCustomerID = customer.ID
 		}
 
-		paymentMethod, err = fiatService.AttachPaymentMethod(customer.ID, *form.Token)
+		paymentMethod, err = fiatService.AttachPaymentMethod(stripeCustomerID.(string), *form.Token)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"card":     paymentMethod,
-			"customer": customer,
-			"identity": identity,
-		})
+		c.JSON(http.StatusOK, paymentMethod)
 	})
 
 	g.DELETE("/cards/:id", auth.LoginRequired(), func(c *gin.Context) {
 		identity := c.MustGet("identity").(*models.Identity)
-		id := c.MustGet("id").(string)
+		id := c.Param("id")
 
 		stripeCustomerID := identity.Meta["stripe_customer_id"]
 		if stripeCustomerID == nil {
@@ -140,7 +136,6 @@ func paymentsGroup(router *gin.Engine) {
 	g.POST("/wallets", auth.LoginRequired(), func(c *gin.Context) {
 		identity := c.MustGet("identity").(*models.Identity)
 		ctx := c.MustGet("ctx").(context.Context)
-		fmt.Println("POST identity", identity)
 
 		form := new(AddWalletForm)
 		if err := c.BindJSON(form); err != nil {

@@ -86,6 +86,7 @@ var _ = Describe("Socious Test Suite", Ordered, func() {
 	Context("Shortener", shortenerGroup)
 	Context("Impact Points", impactPointsGroup)
 	Context("Payments", paymentsGroup)
+	Context("Referral Achievements", referralAchievementsGroup)
 })
 
 func init() {
@@ -117,6 +118,7 @@ func decodeBody(responseBody io.Reader) gin.H {
 	decoder.Decode(&body)
 	return body
 }
+
 func bodyExpect(body, expect gin.H) {
 	replaceAny(expect, body)
 	Expect(body).To(Equal(expect))

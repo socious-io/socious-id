@@ -49,6 +49,8 @@ type User struct {
 
 	StripeCustomerID *string `db:"stripe_customer_id" json:"stripe_customer_id"`
 
+	ReferredBy *uuid.UUID `db:"referred_by" json:"referred_by"`
+
 	CreatedAt time.Time  `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time  `db:"updated_at" json:"updated_at"`
 	DeletedAt *time.Time `db:"deleted_at" json:"deleted_at"`
@@ -67,7 +69,7 @@ func (u *User) Create(ctx context.Context) error {
 		ctx,
 		"users/register",
 		u.FirstName, u.LastName, u.Username, u.Email, u.Password,
-		u.CoverID, u.AvatarID,
+		u.CoverID, u.AvatarID, u.ReferredBy,
 	)
 	if err != nil {
 		return err

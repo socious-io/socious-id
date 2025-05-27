@@ -36,10 +36,26 @@ func GetIdentity(id uuid.UUID) (*Identity, error) {
 	return i, nil
 }
 
+func GetIdentityByUsernameOrShortname(usernameOrShortname string) (*Identity, error) {
+	i := new(Identity)
+	if err := database.Get(i, "identities/get_by_username_or_shortname", usernameOrShortname); err != nil {
+		return nil, err
+	}
+	return i, nil
+}
+
 func GetIdentities(ids []interface{}) ([]Identity, error) {
 	var identities []Identity
 	if err := database.Fetch(&identities, ids...); err != nil {
 		return nil, err
 	}
 	return identities, nil
+}
+
+func GetReferrerIdentity(refereeID uuid.UUID) (*Identity, error) {
+	i := new(Identity)
+	if err := database.Get(i, "identities/get_referrer", refereeID); err != nil {
+		return nil, err
+	}
+	return i, nil
 }

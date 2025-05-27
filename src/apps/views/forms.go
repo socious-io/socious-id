@@ -5,6 +5,7 @@ import (
 	"socious-id/src/apps/models"
 
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx/types"
 )
 
 type ConfirmForm struct {
@@ -102,4 +103,10 @@ type AddWalletForm struct {
 
 type AddCardForm struct {
 	Token *string `json:"token" form:"token"`
+}
+
+type ReferralAchievementForm struct {
+	RefereeID       uuid.UUID      `json:"referee_id"`
+	AchievementType string         `json:"achievement_type"`
+	Meta            types.JSONText `json:"meta"`
 }

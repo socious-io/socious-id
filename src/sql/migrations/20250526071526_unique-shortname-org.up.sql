@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX idx_orgs_shortname ON organizations(shortname);
