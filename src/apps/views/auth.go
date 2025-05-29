@@ -472,10 +472,13 @@ func authGroup(router *gin.Engine) {
 		c.Redirect(http.StatusSeeOther, "/auth/login")
 	})
 
-	g.GET("/logout", auth.LoginRequired(), func(c *gin.Context) {
+	g.GET("/logout", func(c *gin.Context) {
 		session := sessions.Default(c)
-		session.Delete("user_id")
-		session.Save()
+		id := session.Get("user_id")
+		if id != nil {
+			session.Delete("user_id")
+			session.Save()
+		}
 		c.Redirect(http.StatusSeeOther, "/auth/login")
 	})
 
