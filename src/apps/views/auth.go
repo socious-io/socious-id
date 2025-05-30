@@ -173,6 +173,8 @@ func authGroup(router *gin.Engine) {
 				FirstName: &googleUserInfo.GivenName,
 				LastName:  &googleUserInfo.FamilyName,
 			}
+			setUserReferrer(c, u)
+
 			if err = u.Create(ctx); err != nil {
 				c.HTML(http.StatusBadRequest, "login.html", gin.H{
 					"error": err.Error(),
@@ -271,7 +273,6 @@ func authGroup(router *gin.Engine) {
 		authSession := loadAuthSession(c)
 
 		ctx := c.MustGet("ctx").(context.Context)
-		session := sessions.Default(c)
 
 		form := new(auth.OTPForm)
 		if err := c.ShouldBind(form); err != nil {
@@ -286,19 +287,7 @@ func authGroup(router *gin.Engine) {
 			Username: auth.GenerateUsername(form.Email),
 			Email:    form.Email,
 		}
-
-		//Set Referred By
-		referredBy := session.Get("referred_by")
-		if referredBy != nil && referredBy.(string) != "" {
-			refererIdentity, err := models.GetIdentityByUsernameOrShortname(referredBy.(string))
-			if err != nil {
-				log.Printf("Couldn't find the referer user : %s\n", err.Error())
-			} else {
-				u.ReferredBy = &refererIdentity.ID
-			}
-			session.Delete("referred_by")
-			session.Save()
-		}
+		setUserReferrer(c, u)
 
 		if err := u.Create(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{
@@ -343,7 +332,7 @@ func authGroup(router *gin.Engine) {
 		c.HTML(http.StatusOK, "register.html", gin.H{})
 	})
 
-	g.GET("/register/pre", func(c *gin.Context) {
+	g.GET("/register/pre", auth.CheckLogin(), func(c *gin.Context) {
 		c.HTML(http.StatusOK, "pre-register.html", gin.H{})
 	})
 
@@ -483,10 +472,13 @@ func authGroup(router *gin.Engine) {
 		c.Redirect(http.StatusSeeOther, "/auth/login")
 	})
 
-	g.GET("/logout", auth.LoginRequired(), func(c *gin.Context) {
+	g.GET("/logout", func(c *gin.Context) {
 		session := sessions.Default(c)
-		session.Delete("user_id")
-		session.Save()
+		id := session.Get("user_id")
+		if id != nil {
+			session.Delete("user_id")
+			session.Save()
+		}
 		c.Redirect(http.StatusSeeOther, "/auth/login")
 	})
 
@@ -657,4 +649,24 @@ func loadAuthSession(c *gin.Context) *models.AuthSession {
 	}
 
 	return nil
+}
+
+func setUserReferrer(c *gin.Context, u *models.User) error {
+	session := sessions.Default(c)
+	var e error
+
+	referredBy := session.Get("referred_by")
+	if referredBy != nil && referredBy.(string) != "" {
+		refererIdentity, err := models.GetIdentityByUsernameOrShortname(referredBy.(string))
+		if err != nil {
+			e = err
+			log.Printf("Couldn't find the referer user : %s\n", err.Error())
+		} else {
+			u.ReferredBy = &refererIdentity.ID
+		}
+		session.Delete("referred_by")
+		session.Save()
+	}
+
+	return e
 }
