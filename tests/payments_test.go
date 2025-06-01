@@ -18,7 +18,7 @@ func paymentsGroup() {
 		for i, data := range cardsData {
 			w := httptest.NewRecorder()
 			reqBody, _ := json.Marshal(data)
-			req, _ := http.NewRequest("POST", "/payments/cards", bytes.NewBuffer(reqBody))
+			req, _ := http.NewRequest("POST", "/payments/fiat/cards", bytes.NewBuffer(reqBody))
 			req.Header.Set("Content-Type", "application/json")
 			req.Header.Set("Authorization", authTokens[i])
 			router.ServeHTTP(w, req)
@@ -34,7 +34,7 @@ func paymentsGroup() {
 		for i, data := range cardsData {
 			w := httptest.NewRecorder()
 			reqBody, _ := json.Marshal(data)
-			req, _ := http.NewRequest("GET", "/payments/cards", bytes.NewBuffer(reqBody))
+			req, _ := http.NewRequest("GET", "/payments/fiat/cards", bytes.NewBuffer(reqBody))
 			req.Header.Set("Content-Type", "application/json")
 			req.Header.Set("Authorization", authTokens[i])
 			router.ServeHTTP(w, req)
@@ -50,7 +50,7 @@ func paymentsGroup() {
 		for i, data := range cardsData {
 			w := httptest.NewRecorder()
 			reqBody, _ := json.Marshal(data)
-			req, _ := http.NewRequest("DELETE", "/payments/cards", bytes.NewBuffer(reqBody))
+			req, _ := http.NewRequest("DELETE", "/payments/fiat/cards", bytes.NewBuffer(reqBody))
 			req.Header.Set("Content-Type", "application/json")
 			req.Header.Set("Authorization", authTokens[i])
 			router.ServeHTTP(w, req)
@@ -65,7 +65,7 @@ func paymentsGroup() {
 		for _, data := range walletsData {
 			w := httptest.NewRecorder()
 			reqBody, _ := json.Marshal(data)
-			req, _ := http.NewRequest("POST", "/payments/wallets", bytes.NewBuffer(reqBody))
+			req, _ := http.NewRequest("POST", "/payments/crypto/wallets", bytes.NewBuffer(reqBody))
 			req.Header.Set("Content-Type", "application/json")
 			req.Header.Set("Authorization", authTokens[0])
 			router.ServeHTTP(w, req)
@@ -78,7 +78,7 @@ func paymentsGroup() {
 
 	It("Should get all the wallets", func() {
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/payments/wallets", nil)
+		req, _ := http.NewRequest("GET", "/payments/crypto/wallets", nil)
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Authorization", authTokens[0])
 		router.ServeHTTP(w, req)

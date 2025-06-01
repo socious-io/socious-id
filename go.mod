@@ -13,7 +13,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/onsi/ginkgo/v2 v2.22.2
 	github.com/onsi/gomega v1.36.2
-	github.com/socious-io/gopay v0.0.24
+	github.com/socious-io/gopay v0.0.25-0.20250601225552-e61a15fd3ba2
 	github.com/socious-io/pkg_database v1.0.0
 	golang.org/x/crypto v0.32.0
 	gopkg.in/yaml.v2 v2.4.0

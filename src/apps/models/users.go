@@ -16,7 +16,7 @@ type User struct {
 	Password        *string   `db:"password" json:"-"`
 	PasswordExpired bool      `db:"password_expired" json:"password_expired"`
 
-	Status StatusType `db:"status" json:"status"`
+	Status UserStatusType `db:"status" json:"status"`
 
 	Email     string  `db:"email" json:"email"`
 	EmailText *string `db:"email_text" json:"email_text"`
@@ -156,7 +156,7 @@ func (u *User) UpdateProfile(ctx context.Context) error {
 	return database.Fetch(u, u.ID)
 }
 
-func (u *User) UpdateStatus(ctx context.Context, status StatusType) error {
+func (u *User) UpdateStatus(ctx context.Context, status UserStatusType) error {
 	rows, err := database.Query(
 		ctx,
 		"users/update_status",
