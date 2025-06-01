@@ -49,7 +49,7 @@ type UserForm struct {
 }
 
 type UserUpdateStatusForm struct {
-	Status models.StatusType `json:"status" form:"status" validate:"required"`
+	Status models.UserStatusType `json:"status" form:"status" validate:"required"`
 }
 
 type OrganizationUpdateStatusForm struct {

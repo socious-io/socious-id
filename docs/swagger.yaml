@@ -1746,7 +1746,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /payments/cards:
+  /payments/fiat/cards:
     get:
       summary: Get user payment cards
       description: Retrieves a paginated list of payment cards associated with the authenticated user
@@ -1836,7 +1836,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /payments/cards/{id}:
+  /payments/fiat/cards/{id}:
     # get:
     #   summary: Get payment card by ID
     #   description: Retrieves details of a specific payment card by its ID
@@ -1948,7 +1948,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /payments/wallets:
+  /payments/crypto/wallets:
     get:
       summary: Get user wallets
       description: Retrieves a list of wallets associated with the authenticated user
@@ -2004,6 +2004,76 @@ paths:
                 $ref: '#/components/schemas/Wallet'
         '400':
           description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - user not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /payments/fiat/payout:
+    get:
+      summary: Get Stripe payout connection status
+      description: Retrieves the current Stripe payout connection details for the authenticated user
+      tags:
+        - Payments
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Stripe payout connection details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OauthConnect'
+        '400':
+          description: Bad request or no Stripe connection found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - user not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /payments/fiat/payout/connect:
+    get:
+      summary: Connect Stripe payout account
+      description: Initiates the Stripe payout account connection process. Creates a Stripe Connect account and returns the onboarding URL.
+      tags:
+        - Payments
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: redirect_url
+          in: query
+          required: false
+          description: URL to redirect the user after completing Stripe onboarding
+          schema:
+            type: string
+            format: uri
+      responses:
+        '200':
+          description: Stripe payout account connection URL generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                    description: Stripe account onboarding URL
+        '400':
+          description: Bad request or Stripe account creation failed
           content:
             application/json:
               schema:
