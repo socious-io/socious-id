@@ -11,4 +11,4 @@ ALTER TABLE impact_points ADD CONSTRAINT unique_impact_tag UNIQUE (unique_tag);
 ALTER TABLE impact_points ALTER COLUMN unique_tag SET NOT NULL;
 
 -- Unique Referral Achievements
-CREATE UNIQUE INDEX idx_unique_achievements  ON referral_achievements (referrer_id, referee_id, achievement_type);
+CREATE UNIQUE INDEX idx_unique_achievements ON referral_achievements (referrer_id, referee_id, achievement_type);
