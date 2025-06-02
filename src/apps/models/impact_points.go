@@ -30,6 +30,8 @@ type ImpactPoint struct {
 	AccessID *uuid.UUID       `db:"access_id" json:"access_id"`
 	Meta     *json.RawMessage `db:"meta" json:"meta"`
 
+	UniqueTag string `db:"unique_tag" json:"unique_tag"`
+
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 }
 
@@ -64,6 +66,7 @@ func (ip *ImpactPoint) Create(ctx context.Context) error {
 		ip.Type,
 		ip.AccessID,
 		ip.Meta,
+		ip.UniqueTag,
 	)
 	if err != nil {
 		return err
