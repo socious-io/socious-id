@@ -6,6 +6,7 @@ import (
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
 	"socious-id/src/apps/utils"
+	"socious-id/src/apps/workers"
 
 	"github.com/gin-gonic/gin"
 	database "github.com/socious-io/pkg_database"
@@ -29,6 +30,9 @@ func impactPointsGroup(router *gin.Engine) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+
+		// FIXME: use nats
+		go workers.Sync(impactPoint.UserID)
 
 		c.JSON(http.StatusCreated, impactPoint)
 	})
