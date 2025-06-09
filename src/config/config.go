@@ -58,6 +58,12 @@ type ConfigType struct {
 	Discord    struct {
 		Channel string `mapstructure:"channel"`
 	} `mapstructure:"discord"`
+	ReferralAchievements struct {
+		Rewards []struct {
+			Type   string  `mapstructure:"type"`
+			Amount float32 `mapstructure:"amount"`
+		} `mapstructure:"rewards"`
+	} `mapstructure:"referral_achievements"`
 	Payment struct {
 		Chains gopay.Chains `mapstructure:"chains"`
 		Fiats  gopay.Fiats  `mapstructure:"fiats"`

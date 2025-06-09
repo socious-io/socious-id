@@ -54,16 +54,16 @@ func impactPointsGroup(router *gin.Engine) {
 		})
 	})
 
-	g.GET("/overview", auth.LoginRequired(), func(c *gin.Context) {
+	g.GET("stats", auth.LoginRequired(), func(c *gin.Context) {
 		user := c.MustGet("user").(*models.User)
 
-		countsPerType, err := models.GetImpactPointsCountsPerType(user.ID)
+		stats, err := models.GetImpactPointStats(user.ID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"overviews": countsPerType})
+		c.JSON(http.StatusOK, stats)
 	})
 
 	g.GET("badges", auth.LoginRequired(), func(c *gin.Context) {
