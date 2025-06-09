@@ -4,13 +4,13 @@ WITH ra AS (
   WHERE referee_id IN (?)
 )
 SELECT
-  COALESCE(jsonb_agg(
-    json_build_object(
-      'type', ra_sub.achievement_type, 
-      'reward_claimed_at', ra_sub.reward_claimed_at
-    )
-  ), '[]') AS achievements,
-  row_to_json(i.*) as referee
-FROM ra AS ra_sub
-JOIN identities i ON i.id = ra_sub.referee_id
+	COALESCE(jsonb_agg(
+		json_build_object(
+		  'type', ra.achievement_type, 
+		  'reward_claimed_at', ra.reward_claimed_at
+		)
+	), '[]') AS achievements,
+	row_to_json(i.*) as referee
+FROM ra
+JOIN identities i ON i.id=ra.referee_id
 GROUP BY i.id;
