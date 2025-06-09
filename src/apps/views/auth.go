@@ -117,7 +117,7 @@ func authGroup(router *gin.Engine) {
 			})
 			return
 		}
-		if u.Status == models.StatusTypeInactive {
+		if u.Status == models.UserStatusTypeInactive {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
 				"error": "Error: User couldn't be found/is not registered on Socious",
 			})
@@ -184,8 +184,8 @@ func authGroup(router *gin.Engine) {
 		}
 
 		//Make user active
-		if u.Status == models.StatusTypeInactive {
-			err := u.UpdateStatus(ctx, models.StatusTypeActive)
+		if u.Status == models.UserStatusTypeInactive {
+			err := u.UpdateStatus(ctx, models.UserStatusTypeActive)
 			if err != nil {
 				c.HTML(http.StatusBadRequest, "login.html", gin.H{
 					"error": err.Error(),
@@ -388,7 +388,7 @@ func authGroup(router *gin.Engine) {
 		}
 
 		//Checking user status
-		if u.Status == models.StatusTypeInactive {
+		if u.Status == models.UserStatusTypeInactive {
 			c.HTML(http.StatusBadRequest, "forget-password.html", gin.H{
 				"error": "Error: User couldn't be found/is not registered on Socious",
 			})

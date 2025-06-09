@@ -70,9 +70,9 @@ func (ovt OrganizationVerificationType) Value() (driver.Value, error) {
 type UserStatusType string
 
 const (
-	StatusTypeActive    UserStatusType = "ACTIVE"
-	StatusTypeInactive  UserStatusType = "INACTIVE"
-	StatusTypeSuspended UserStatusType = "SUSPENDED"
+	UserStatusTypeActive    UserStatusType = "ACTIVE"
+	UserStatusTypeInactive  UserStatusType = "INACTIVE"
+	UserStatusTypeSuspended UserStatusType = "SUSPENDED"
 )
 
 func (ust *UserStatusType) Scan(value interface{}) error {

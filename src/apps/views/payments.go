@@ -158,6 +158,7 @@ func paymentsGroup(router *gin.Engine) {
 			IdentityID:     identity.ID,
 			MatrixUniqueID: account.ID,
 			AccessToken:    "",
+			Status:         models.UserStatusTypeInactive,
 			Provider:       models.OauthConnectedProvidersStripeJp, //WARNING: Hardcoded
 			RedirectURL:    &userRedirectUrl,
 			IsConfirmed:    false,
@@ -191,10 +192,10 @@ func paymentsGroup(router *gin.Engine) {
 
 			//Updating the OauthConnect
 			oc.Meta = &accountJson
-			oc.Status = models.StatusTypeInactive
+			oc.Status = models.UserStatusTypeInactive
 			oc.IsConfirmed = true
 			if acc.PayoutsEnabled {
-				oc.Status = models.StatusTypeActive
+				oc.Status = models.UserStatusTypeActive
 			}
 
 			err = oc.Upsert(ctx)
