@@ -3,5 +3,5 @@ FROM (
 	(SELECT id FROM users WHERE referred_by = $1)
 		UNION
 	(SELECT id FROM organizations WHERE referred_by = $1)
-)
+) AS combined
 LIMIT $2 OFFSET $3
