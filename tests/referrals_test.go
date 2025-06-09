@@ -3,6 +3,7 @@ package tests_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 
@@ -51,6 +52,7 @@ func referralsGroup() {
 		req.Header.Set("Authorization", authTokens[0])
 		router.ServeHTTP(w, req)
 		body := decodeBody(w.Body)
+		fmt.Println(body)
 		Expect(w.Code).To(Equal(http.StatusOK))
 		Expect(body["total_count"].(float64)).To(Equal(1.0))
 	})
