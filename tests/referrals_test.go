@@ -12,7 +12,7 @@ import (
 	database "github.com/socious-io/pkg_database"
 )
 
-func referralAchievementsGroup() {
+func referralsGroup() {
 	BeforeAll(func() {
 		database.GetDB().DB.Exec(`UPDATE users SET referred_by = $1 WHERE id = $2`, usersData[0]["id"], usersData[1]["id"])
 	})
@@ -25,7 +25,7 @@ func referralAchievementsGroup() {
 
 			w := httptest.NewRecorder()
 			reqBody, _ := json.Marshal(data)
-			req, _ := http.NewRequest("POST", "/referral-achievements", bytes.NewBuffer(reqBody))
+			req, _ := http.NewRequest("POST", "/referrals/achievements", bytes.NewBuffer(reqBody))
 			req.Header.Set("Content-Type", "application/json")
 			router.ServeHTTP(w, req)
 			body := decodeBody(w.Body)
@@ -37,11 +37,34 @@ func referralAchievementsGroup() {
 
 	It("Should fetch referral achievement list", func() {
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/referral-achievements", nil)
+		req, _ := http.NewRequest("GET", "/referrals/achievements", nil)
 		req.Header.Set("Authorization", authTokens[0])
 		router.ServeHTTP(w, req)
 		body := decodeBody(w.Body)
 		Expect(w.Code).To(Equal(http.StatusOK))
 		Expect(body["total_count"].(float64)).To(Equal(2.0))
 	})
+
+	It("Should fetch referrals", func() {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/referrals", nil)
+		req.Header.Set("Authorization", authTokens[0])
+		router.ServeHTTP(w, req)
+		body := decodeBody(w.Body)
+		Expect(w.Code).To(Equal(http.StatusOK))
+		Expect(body["total_count"].(float64)).To(Equal(1.0))
+	})
+
+	It("Should fetch referral stats", func() {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/referrals/stats", nil)
+		req.Header.Set("Authorization", authTokens[0])
+		router.ServeHTTP(w, req)
+		body := decodeBody(w.Body)
+		Expect(w.Code).To(Equal(http.StatusOK))
+		Expect(body["total_unclaimed_reward_amount"].(float64)).To(Equal(0.0))
+		Expect(body["total_reward_amount"].(float64)).To(Equal(0.0))
+		Expect(body["total_count"].(float64)).To(Equal(1.0))
+	})
+
 }

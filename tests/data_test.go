@@ -75,6 +75,7 @@ var (
 			"meta": gin.H{
 				"test": "test",
 			},
+			"unique_tag": "unique_1",
 		},
 		{
 			"type":                  "DONATION",
@@ -84,6 +85,7 @@ var (
 			"meta": gin.H{
 				"test": "test",
 			},
+			"unique_tag": "unique_2",
 		},
 	}
 

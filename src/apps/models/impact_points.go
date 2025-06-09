@@ -30,6 +30,8 @@ type ImpactPoint struct {
 	AccessID *uuid.UUID       `db:"access_id" json:"access_id"`
 	Meta     *json.RawMessage `db:"meta" json:"meta"`
 
+	UniqueTag string `db:"unique_tag" json:"unique_tag"`
+
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 }
 
@@ -39,10 +41,16 @@ type Badges struct {
 	SocialCauseCategory string `db:"social_cause_category" json:"social_cause_category"`
 }
 
-type ImpactPointOverview struct {
-	TotalPoints int             `db:"total_points" json:"total_points"`
-	TotalValues float64         `db:"total_values" json:"total_values"`
-	Type        ImpactPointType `db:"type" json:"type"`
+type ImpactPointStats struct {
+	TotalPoints int     `db:"total_points" json:"total_points"`
+	TotalValues float64 `db:"total_values" json:"total_values"`
+
+	TotalPerType []struct {
+		Type        ImpactPointType `db:"type" json:"type"`
+		TotalPoints int             `db:"total_points" json:"total_points"`
+		TotalValues float64         `db:"total_values" json:"total_values"`
+	} `db:"-" json:"total_per_type"`
+	TotalPerTypeJson types.JSONText `db:"total_per_type" json:"-"`
 }
 
 func (ImpactPoint) TableName() string {
@@ -64,6 +72,7 @@ func (ip *ImpactPoint) Create(ctx context.Context) error {
 		ip.Type,
 		ip.AccessID,
 		ip.Meta,
+		ip.UniqueTag,
 	)
 	if err != nil {
 		return err
@@ -110,12 +119,15 @@ func GetImpactPoints(userID uuid.UUID, p database.Paginate) ([]ImpactPoint, int,
 	return impactPoints, fetchList[0].TotalCount, nil
 }
 
-func GetImpactPointsCountsPerType(userID uuid.UUID) ([]ImpactPointOverview, error) {
-	countsByType := []ImpactPointOverview{}
-	if err := database.QuerySelect("impact_points/get_count_per_type", &countsByType, userID); err != nil {
+func GetImpactPointStats(userID uuid.UUID) (*ImpactPointStats, error) {
+	stats := new(ImpactPointStats)
+	if err := database.Get(stats, "impact_points/get_stats", userID); err != nil {
 		return nil, err
 	}
-	return countsByType, nil
+	if err := json.Unmarshal(stats.TotalPerTypeJson, &stats.TotalPerType); err != nil {
+		return nil, err
+	}
+	return stats, nil
 }
 
 func GetImpactBadges(userID uuid.UUID) ([]Badges, error) {

@@ -89,6 +89,7 @@ type ImpactPointForm struct {
 	Type                models.ImpactPointType `json:"type" form:"type" validate:"required,oneof=WORKSUBMIT DONATION VOLUNTEER OTHER"`
 	AccessID            *uuid.UUID             `json:"access_id" form:"access_id"`
 	Meta                *json.RawMessage       `json:"meta" form:"meta"`
+	UniqueTag           string                 `json:"unique_tag" form:"unique_tag" validate:"required"`
 }
 
 type KYBVerificationForm struct {

@@ -28,14 +28,14 @@ components:
       description: Client secret key required for accessing protected endpoints
   schemas:
     StatusType:
-        type: string
-        enum:
-          - pending
-          - active
-          - inactive
-          - suspended
-          - deleted
-        description: Status of the user
+      type: string
+      enum:
+        - pending
+        - active
+        - inactive
+        - suspended
+        - deleted
+      description: Status of the user
     VerificationCredentialStatus:
         type: string
         enum:
@@ -82,259 +82,6 @@ components:
           description: Error message
       required:
         - error
-
-    AuthSessionForm:
-      type: object
-      required:
-        - redirect_url
-      properties:
-        redirect_url:
-          type: string
-          format: uri
-          description: URL to redirect after authentication
-    ChangePasswordForm:
-      type: object
-      required:
-        - current_password
-        - password
-        - password_confirmation
-      properties:
-        current_password:
-          type: string
-          format: password
-          description: User's current password
-        password:
-          type: string
-          format: password
-          description: New password
-        password_confirmation:
-          type: string
-          format: password
-          description: Confirmation of new password
-    GetTokenForm:
-      type: object
-      required:
-        - code
-      properties:
-        code:
-          type: string
-          description: OTP code for authentication
-    RefreshTokenForm:
-      type: object
-      required:
-        - refresh_token
-      properties:
-        refresh_token:
-          type: string
-          description: JWT refresh token
-    ImpactPointForm:
-      type: object
-      properties:
-        user_id:
-          type: string
-          format: uuid
-          description: ID of the user earning the impact point
-        total_points:
-          type: integer
-          description: Total number of points earned
-        social_cause:
-          type: string
-          description: Social cause related to the impact point
-        social_cause_category:
-          type: string
-          description: Category of the social cause
-        value:
-          type: number
-          format: float
-          description: Category of the social cause
-        type:
-          $ref: '#/components/schemas/StatusType'
-          description: Type of impact point
-        access_id:
-          type: string
-          format: uuid
-          nullable: true
-          description: Optional ID referencing related access
-        meta:
-          type: object
-          nullable: true
-          description: Additional metadata about the impact point
-      required:
-        - user_id
-        - type
-    UserForm:
-      type: object
-      properties:
-        username:
-          type: string
-          description: Username for the user account
-        email:
-          type: string
-          format: email
-          description: User's email address
-        phone:
-          type: string
-          nullable: true
-          description: User's phone number
-        first_name:
-          type: string
-          nullable: true
-          description: User's first name
-        last_name:
-          type: string
-          nullable: true
-          description: User's last name
-        mission:
-          type: string
-          nullable: true
-          description: User's mission statement
-        bio:
-          type: string
-          nullable: true
-          description: User's biography
-        city:
-          type: string
-          nullable: true
-          description: City where the user is located
-        country:
-          type: string
-          nullable: true
-          description: Country where the user is located
-        address:
-          type: string
-          nullable: true
-          description: User's physical address
-        avatar_id:
-          type: string
-          format: uuid
-          nullable: true
-          description: ID of the avatar media
-        cover_id:
-          type: string
-          format: uuid
-          nullable: true
-          description: ID of the cover media
-      required:
-        - username
-        - email
-    RegisterForm:
-      type: object
-      properties:
-        username:
-          type: string
-          description: Username for the user account
-        password:
-          type: string
-          format: password
-          description: User's password
-        email:
-          type: string
-          format: email
-          description: User's email address
-        phone:
-          type: string
-          nullable: true
-          description: User's phone number
-        first_name:
-          type: string
-          nullable: true
-          description: User's first name
-        last_name:
-          type: string
-          nullable: true
-          description: User's last name
-      required:
-        - username
-        - password
-        - email
-    OrganizationForm:
-      type: object
-      properties:
-        shortname:
-          type: string
-          description: Short name used as identifier for the organization
-        name:
-          type: string
-          nullable: true
-          description: Full name of the organization
-        bio:
-          type: string
-          nullable: true
-          description: Brief biography of the organization
-        description:
-          type: string
-          nullable: true
-          description: Detailed description of the organization
-        email:
-          type: string
-          format: email
-          nullable: true
-          description: Contact email for the organization
-        phone:
-          type: string
-          nullable: true
-          description: Contact phone number for the organization
-        city:
-          type: string
-          nullable: true
-          description: City where the organization is located
-        country:
-          type: string
-          nullable: true
-          description: Country where the organization is located
-        address:
-          type: string
-          nullable: true
-          description: Physical address of the organization
-        website:
-          type: string
-          format: uri
-          nullable: true
-          description: Website URL of the organization
-        mission:
-          type: string
-          nullable: true
-          description: Mission statement of the organization
-        culture:
-          type: string
-          nullable: true
-          description: Description of the organization's culture
-        logo_id:
-          type: string
-          format: uuid
-          nullable: true
-          description: ID of the logo media
-        cover_id:
-          type: string
-          format: uuid
-          nullable: true
-          description: ID of the cover media
-      required:
-        - shortname
-    OrganizationUpdateStatusForm:
-      type: object
-      properties:
-        status:
-          $ref: '#/components/schemas/OrganizationStatusType'
-          description: New status to set for the organization
-      required:
-        - status
-    UserUpdateStatusForm:
-      type: object
-      properties:
-        status:
-          $ref: '#/components/schemas/StatusType'
-          description: New status to set for the user
-      required:
-        - status
-    ClientSecretForm:
-      type: object
-      properties:
-        client_secret:
-          type: string
-          description: Client secret for authentication
-      required:
-        - client_secret
 
     AuthSession:
       type: object
@@ -708,19 +455,42 @@ components:
         }
         created_at: "2025-05-02T10:30:00Z"
         updated_at: "2025-05-02T10:30:00Z"
-    ImpactPointOverview:
+    ImpactPointStats:
       type: object
+      required:
+        - total_points
+        - total_values
+        - total_per_type
       properties:
         total_points:
           type: integer
-          description: Total number of impact points
+          description: Total points accumulated across all types
+          example: 500
         total_values:
-          type: number
-          format: float
-          description: Total value of impact points
-        type:
-          type: string
-          $ref: '#/components/schemas/ImpactPointType'
+          type: integer
+          description: Total values accumulated across all types
+          example: 0
+        total_per_type:
+          type: array
+          description: Breakdown of points and values by type
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                $ref: '#/components/schemas/ImpactPointType'
+              total_points:
+                type: integer
+                description: Total points for this type
+                example: 100
+              total_values:
+                type: integer
+                description: Total values for this type
+                example: 0
+            required:
+              - type
+              - total_points
+              - total_values
     ImpactBadge:
       type: object
       properties:
@@ -752,6 +522,136 @@ components:
         image_url: "https://example.com/badges/recycling-hero.png"
         level: 2
         achieved_at: "2025-05-01T15:30:00Z"
+    Referral:
+      type: object
+      properties:
+        referee:
+          $ref: '#/components/schemas/Identity'
+          description: Identity of the referee
+        achievements:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: Achievement type
+              reward_claimed_at:
+                type: string
+                format: date-time
+                nullable: true
+                description: Timestamp when the reward was claimed
+    ReferralStats:
+      type: object
+      required:
+        - total_count
+        - total_reward_amount
+        - total_unclaimed_reward_amount
+        - total_per_achievement_type
+      properties:
+        total_count:
+          type: integer
+          description: Total number of referral achievements
+          example: 2
+        total_reward_amount:
+          type: number
+          format: float
+          description: Total reward amount earned from all achievements
+          example: 6
+        total_unclaimed_reward_amount:
+          type: number
+          format: float
+          description: Total amount of unclaimed rewards
+          example: 5
+        total_per_achievement_type:
+          type: array
+          description: Breakdown of achievement counts by type
+          items:
+            type: object
+            properties:
+              achievement_type:
+                type: string
+                description: Type of achievement
+                example: "VERIFICATION"
+              total_count:
+                type: integer
+                description: Total count for this achievement type
+                example: 2
+            required:
+              - achievement_type
+              - total_count
+    ReferralAchievement:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the achievement
+        referrer_id:
+          type: string
+          format: uuid
+          description: ID of the referrer who earned the achievement
+        referee_id:
+          type: string
+          description: ID of the referee associated with the achievement
+        achievement_type:
+          type: string
+          description: Type of achievement
+        reward_amount:
+          type: number
+          format: float
+          description: Reward amount for this achievement
+        reward_claimed_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the reward was claimed
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the achievement was created
+        meta:
+          type: object
+          nullable: true
+          description: Additional metadata for the achievement
+    Identity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the identity
+        type:
+          type: string
+          enum:
+            - users
+            - organizations
+          description: Type of identity (user or organization)
+        meta:
+          type: object
+          description: Metadata about the identity
+          properties:
+            name:
+              type: string
+              description: Display name of the identity
+            username:
+              type: string
+              description: Username (for users)
+            shortname:
+              type: string
+              description: Short name (for organizations)
+            avatar:
+              type: string
+              format: uri
+              description: Avatar URL
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the identity was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the identity was last updated
 
 paths:
   /auth/password:
@@ -768,7 +668,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChangePasswordForm'
+              type: object
+              required:
+                - current_password
+                - password
+                - password_confirmation
+              properties:
+                current_password:
+                  type: string
+                  format: password
+                  description: User's current password
+                password:
+                  type: string
+                  format: password
+                  description: New password
       responses:
         '202':
           description: Password changed successfully
@@ -811,7 +724,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AuthSessionForm'
+              type: object
+              required:
+                - redirect_url
+              properties:
+                redirect_url:
+                  type: string
+                  format: uri
+                  description: URL to redirect after authentication
       responses:
         '201':
           description: Authentication session created successfully
@@ -856,6 +776,12 @@ paths:
           schema:
             type: string
             enum: ['true', 'false']
+        - name: referred_by
+          in: query
+          required: false
+          description: Flag to indicate if its a referred person
+          schema:
+            type: string
       responses:
         '301':
           description: Redirect to login or registration page
@@ -878,7 +804,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GetTokenForm'
+              type: object
+              required:
+                - code
+              properties:
+                code:
+                  type: string
+                  description: OTP code for authentication
       responses:
         '202':
           description: Tokens generated successfully
@@ -905,7 +837,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RefreshTokenForm'
+              type: object
+              required:
+                - refresh_token
+              properties:
+                refresh_token:
+                  type: string
+                  description: JWT refresh token
       responses:
         '200':
           description: Tokens refreshed successfully
@@ -1103,7 +1041,40 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ImpactPointForm'
+              type: object
+              required:
+                - user_id
+                - type
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                  description: ID of the user earning the impact point
+                total_points:
+                  type: integer
+                  description: Total number of points earned
+                social_cause:
+                  type: string
+                  description: Social cause related to the impact point
+                social_cause_category:
+                  type: string
+                  description: Category of the social cause
+                value:
+                  type: number
+                  format: float
+                  description: Category of the social cause
+                type:
+                  $ref: '#/components/schemas/StatusType'
+                  description: Type of impact point
+                access_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: Optional ID referencing related access
+                meta:
+                  type: object
+                  nullable: true
+                  description: Additional metadata about the impact point
       responses:
         '201':
           description: Impact point successfully created
@@ -1175,7 +1146,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /impact-points/overview:
+  /impact-points/stats:
     get:
       summary: Get user impact points overview
       description: Retrieves counts of impact points grouped by type for the authenticated user
@@ -1298,7 +1269,69 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OrganizationForm'
+              type: object
+              required:
+                - shortname
+              properties:
+                shortname:
+                  type: string
+                  description: Short name used as identifier for the organization
+                name:
+                  type: string
+                  nullable: true
+                  description: Full name of the organization
+                bio:
+                  type: string
+                  nullable: true
+                  description: Brief biography of the organization
+                description:
+                  type: string
+                  nullable: true
+                  description: Detailed description of the organization
+                email:
+                  type: string
+                  format: email
+                  nullable: true
+                  description: Contact email for the organization
+                phone:
+                  type: string
+                  nullable: true
+                  description: Contact phone number for the organization
+                city:
+                  type: string
+                  nullable: true
+                  description: City where the organization is located
+                country:
+                  type: string
+                  nullable: true
+                  description: Country where the organization is located
+                address:
+                  type: string
+                  nullable: true
+                  description: Physical address of the organization
+                website:
+                  type: string
+                  format: uri
+                  nullable: true
+                  description: Website URL of the organization
+                mission:
+                  type: string
+                  nullable: true
+                  description: Mission statement of the organization
+                culture:
+                  type: string
+                  nullable: true
+                  description: Description of the organization's culture
+                logo_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: ID of the logo media
+                cover_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: ID of the cover media
       responses:
         '201':
           description: Organization created
@@ -1392,7 +1425,69 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OrganizationForm'
+              type: object
+              required:
+                - shortname
+              properties:
+                shortname:
+                  type: string
+                  description: Short name used as identifier for the organization
+                name:
+                  type: string
+                  nullable: true
+                  description: Full name of the organization
+                bio:
+                  type: string
+                  nullable: true
+                  description: Brief biography of the organization
+                description:
+                  type: string
+                  nullable: true
+                  description: Detailed description of the organization
+                email:
+                  type: string
+                  format: email
+                  nullable: true
+                  description: Contact email for the organization
+                phone:
+                  type: string
+                  nullable: true
+                  description: Contact phone number for the organization
+                city:
+                  type: string
+                  nullable: true
+                  description: City where the organization is located
+                country:
+                  type: string
+                  nullable: true
+                  description: Country where the organization is located
+                address:
+                  type: string
+                  nullable: true
+                  description: Physical address of the organization
+                website:
+                  type: string
+                  format: uri
+                  nullable: true
+                  description: Website URL of the organization
+                mission:
+                  type: string
+                  nullable: true
+                  description: Mission statement of the organization
+                culture:
+                  type: string
+                  nullable: true
+                  description: Description of the organization's culture
+                logo_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: ID of the logo media
+                cover_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: ID of the cover media
       responses:
         '202':
           description: Organization updated
@@ -1467,7 +1562,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OrganizationUpdateStatusForm'
+              type: object
+              properties:
+                status:
+                  $ref: '#/components/schemas/OrganizationStatusType'
+                  description: New status to set for the organization
+              required:
+                - status
       responses:
         '200':
           description: Status updated
@@ -1640,7 +1741,60 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserForm'
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Username for the user account
+                email:
+                  type: string
+                  format: email
+                  description: User's email address
+                phone:
+                  type: string
+                  nullable: true
+                  description: User's phone number
+                first_name:
+                  type: string
+                  nullable: true
+                  description: User's first name
+                last_name:
+                  type: string
+                  nullable: true
+                  description: User's last name
+                mission:
+                  type: string
+                  nullable: true
+                  description: User's mission statement
+                bio:
+                  type: string
+                  nullable: true
+                  description: User's biography
+                city:
+                  type: string
+                  nullable: true
+                  description: City where the user is located
+                country:
+                  type: string
+                  nullable: true
+                  description: Country where the user is located
+                address:
+                  type: string
+                  nullable: true
+                  description: User's physical address
+                avatar_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: ID of the avatar media
+                cover_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: ID of the cover media
+              required:
+                - username
+                - email
       responses:
         '200':
           description: User updated
@@ -1683,7 +1837,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserUpdateStatusForm'
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  $ref: '#/components/schemas/StatusType'
+                  description: New status to set for the user
       responses:
         '200':
           description: Status updated
@@ -1720,13 +1880,6 @@ paths:
       operationId: verifyUser
       security:
         - ClientSecret: []
-      requestBody:
-        description: Verification data
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ClientSecretForm'
       responses:
         '200':
           description: User verified
@@ -1816,7 +1969,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddCardForm'
+              type: object
+              required:
+                - token
+              properties:
+                token:
+                  type: string
+                  description: Card token
       responses:
         '200':
           description: Card added successfully
@@ -1837,82 +1996,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
   /payments/fiat/cards/{id}:
-    # get:
-    #   summary: Get payment card by ID
-    #   description: Retrieves details of a specific payment card by its ID
-    #   tags:
-    #     - Payments
-    #   security:
-    #     - BearerAuth: []
-    #     - CookieAuth: []
-    #   parameters:
-    #     - name: id
-    #       in: path
-    #       required: true
-    #       description: UUID of the payment card
-    #       schema:
-    #         type: string
-    #         format: uuid
-    #   responses:
-    #     '302':
-    #       description: Card found
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Card'
-    #     '400':
-    #       description: Bad request or card not found
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '401':
-    #       description: Unauthorized - user not authenticated
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    # put:
-    #   summary: Update payment card
-    #   description: Updates a specific payment card by its ID
-    #   tags:
-    #     - Payments
-    #   security:
-    #     - BearerAuth: []
-    #     - CookieAuth: []
-    #   parameters:
-    #     - name: id
-    #       in: path
-    #       required: true
-    #       description: UUID of the payment card
-    #       schema:
-    #         type: string
-    #         format: uuid
-    #   requestBody:
-    #     required: true
-    #     content:
-    #       application/json:
-    #         schema:
-    #           $ref: '#/components/schemas/AddCardForm'
-    #   responses:
-    #     '200':
-    #       description: Card updated successfully
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Card'
-    #     '400':
-    #       description: Bad request or card not found
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '401':
-    #       description: Unauthorized - user not authenticated
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
     delete:
       summary: Delete payment card
       description: Deletes a specific payment card by its ID
@@ -1994,7 +2077,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddWalletForm'
+              type: object
+              required:
+                - chain
+                - address
+              properties:
+                chain:
+                  type: string
+                  description: Chain Unique Name
+                chain_id:
+                  type: string
+                  description: Chain ID
+                address:
+                  type: string
+                  description: Address of the wallet
       responses:
         '200':
           description: Wallet Added
@@ -2010,6 +2106,199 @@ paths:
                 $ref: '#/components/schemas/Error'
         '401':
           description: Unauthorized - user not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /referrals:
+    get:
+      summary: Get user's referrals
+      description: Returns a paginated list of referrals for the authenticated user
+      operationId: getReferrals
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Maximum number of referrals to return per page
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Referral'
+                  total_count:
+                    type: integer
+                    description: Total number of referrals
+                  page:
+                    type: integer
+                    description: Current page number
+                  limit:
+                    type: integer
+                    description: Number of items per page
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'  
+  /referrals/stats:
+    get:
+      summary: Get referral statistics
+      description: Returns referral statistics for the authenticated user
+      operationId: getReferralStats
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReferralStats'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /referrals/achievements:
+    get:
+      summary: Get referral achievements
+      description: Returns a paginated list of referral achievements for the authenticated user
+      operationId: getReferralAchievements
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Maximum number of achievements to return per page
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReferralAchievement'
+                  total_count:
+                    type: integer
+                    description: Total number of achievements
+                  page:
+                    type: integer
+                    description: Current page number
+                  limit:
+                    type: integer
+                    description: Number of items per page
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Create a referral achievement
+      description: Creates a new referral achievement (requires client secret)
+      operationId: createReferralAchievement
+      security:
+        - ClientSecret: []
+      requestBody:
+        description: Referral achievement to create
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - referrer_id
+                - referee_id
+                - achievement_type
+              properties:
+                referrer_id:
+                  type: string
+                  format: uuid
+                  description: ID of the referrer
+                referee_id:
+                  type: string
+                  description: ID of the referee
+                achievement_type:
+                  type: string
+                  description: Type of achievement
+                meta:
+                  type: object
+                  nullable: true
+                  description: Additional metadata for the achievement
+      responses:
+        '201':
+          description: Referral achievement created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReferralAchievement'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
           content:
             application/json:
               schema:
