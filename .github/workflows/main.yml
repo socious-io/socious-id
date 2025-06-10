@@ -105,6 +105,7 @@ jobs:
         run: |
           cp /etc/${{ env.CONFIG_DIR_NAME }}/config.yml .
           cp /etc/${{ env.CONFIG_DIR_NAME }}/gcs-service-account.json .
+          cp /etc/${{ env.CONFIG_DIR_NAME }}/AuthKey_Q27NC65FMJ.p8 .
 
       - name: Docker Setup Buildx
         uses: docker/setup-buildx-action@v3.6.1

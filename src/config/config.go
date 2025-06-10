@@ -53,6 +53,12 @@ type ConfigType struct {
 			ID     string `mapstructure:"id"`
 			Secret string `mapstructure:"secret"`
 		} `mapstructure:"google"`
+		Apple struct {
+			ID             string `mapstructure:"id"`
+			PrivateKeyPath string `mapstructure:"private_key_path"`
+			TeamID         string `mapstructure:"team_id"`
+			KeyID          string `mapstructure:"key_id"`
+		} `mapstructure:"apple"`
 	} `mapstructure:"oauth"`
 	AdminToken string `mapstructure:"admin_token"`
 	Discord    struct {
