@@ -8,6 +8,7 @@ import (
 	"socious-id/src/apps/models"
 	"socious-id/src/apps/utils"
 	"socious-id/src/config"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx/types"
@@ -136,9 +137,10 @@ func paymentsGroup(router *gin.Engine) {
 	})
 
 	g.GET("/fiat/payout/connect", auth.LoginRequired(), func(c *gin.Context) {
-		ctx := c.MustGet("ctx").(context.Context)
 		identity := c.MustGet("identity").(*models.Identity)
 		userRedirectUrl := c.Query("redirect_url")
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+		defer cancel()
 
 		fiatService := config.Config.Payment.Fiats[0]
 		account, err := fiatService.CreateAccount("JP")
