@@ -67,20 +67,20 @@ func (ovt OrganizationVerificationType) Value() (driver.Value, error) {
 	return string(ovt), nil
 }
 
-type StatusType string
+type UserStatusType string
 
 const (
-	StatusTypeActive    StatusType = "ACTIVE"
-	StatusTypeInactive  StatusType = "INACTIVE"
-	StatusTypeSuspended StatusType = "SUSPENDED"
+	UserStatusTypeActive    UserStatusType = "ACTIVE"
+	UserStatusTypeInactive  UserStatusType = "INACTIVE"
+	UserStatusTypeSuspended UserStatusType = "SUSPENDED"
 )
 
-func (st *StatusType) Scan(value interface{}) error {
-	return scanEnum(value, (*string)(st))
+func (ust *UserStatusType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(ust))
 }
 
-func (st StatusType) Value() (driver.Value, error) {
-	return string(st), nil
+func (ust UserStatusType) Value() (driver.Value, error) {
+	return string(ust), nil
 }
 
 type OrganizationStatusType string
@@ -199,4 +199,19 @@ func (it *IdentityType) Scan(value interface{}) error {
 
 func (it IdentityType) Value() (driver.Value, error) {
 	return string(it), nil
+}
+
+type OauthConnectedProviders string
+
+const (
+	OauthConnectedProvidersStripe   OauthConnectedProviders = "STRIPE"
+	OauthConnectedProvidersStripeJp OauthConnectedProviders = "STRIPE_JP"
+)
+
+func (ocp *OauthConnectedProviders) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(ocp))
+}
+
+func (ocp OauthConnectedProviders) Value() (driver.Value, error) {
+	return string(ocp), nil
 }
