@@ -133,7 +133,14 @@ func paymentsGroup(router *gin.Engine) {
 			return
 		}
 
-		c.JSON(http.StatusOK, oc)
+		fiatService := config.Config.Payment.Fiats[0]
+		acc, err := fiatService.FetchAccount(oc.MatrixUniqueID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, acc)
 	})
 
 	g.GET("/fiat/payout/connect", auth.LoginRequired(), func(c *gin.Context) {
@@ -156,19 +163,22 @@ func paymentsGroup(router *gin.Engine) {
 			return
 		}
 
-		oc := models.OauthConnect{
-			IdentityID:     identity.ID,
-			MatrixUniqueID: account.ID,
-			AccessToken:    "",
-			Status:         models.UserStatusTypeInactive,
-			Provider:       models.OauthConnectedProvidersStripeJp, //WARNING: Hardcoded
-			RedirectURL:    &userRedirectUrl,
-			IsConfirmed:    false,
-		}
+		oc, err := models.GetOauthConnectByIdentityId(identity.ID, models.OauthConnectedProvidersStripeJp)
+		if err != nil && oc == nil {
+			oc = &models.OauthConnect{
+				IdentityID:     identity.ID,
+				MatrixUniqueID: account.ID,
+				AccessToken:    "",
+				Status:         models.UserStatusTypeInactive,
+				Provider:       models.OauthConnectedProvidersStripeJp, //WARNING: Hardcoded
+				RedirectURL:    &userRedirectUrl,
+				IsConfirmed:    false,
+			}
 
-		if err := oc.Upsert(ctx); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			if err := oc.Upsert(ctx); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
 		}
 
 		c.JSON(http.StatusOK, gin.H{
@@ -178,7 +188,7 @@ func paymentsGroup(router *gin.Engine) {
 
 	g.GET("/fiat/payout/callback/stripe", func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
-		stripeAccount := c.Param("stripe_account")
+		stripeAccount := c.Query("stripe_account")
 
 		oc, err := models.GetOauthConnectByMUI(stripeAccount, models.OauthConnectedProvidersStripeJp)
 		if err != nil {
@@ -186,33 +196,41 @@ func paymentsGroup(router *gin.Engine) {
 			return
 		}
 
-		if stripeAccount != "" {
-			fiatService := config.Config.Payment.Fiats[0]
+		if oc.IsConfirmed {
+			c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s?status=success", *oc.RedirectURL))
+			return
+		}
 
-			acc, _ := fiatService.FetchAccount(stripeAccount)
-			accountJson := types.JSONText(acc.LastResponse.RawJSON)
+		if stripeAccount == "" {
+			c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s?status=failed&error=%s",
+				*oc.RedirectURL,
+				"stripe account query is empty",
+			))
+			return
+		}
 
-			//Updating the OauthConnect
-			oc.Meta = &accountJson
-			oc.Status = models.UserStatusTypeInactive
-			oc.IsConfirmed = true
-			if acc.PayoutsEnabled {
-				oc.Status = models.UserStatusTypeActive
-			}
+		fiatService := config.Config.Payment.Fiats[0]
 
-			err = oc.Upsert(ctx)
-			if err != nil {
-				c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s?status=failed&error=%s",
-					*oc.RedirectURL,
-					err.Error(),
-				))
-			}
+		acc, _ := fiatService.FetchAccount(stripeAccount)
+		accountJson := types.JSONText(acc.LastResponse.RawJSON)
 
+		//Updating the OauthConnect
+		oc.Meta = &accountJson
+		oc.Status = models.UserStatusTypeInactive
+		oc.IsConfirmed = true
+		if acc.PayoutsEnabled {
+			oc.Status = models.UserStatusTypeActive
+		}
+
+		err = oc.Upsert(ctx)
+		if err != nil {
 			c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s?status=failed&error=%s",
 				*oc.RedirectURL,
 				err.Error(),
 			))
 		}
+
+		c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s?status=success", *oc.RedirectURL))
 	})
 
 	g.GET("/crypto/wallets", auth.LoginRequired(), func(c *gin.Context) {
