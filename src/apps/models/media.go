@@ -12,7 +12,7 @@ import (
 
 type Media struct {
 	ID         uuid.UUID `db:"id" json:"id"`
-	IdentityID uuid.UUID `db:"identity_id" json:"-"`
+	IdentityID uuid.UUID `db:"identity_id" json:"identity_id"`
 	URL        string    `db:"url" json:"url"`
 	Filename   string    `db:"filename" json:"filename"`
 	CreatedAt  time.Time `db:"created_at" json:"created_at"`
