@@ -2,6 +2,7 @@ package views
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"socious-id/src/apps/auth"
@@ -140,7 +141,7 @@ func paymentsGroup(router *gin.Engine) {
 			return
 		}
 
-		c.JSON(http.StatusOK, acc)
+		c.JSON(http.StatusOK, json.RawMessage(acc.LastResponse.RawJSON))
 	})
 
 	g.GET("/fiat/payout/connect", auth.LoginRequired(), func(c *gin.Context) {
