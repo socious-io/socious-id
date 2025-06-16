@@ -50,6 +50,17 @@ func kybVerificationGroup(router *gin.Engine) {
 			return
 		}
 
+		//Synchronize
+		orgMembers, err := models.GetOrganizationMembers(organization.ID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		for _, m := range orgMembers {
+			//TODO: use nats
+			go workers.Sync(m.UserID)
+		}
+
 		utils.DiscordSendTextMessage(
 			config.Config.Discord.Channel,
 			createDiscordReviewMessage(kyb, user, organization),
@@ -92,6 +103,7 @@ func kybVerificationGroup(router *gin.Engine) {
 			return
 		}
 
+		//Synchronize
 		orgMembers, err := models.GetOrganizationMembers(org.ID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
