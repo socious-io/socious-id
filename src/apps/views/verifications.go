@@ -28,19 +28,23 @@ func verificationsGroup(router *gin.Engine) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		v.ProofVerify(ctx)
 
-		if v.Status == models.VerificationStatusVerified {
+		if err := v.HandleByType(ctx); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if v.Type == models.VerificationTypeKYC && v.Status == models.VerificationStatusVerified {
 			if err := u.Verify(ctx, models.UserVerificationTypeIdenity); err != nil {
 				c.JSON(http.StatusUnprocessableEntity, gin.H{
 					"error": "user is verified but couldn't verify user",
 				})
 				return
 			}
-		}
 
-		if currentVerificationStatus == nil && u.IdentityVerifiedAt != nil {
-			go workers.Sync(u.ID)
+			if currentVerificationStatus == nil && u.IdentityVerifiedAt != nil {
+				go workers.Sync(u.ID)
+			}
 		}
 
 		c.JSON(http.StatusOK, v)
@@ -50,10 +54,16 @@ func verificationsGroup(router *gin.Engine) {
 		ctx, _ := c.MustGet("ctx").(context.Context)
 		u, _ := c.MustGet("user").(*models.User)
 
+		form := new(VerificationCredentialForm)
+		if err := c.ShouldBindJSON(form); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
 		v := new(models.VerificationCredential)
 		v.UserID = u.ID
 
-		if err := v.Create(ctx); err != nil {
+		if err := v.Create(ctx, form.Type); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -96,7 +106,7 @@ func verificationsGroup(router *gin.Engine) {
 			return
 		}
 
-		if err := v.ProofRequest(ctx); err != nil {
+		if err := v.HandleByType(ctx); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}

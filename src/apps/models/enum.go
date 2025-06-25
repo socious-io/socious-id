@@ -215,3 +215,20 @@ func (ocp *OauthConnectedProviders) Scan(value interface{}) error {
 func (ocp OauthConnectedProviders) Value() (driver.Value, error) {
 	return string(ocp), nil
 }
+
+type VerificationType string
+
+const (
+	VerificationTypeKYC        VerificationType = "KYC"
+	VerificationTypeBadges     VerificationType = "BADGES"
+	VerificationTypeEducation  VerificationType = "EDUCATION"
+	VerificationTypeExperience VerificationType = "EXPERIENCE"
+)
+
+func (vt *VerificationType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(vt))
+}
+
+func (vt VerificationType) Value() (driver.Value, error) {
+	return string(vt), nil
+}

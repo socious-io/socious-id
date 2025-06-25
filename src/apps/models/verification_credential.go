@@ -23,6 +23,8 @@ type VerificationCredential struct {
 	UserID uuid.UUID `db:"user_id" json:"user_id"`
 	User   *User     `db:"-" json:"user"`
 
+	Type VerificationType `db:"type" json:"type"`
+
 	ConnectionID    *string         `db:"connection_id" json:"connection_id"`
 	ConnectionURL   *string         `db:"connection_url" json:"connection_url"`
 	PresentID       *string         `db:"present_id" json:"present_id"`
@@ -45,11 +47,11 @@ func (VerificationCredential) FetchQuery() string {
 	return "verification_credentials/fetch"
 }
 
-func (v *VerificationCredential) Create(ctx context.Context) error {
+func (v *VerificationCredential) Create(ctx context.Context, vType VerificationType) error {
 	rows, err := database.Query(
 		ctx,
 		"verification_credentials/create",
-		v.UserID,
+		v.UserID, vType,
 	)
 	if err != nil {
 		return err
@@ -110,6 +112,17 @@ func (v *VerificationCredential) ProofRequest(ctx context.Context) error {
 	return nil
 }
 
+func (v *VerificationCredential) HandleByType(ctx context.Context) error {
+	switch v.Type {
+	case VerificationTypeBadges:
+		return v.SendBadges(ctx)
+	case VerificationTypeKYC:
+		return v.ProofVerify(ctx)
+	}
+
+	return v.ProofVerify(ctx)
+}
+
 func (v *VerificationCredential) ProofVerify(ctx context.Context) error {
 	if v.PresentID == nil {
 		return errors.New("need request proof present first")
@@ -146,6 +159,54 @@ func (v *VerificationCredential) ProofVerify(ctx context.Context) error {
 	return database.Fetch(v, v.ID)
 }
 
+func (v *VerificationCredential) SendBadges(ctx context.Context) error {
+	if v.Status == VerificationStatusVerified {
+		return errors.New("credentials is already sent")
+	}
+
+	badges, err := GetImpactBadges(v.UserID)
+	if err != nil {
+		rows, err := database.Query(
+			ctx,
+			"verification_credentials/update_present_failed",
+			v.ID, nil, fmt.Sprintf("Error Fetching Impact Badge: %s", err.Error()),
+		)
+		if err != nil {
+			return err
+		}
+		rows.Close()
+		return database.Fetch(v, v.ID)
+	}
+
+	vc, err := wallet.SendCredentials(*v.ConnectionID, config.Config.Wallet.AgentTrustDID, wallet.H{
+		"badges": badges,
+	})
+	if err != nil {
+		rows, err := database.Query(
+			ctx,
+			"verification_credentials/update_present_failed",
+			v.ID, nil, fmt.Sprintf("Error Sending Credentials: %s", err.Error()),
+		)
+		if err != nil {
+			return err
+		}
+		rows.Close()
+		return database.Fetch(v, v.ID)
+	}
+	vcData, _ := json.Marshal(vc)
+	rows, err := database.Query(
+		ctx,
+		"verification_credentials/update_present_verify",
+		v.ID, vcData,
+	)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	return database.Fetch(v, v.ID)
+
+}
+
 func GetSimilar(ctx context.Context, currentVC *VerificationCredential, data wallet.H) (*VerificationCredential, error) {
 	v := new(VerificationCredential)
 	err := database.Get(
@@ -168,6 +229,15 @@ func GetVerificationByUser(userId uuid.UUID) (*VerificationCredential, error) {
 	v := new(VerificationCredential)
 
 	if err := database.Get(v, "verification_credentials/fetch_by_user", userId); err != nil {
+		return nil, err
+	}
+	return v, nil
+}
+
+func GetVerificationByUserAndType(userId uuid.UUID, vcType VerificationType) (*VerificationCredential, error) {
+	v := new(VerificationCredential)
+
+	if err := database.Get(v, "verification_credentials/fetch_by_user_and_type", userId, vcType); err != nil {
 		return nil, err
 	}
 	return v, nil
