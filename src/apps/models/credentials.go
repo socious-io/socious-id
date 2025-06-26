@@ -116,8 +116,6 @@ func (c *Credential) HandleByType(ctx context.Context) error {
 	switch c.Type {
 	case CredentialTypeBadges:
 		return c.SendBadges(ctx)
-	case CredentialTypeKYC:
-		return c.ProofVerify(ctx)
 	}
 
 	return c.ProofVerify(ctx)
