@@ -1,7 +1,7 @@
-CREATE TYPE verification_credential_type AS ENUM (
+ALTER TABLE verification_credentials RENAME TO credentials;
+CREATE TYPE credential_type AS ENUM (
     'BADGES',
-    'KYC',
-    'EDUCATION',
-    'EXPERIENCE'
+    'KYC'
 );
-ALTER TABLE verification_credentials ADD COLUMN type verification_credential_type NOT NULL DEFAULT 'KYC';
+ALTER TABLE credentials ADD COLUMN type credential_type NOT NULL DEFAULT 'KYC';
+ALTER TABLE impact_points ADD COLUMN claimed_at TIMESTAMP DEFAULT NULL;

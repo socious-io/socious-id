@@ -112,6 +112,6 @@ type ReferralAchievementForm struct {
 	Meta            types.JSONText `json:"meta"`
 }
 
-type VerificationCredentialForm struct {
-	Type models.VerificationType `json:"type"`
+type CredentialForm struct {
+	Type models.CredentialType `json:"type"`
 }

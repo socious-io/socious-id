@@ -39,9 +39,9 @@ func (amt AuthModeType) Value() (driver.Value, error) {
 type UserVerificationType string
 
 const (
-	UserVerificationTypeEmail   UserVerificationType = "EMAIL"
-	UserVerificationTypePhone   UserVerificationType = "PHONE"
-	UserVerificationTypeIdenity UserVerificationType = "IDENTITY"
+	UserVerificationTypeEmail    UserVerificationType = "EMAIL"
+	UserVerificationTypePhone    UserVerificationType = "PHONE"
+	UserVerificationTypeIdentity UserVerificationType = "IDENTITY"
 )
 
 func (uvt *UserVerificationType) Scan(value interface{}) error {
@@ -112,28 +112,28 @@ func scanEnum(value interface{}, target interface{}) error {
 	return nil
 }
 
-type VerificationStatusType string
+type CredentialStatusType string
 
 const (
-	VerificationStatusCreated   VerificationStatusType = "CREATED"
-	VerificationStatusRequested VerificationStatusType = "REQUESTED"
-	VerificationStatusVerified  VerificationStatusType = "VERIFIED"
-	VerificationStatusFailed    VerificationStatusType = "FAILED"
+	CredentialStatusCreated   CredentialStatusType = "CREATED"
+	CredentialStatusRequested CredentialStatusType = "REQUESTED"
+	CredentialStatusVerified  CredentialStatusType = "VERIFIED"
+	CredentialStatusFailed    CredentialStatusType = "FAILED"
 )
 
-func (c *VerificationStatusType) Scan(value interface{}) error {
+func (c *CredentialStatusType) Scan(value interface{}) error {
 	switch v := value.(type) {
 	case []byte:
-		*c = VerificationStatusType(string(v))
+		*c = CredentialStatusType(string(v))
 	case string:
-		*c = VerificationStatusType(v)
+		*c = CredentialStatusType(v)
 	default:
 		return fmt.Errorf("failed to scan credential type: %v", value)
 	}
 	return nil
 }
 
-func (c VerificationStatusType) Value() (driver.Value, error) {
+func (c CredentialStatusType) Value() (driver.Value, error) {
 	return string(c), nil
 }
 
@@ -216,19 +216,17 @@ func (ocp OauthConnectedProviders) Value() (driver.Value, error) {
 	return string(ocp), nil
 }
 
-type VerificationType string
+type CredentialType string
 
 const (
-	VerificationTypeKYC        VerificationType = "KYC"
-	VerificationTypeBadges     VerificationType = "BADGES"
-	VerificationTypeEducation  VerificationType = "EDUCATION"
-	VerificationTypeExperience VerificationType = "EXPERIENCE"
+	CredentialTypeKYC    CredentialType = "KYC"
+	CredentialTypeBadges CredentialType = "BADGES"
 )
 
-func (vt *VerificationType) Scan(value interface{}) error {
+func (vt *CredentialType) Scan(value interface{}) error {
 	return scanEnum(value, (*string)(vt))
 }
 
-func (vt VerificationType) Value() (driver.Value, error) {
+func (vt CredentialType) Value() (driver.Value, error) {
 	return string(vt), nil
 }

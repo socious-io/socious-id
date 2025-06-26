@@ -15,27 +15,31 @@ import (
 	"github.com/google/uuid"
 )
 
-func verificationsGroup(router *gin.Engine) {
-	g := router.Group("verifications")
+func credentialsGroup(router *gin.Engine) {
+	g := router.Group("credentials")
 
 	g.GET("", auth.LoginRequired(), func(c *gin.Context) {
 		ctx, _ := c.MustGet("ctx").(context.Context)
 		u, _ := c.MustGet("user").(*models.User)
+
+		var credentialType models.CredentialType
+		err := credentialType.Scan(c.Query("type"))
+		if err != nil {
+			credentialType = models.CredentialTypeKYC
+		}
+
 		currentVerificationStatus := u.IdentityVerifiedAt
 
-		v, err := models.GetVerificationByUser(u.ID)
+		v, err := models.GetCredentialByUserAndType(u.ID, credentialType)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		if err := v.HandleByType(ctx); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
+		v.HandleByType(ctx)
 
-		if v.Type == models.VerificationTypeKYC && v.Status == models.VerificationStatusVerified {
-			if err := u.Verify(ctx, models.UserVerificationTypeIdenity); err != nil {
+		if v.Type == models.CredentialTypeKYC && v.Status == models.CredentialStatusVerified {
+			if err := u.Verify(ctx, models.UserVerificationTypeIdentity); err != nil {
 				c.JSON(http.StatusUnprocessableEntity, gin.H{
 					"error": "user is verified but couldn't verify user",
 				})
@@ -54,13 +58,13 @@ func verificationsGroup(router *gin.Engine) {
 		ctx, _ := c.MustGet("ctx").(context.Context)
 		u, _ := c.MustGet("user").(*models.User)
 
-		form := new(VerificationCredentialForm)
+		form := new(CredentialForm)
 		if err := c.ShouldBindJSON(form); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		v := new(models.VerificationCredential)
+		v := new(models.Credential)
 		v.UserID = u.ID
 
 		if err := v.Create(ctx, form.Type); err != nil {
@@ -74,7 +78,7 @@ func verificationsGroup(router *gin.Engine) {
 		ctx, _ := c.MustGet("ctx").(context.Context)
 		id := uuid.MustParse(c.Param("id"))
 
-		v, err := models.GetVerification(id)
+		v, err := models.GetCredential(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -100,7 +104,7 @@ func verificationsGroup(router *gin.Engine) {
 		ctx, _ := c.MustGet("ctx").(context.Context)
 		id := uuid.MustParse(c.Param("id"))
 
-		v, err := models.GetVerification(id)
+		v, err := models.GetCredential(id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return

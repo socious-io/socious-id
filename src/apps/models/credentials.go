@@ -15,15 +15,15 @@ import (
 	database "github.com/socious-io/pkg_database"
 )
 
-type VerificationCredential struct {
+type Credential struct {
 	ID uuid.UUID `db:"id" json:"id"`
 
-	Status VerificationStatusType `db:"status" json:"status"`
+	Status CredentialStatusType `db:"status" json:"status"`
 
 	UserID uuid.UUID `db:"user_id" json:"user_id"`
 	User   *User     `db:"-" json:"user"`
 
-	Type VerificationType `db:"type" json:"type"`
+	Type CredentialType `db:"type" json:"type"`
 
 	ConnectionID    *string         `db:"connection_id" json:"connection_id"`
 	ConnectionURL   *string         `db:"connection_url" json:"connection_url"`
@@ -39,19 +39,19 @@ type VerificationCredential struct {
 	UserJson types.JSONText `db:"user" json:"-"`
 }
 
-func (VerificationCredential) TableName() string {
-	return "verification_credentials"
+func (Credential) TableName() string {
+	return "credentials"
 }
 
-func (VerificationCredential) FetchQuery() string {
-	return "verification_credentials/fetch"
+func (Credential) FetchQuery() string {
+	return "credentials/fetch"
 }
 
-func (v *VerificationCredential) Create(ctx context.Context, vType VerificationType) error {
+func (c *Credential) Create(ctx context.Context, cType CredentialType) error {
 	rows, err := database.Query(
 		ctx,
-		"verification_credentials/create",
-		v.UserID, vType,
+		"credentials/create",
+		c.UserID, cType,
 	)
 	if err != nil {
 		return err
@@ -59,15 +59,15 @@ func (v *VerificationCredential) Create(ctx context.Context, vType VerificationT
 
 	defer rows.Close()
 	for rows.Next() {
-		if err := rows.StructScan(v); err != nil {
+		if err := rows.StructScan(c); err != nil {
 			return err
 		}
 	}
-	return database.Fetch(v, v.ID)
+	return database.Fetch(c, c.ID)
 }
 
-func (v *VerificationCredential) NewConnection(ctx context.Context, callback string) error {
-	if v.Status == VerificationStatusRequested {
+func (v *Credential) NewConnection(ctx context.Context, callback string) error {
+	if v.Status == CredentialStatusRequested {
 		return nil
 	}
 	conn, err := wallet.CreateConnection(callback)
@@ -77,7 +77,7 @@ func (v *VerificationCredential) NewConnection(ctx context.Context, callback str
 	connectURL, _ := url.JoinPath(config.Config.Host, conn.ShortID)
 	rows, err := database.Query(
 		ctx,
-		"verification_credentials/update_connection",
+		"credentials/update_connection",
 		v.ID, conn.ID, connectURL,
 	)
 	if err != nil {
@@ -87,7 +87,7 @@ func (v *VerificationCredential) NewConnection(ctx context.Context, callback str
 	return database.Fetch(v, v.ID)
 }
 
-func (v *VerificationCredential) ProofRequest(ctx context.Context) error {
+func (v *Credential) ProofRequest(ctx context.Context) error {
 	if v.ConnectionID == nil {
 		return errors.New("connection not valid")
 	}
@@ -102,7 +102,7 @@ func (v *VerificationCredential) ProofRequest(ctx context.Context) error {
 	}
 	rows, err := database.Query(
 		ctx,
-		"verification_credentials/update_present_id",
+		"credentials/update_status_id",
 		v.ID, presentID,
 	)
 	if err != nil {
@@ -112,18 +112,18 @@ func (v *VerificationCredential) ProofRequest(ctx context.Context) error {
 	return nil
 }
 
-func (v *VerificationCredential) HandleByType(ctx context.Context) error {
-	switch v.Type {
-	case VerificationTypeBadges:
-		return v.SendBadges(ctx)
-	case VerificationTypeKYC:
-		return v.ProofVerify(ctx)
+func (c *Credential) HandleByType(ctx context.Context) error {
+	switch c.Type {
+	case CredentialTypeBadges:
+		return c.SendBadges(ctx)
+	case CredentialTypeKYC:
+		return c.ProofVerify(ctx)
 	}
 
-	return v.ProofVerify(ctx)
+	return c.ProofVerify(ctx)
 }
 
-func (v *VerificationCredential) ProofVerify(ctx context.Context) error {
+func (v *Credential) ProofVerify(ctx context.Context) error {
 	if v.PresentID == nil {
 		return errors.New("need request proof present first")
 	}
@@ -133,12 +133,12 @@ func (v *VerificationCredential) ProofVerify(ctx context.Context) error {
 		return err
 	}
 	vcData, _ := json.Marshal(vc)
-	duplicateVerification, err := GetSimilar(ctx, v, vc)
-	if err == nil && duplicateVerification != nil {
+	duplicateCredential, err := GetSimilarCredential(ctx, v, vc)
+	if err == nil && duplicateCredential != nil {
 		rows, err := database.Query(
 			ctx,
-			"verification_credentials/update_present_failed",
-			v.ID, vcData, fmt.Sprintf("Duplicate Identity: Verification ID: %s", (*duplicateVerification).ID),
+			"credentials/update_status_failed",
+			v.ID, vcData, fmt.Sprintf("Duplicate Identity: Verification ID: %s", (*duplicateCredential).ID),
 		)
 		if err != nil {
 			return err
@@ -149,7 +149,7 @@ func (v *VerificationCredential) ProofVerify(ctx context.Context) error {
 
 	rows, err := database.Query(
 		ctx,
-		"verification_credentials/update_present_verify",
+		"credentials/update_status_verify",
 		v.ID, vcData,
 	)
 	if err != nil {
@@ -159,8 +159,8 @@ func (v *VerificationCredential) ProofVerify(ctx context.Context) error {
 	return database.Fetch(v, v.ID)
 }
 
-func (v *VerificationCredential) SendBadges(ctx context.Context) error {
-	if v.Status == VerificationStatusVerified {
+func (v *Credential) SendBadges(ctx context.Context) error {
+	if v.Status == CredentialStatusVerified {
 		return errors.New("credentials is already sent")
 	}
 
@@ -168,7 +168,7 @@ func (v *VerificationCredential) SendBadges(ctx context.Context) error {
 	if err != nil {
 		rows, err := database.Query(
 			ctx,
-			"verification_credentials/update_present_failed",
+			"credentials/update_status_failed",
 			v.ID, nil, fmt.Sprintf("Error Fetching Impact Badge: %s", err.Error()),
 		)
 		if err != nil {
@@ -184,7 +184,7 @@ func (v *VerificationCredential) SendBadges(ctx context.Context) error {
 	if err != nil {
 		rows, err := database.Query(
 			ctx,
-			"verification_credentials/update_present_failed",
+			"credentials/update_status_failed",
 			v.ID, nil, fmt.Sprintf("Error Sending Credentials: %s", err.Error()),
 		)
 		if err != nil {
@@ -196,22 +196,28 @@ func (v *VerificationCredential) SendBadges(ctx context.Context) error {
 	vcData, _ := json.Marshal(vc)
 	rows, err := database.Query(
 		ctx,
-		"verification_credentials/update_present_verify",
+		"credentials/update_status_verify",
 		v.ID, vcData,
 	)
 	if err != nil {
 		return err
 	}
 	defer rows.Close()
+
+	err = ClaimAllImpactPoints(ctx, v.UserID)
+	if err != nil {
+		return err
+	}
+
 	return database.Fetch(v, v.ID)
 
 }
 
-func GetSimilar(ctx context.Context, currentVC *VerificationCredential, data wallet.H) (*VerificationCredential, error) {
-	v := new(VerificationCredential)
+func GetSimilarCredential(ctx context.Context, currentVC *Credential, data wallet.H) (*Credential, error) {
+	v := new(Credential)
 	err := database.Get(
 		v,
-		"verification_credentials/get_similar",
+		"credentials/get_similar",
 		currentVC.ID,
 		data["document_number"],
 		data["country"],
@@ -225,26 +231,17 @@ func GetSimilar(ctx context.Context, currentVC *VerificationCredential, data wal
 	return v, nil
 }
 
-func GetVerificationByUser(userId uuid.UUID) (*VerificationCredential, error) {
-	v := new(VerificationCredential)
+func GetCredentialByUserAndType(userId uuid.UUID, credentialType CredentialType) (*Credential, error) {
+	v := new(Credential)
 
-	if err := database.Get(v, "verification_credentials/fetch_by_user", userId); err != nil {
+	if err := database.Get(v, "credentials/fetch_by_user_and_type", userId, credentialType); err != nil {
 		return nil, err
 	}
 	return v, nil
 }
 
-func GetVerificationByUserAndType(userId uuid.UUID, vcType VerificationType) (*VerificationCredential, error) {
-	v := new(VerificationCredential)
-
-	if err := database.Get(v, "verification_credentials/fetch_by_user_and_type", userId, vcType); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-func GetVerification(id uuid.UUID) (*VerificationCredential, error) {
-	v := new(VerificationCredential)
+func GetCredential(id uuid.UUID) (*Credential, error) {
+	v := new(Credential)
 
 	if err := database.Fetch(v, id); err != nil {
 		return nil, err
