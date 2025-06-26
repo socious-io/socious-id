@@ -102,7 +102,7 @@ func (v *Credential) ProofRequest(ctx context.Context) error {
 	}
 	rows, err := database.Query(
 		ctx,
-		"credentials/update_status_id",
+		"credentials/update_present_id",
 		v.ID, presentID,
 	)
 	if err != nil {
