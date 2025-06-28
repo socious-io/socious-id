@@ -89,7 +89,7 @@ var (
 		},
 	}
 
-	verificationsData = []gin.H{}
+	credentialsData = []gin.H{}
 
 	cardsData = []gin.H{
 		{

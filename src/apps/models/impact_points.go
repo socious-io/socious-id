@@ -32,13 +32,15 @@ type ImpactPoint struct {
 
 	UniqueTag string `db:"unique_tag" json:"unique_tag"`
 
-	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	CreatedAt time.Time  `db:"created_at" json:"created_at"`
+	ClaimedAt *time.Time `db:"claimed_at" json:"claimed_at"`
 }
 
 type Badges struct {
 	TotalPoints         int    `db:"total_points" json:"total_points"`
 	Count               int    `db:"count" json:"count"`
 	SocialCauseCategory string `db:"social_cause_category" json:"social_cause_category"`
+	IsClaimed           bool   `db:"is_claimed" json:"is_claimed"`
 }
 
 type ImpactPointStats struct {
@@ -136,4 +138,11 @@ func GetImpactBadges(userID uuid.UUID) ([]Badges, error) {
 		return nil, err
 	}
 	return badges, nil
+}
+
+func ClaimAllImpactPoints(ctx context.Context, userID uuid.UUID) error {
+	if _, err := database.Query(ctx, "impact_points/claim_all", userID); err != nil {
+		return err
+	}
+	return nil
 }
