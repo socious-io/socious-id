@@ -3,6 +3,10 @@ package models
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"socious-id/src/apps/utils"
+	"socious-id/src/config"
+	"strings"
 	"time"
 
 	database "github.com/socious-io/pkg_database"
@@ -13,14 +17,16 @@ import (
 )
 
 type ReferralAchievement struct {
-	ID              uuid.UUID       `db:"id" json:"id"`
-	ReferrerID      uuid.UUID       `db:"referrer_id" json:"referrer_id"`
-	RefereeID       string          `db:"referee_id" json:"referee_id"`
-	AchievementType string          `db:"achievement_type" json:"achievement_type"`
-	RewardAmount    float32         `db:"reward_amount" json:"reward_amount"`
-	RewardClaimedAt *time.Time      `db:"reward_claimed_at" json:"reward_claimed_at"`
-	CreatedAt       time.Time       `db:"created_at" json:"created_at"`
-	Meta            *types.JSONText `db:"meta" json:"meta"`
+	ID              uuid.UUID      `db:"id" json:"id"`
+	ReferrerID      *uuid.UUID     `db:"referrer_id" json:"referrer_id"`
+	RefereeID       uuid.UUID      `db:"referee_id" json:"referee_id"`
+	AchievementType string         `db:"achievement_type" json:"achievement_type"`
+	RewardAmount    float32        `db:"reward_amount" json:"reward_amount"`
+	RewardClaimedAt *time.Time     `db:"reward_claimed_at" json:"reward_claimed_at"`
+	CreatedAt       time.Time      `db:"created_at" json:"created_at"`
+	Meta            map[string]any `db:"-" json:"meta"`
+
+	MetaJson *types.JSONText `db:"meta" json:"-"`
 }
 
 func (ReferralAchievement) TableName() string {
@@ -71,21 +77,51 @@ func (r *Referral) Scan(rows *sqlx.Rows) error {
 }
 
 func (ra *ReferralAchievement) Create(ctx context.Context) error {
-	rows, err := database.Query(
-		ctx,
-		"referrals/create_achievement",
-		ra.ReferrerID, ra.RefereeID, ra.AchievementType, ra.Meta,
-	)
-	if err != nil {
-		return err
+	var err error
+
+	referralAchievements := []*ReferralAchievement{}
+
+	if strings.HasPrefix(ra.AchievementType, "REF_") {
+		referrerIdentity, err := GetReferrerIdentity(ra.RefereeID)
+		if err == nil {
+			ra.ReferrerID = &referrerIdentity.ID
+			referralAchievements = append(referralAchievements, ra)
+		}
+
+		referralAchievements = append(referralAchievements, &ReferralAchievement{
+			RefereeID:       ra.RefereeID,
+			AchievementType: strings.TrimPrefix(ra.AchievementType, "REF_"),
+			Meta:            ra.Meta,
+		})
 	}
-	defer rows.Close()
-	for rows.Next() {
-		if err := ra.Scan(rows); err != nil {
+
+	for i, ra := range referralAchievements {
+		ra.MetaJson, err = utils.MapToJSONText(ra.Meta)
+		if err != nil {
 			return err
 		}
+		ra.RewardAmount = getRewardAmountByType(ra.AchievementType)
+
+		fmt.Println(i, ra.ReferrerID, ra.RefereeID, ra.AchievementType, ra.RewardAmount)
+
+		rows, err := database.Query(
+			ctx,
+			"referrals/create_achievement",
+			ra.ReferrerID, ra.RefereeID, ra.AchievementType, ra.RewardAmount, ra.MetaJson,
+		)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+		for rows.Next() {
+			if err := ra.Scan(rows); err != nil {
+				return err
+			}
+		}
 	}
-	return nil
+
+	return database.Fetch(ra, referralAchievements[0].ID)
+
 }
 
 func GetReferralAchievements(identityID uuid.UUID, p database.Paginate) ([]ReferralAchievement, int, error) {
@@ -147,4 +183,16 @@ func GetReferrals(identityID uuid.UUID, p database.Paginate) ([]Referral, int, e
 		return nil, 0, err
 	}
 	return referrals, fetchList[0].TotalCount, nil
+}
+
+func getRewardAmountByType(t string) float32 {
+	rewards := config.Config.ReferralAchievements.Rewards
+
+	for _, reward := range rewards {
+		if reward.Type == t {
+			return reward.Amount
+		}
+	}
+
+	return 0
 }
