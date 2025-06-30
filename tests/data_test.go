@@ -120,7 +120,7 @@ var (
 		},
 		{
 			"referee_id":       "auto:<referee_id>",
-			"achievement_type": "CREATE_ACCOUNT",
+			"achievement_type": "REF_KYC",
 			"meta":             types.JSONText(`{"meta_key": "test2"}`),
 		},
 	}

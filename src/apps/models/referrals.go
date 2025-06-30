@@ -3,7 +3,6 @@ package models
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"socious-id/src/apps/utils"
 	"socious-id/src/config"
 	"strings"
@@ -87,22 +86,20 @@ func (ra *ReferralAchievement) Create(ctx context.Context) error {
 			ra.ReferrerID = &referrerIdentity.ID
 			referralAchievements = append(referralAchievements, ra)
 		}
-
-		referralAchievements = append(referralAchievements, &ReferralAchievement{
-			RefereeID:       ra.RefereeID,
-			AchievementType: strings.TrimPrefix(ra.AchievementType, "REF_"),
-			Meta:            ra.Meta,
-		})
 	}
 
-	for i, ra := range referralAchievements {
+	referralAchievements = append(referralAchievements, &ReferralAchievement{
+		RefereeID:       ra.RefereeID,
+		AchievementType: strings.TrimPrefix(ra.AchievementType, "REF_"),
+		Meta:            ra.Meta,
+	})
+
+	for _, ra := range referralAchievements {
 		ra.MetaJson, err = utils.MapToJSONText(ra.Meta)
 		if err != nil {
 			return err
 		}
 		ra.RewardAmount = getRewardAmountByType(ra.AchievementType)
-
-		fmt.Println(i, ra.ReferrerID, ra.RefereeID, ra.AchievementType, ra.RewardAmount)
 
 		rows, err := database.Query(
 			ctx,
@@ -121,7 +118,6 @@ func (ra *ReferralAchievement) Create(ctx context.Context) error {
 	}
 
 	return database.Fetch(ra, referralAchievements[0].ID)
-
 }
 
 func GetReferralAchievements(identityID uuid.UUID, p database.Paginate) ([]ReferralAchievement, int, error) {
