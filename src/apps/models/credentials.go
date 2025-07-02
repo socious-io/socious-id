@@ -177,6 +177,7 @@ func (v *Credential) SendBadges(ctx context.Context) error {
 	}
 
 	vc, err := wallet.SendCredentials(*v.ConnectionID, config.Config.Wallet.AgentTrustDID, wallet.H{
+		"type":   "impact_point_badges",
 		"badges": badges,
 	})
 	if err != nil {
