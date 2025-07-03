@@ -135,7 +135,7 @@ func usersGroup(router *gin.Engine) {
 			return
 		}
 
-		if err := user.Verify(ctx, models.UserVerificationTypeIdenity); err != nil {
+		if err := user.Verify(ctx, models.UserVerificationTypeIdentity); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}

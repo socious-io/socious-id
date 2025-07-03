@@ -1,6 +1,7 @@
-UPDATE verification_credentials SET
+UPDATE credentials SET
   body=$2,
-  status='VERIFIED',
+  validation_error=$3,
+  status='FAILED',
   verified_at=NOW(),
   updated_at=NOW()
 WHERE id=$1

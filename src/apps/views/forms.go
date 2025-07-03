@@ -49,7 +49,7 @@ type UserForm struct {
 }
 
 type UserUpdateStatusForm struct {
-	Status models.StatusType `json:"status" form:"status" validate:"required"`
+	Status models.UserStatusType `json:"status" form:"status" validate:"required"`
 }
 
 type OrganizationUpdateStatusForm struct {
@@ -89,6 +89,7 @@ type ImpactPointForm struct {
 	Type                models.ImpactPointType `json:"type" form:"type" validate:"required,oneof=WORKSUBMIT DONATION VOLUNTEER OTHER"`
 	AccessID            *uuid.UUID             `json:"access_id" form:"access_id"`
 	Meta                *json.RawMessage       `json:"meta" form:"meta"`
+	UniqueTag           string                 `json:"unique_tag" form:"unique_tag" validate:"required"`
 }
 
 type KYBVerificationForm struct {
@@ -109,4 +110,8 @@ type ReferralAchievementForm struct {
 	RefereeID       uuid.UUID      `json:"referee_id"`
 	AchievementType string         `json:"achievement_type"`
 	Meta            types.JSONText `json:"meta"`
+}
+
+type CredentialForm struct {
+	Type models.CredentialType `json:"type"`
 }

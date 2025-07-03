@@ -1,4 +1,4 @@
-UPDATE verification_credentials SET
+UPDATE credentials SET
   present_id=$2,
   status='REQUESTED',
   updated_at=NOW()

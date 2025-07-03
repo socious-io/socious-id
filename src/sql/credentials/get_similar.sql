@@ -1,4 +1,4 @@
-SELECT * FROM verification_credentials
+SELECT * FROM credentials
 WHERE
 (
     (

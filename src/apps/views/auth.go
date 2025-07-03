@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
+	"socious-id/src/apps/utils"
 	"socious-id/src/config"
 	"time"
 
@@ -117,7 +118,7 @@ func authGroup(router *gin.Engine) {
 			})
 			return
 		}
-		if u.Status == models.StatusTypeInactive {
+		if u.Status == models.UserStatusTypeInactive {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
 				"error": "Error: User couldn't be found/is not registered on Socious",
 			})
@@ -184,8 +185,84 @@ func authGroup(router *gin.Engine) {
 		}
 
 		//Make user active
-		if u.Status == models.StatusTypeInactive {
-			err := u.UpdateStatus(ctx, models.StatusTypeActive)
+		if u.Status == models.UserStatusTypeInactive {
+			err := u.UpdateStatus(ctx, models.UserStatusTypeActive)
+			if err != nil {
+				c.HTML(http.StatusBadRequest, "login.html", gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
+		}
+
+		//Set session
+		session := sessions.Default(c)
+		session.Set("user_id", u.ID.String())
+		session.Save()
+
+		//Redirect
+		if u.Password == nil {
+			c.Redirect(http.StatusSeeOther, "/auth/password/set")
+			return
+		}
+		c.Redirect(http.StatusSeeOther, "/auth/confirm")
+	})
+
+	g.GET("/apple", func(c *gin.Context) {
+		redirectURL, err := utils.CreateUrl("https://appleid.apple.com/auth/authorize", map[string]string{
+			"response_type": "code",
+			"response_mode": "form_post",
+			"client_id":     config.Config.Oauth.Apple.ID,
+			"redirect_uri":  fmt.Sprintf("%s/auth/apple/callback", config.Config.Host),
+			"scope":         "name email",
+		})
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+
+		c.Redirect(http.StatusTemporaryRedirect, redirectURL)
+	})
+
+	g.POST("/apple/callback", func(c *gin.Context) {
+		ctx := c.MustGet("ctx").(context.Context)
+
+		form := new(auth.AppleLoginForm)
+		if err := c.ShouldBind(form); err != nil {
+			c.HTML(http.StatusBadRequest, "login.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		userInfo, err := auth.AppleLoginWithCode(form.Code, fmt.Sprintf("%s/auth/apple/callback", config.Config.Host))
+		if err != nil {
+			c.HTML(http.StatusBadRequest, "login.html", gin.H{
+				"error": "Error: Apple login failed",
+			})
+			return
+		}
+
+		u, err := models.GetUserByEmail(userInfo.Email)
+		if err != nil && errors.Is(err, sql.ErrNoRows) {
+			u = &models.User{
+				Username:  auth.GenerateUsername(userInfo.Email),
+				Email:     userInfo.Email,
+				FirstName: &userInfo.Name.FirstName,
+				LastName:  &userInfo.Name.LastName,
+			}
+			setUserReferrer(c, u)
+
+			if err = u.Create(ctx); err != nil {
+				c.HTML(http.StatusBadRequest, "login.html", gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
+		}
+
+		//Make user active
+		if u.Status == models.UserStatusTypeInactive {
+			err := u.UpdateStatus(ctx, models.UserStatusTypeActive)
 			if err != nil {
 				c.HTML(http.StatusBadRequest, "login.html", gin.H{
 					"error": err.Error(),
@@ -388,7 +465,7 @@ func authGroup(router *gin.Engine) {
 		}
 
 		//Checking user status
-		if u.Status == models.StatusTypeInactive {
+		if u.Status == models.UserStatusTypeInactive {
 			c.HTML(http.StatusBadRequest, "forget-password.html", gin.H{
 				"error": "Error: User couldn't be found/is not registered on Socious",
 			})

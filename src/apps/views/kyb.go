@@ -50,6 +50,10 @@ func kybVerificationGroup(router *gin.Engine) {
 			return
 		}
 
+		//Synchronize
+		//TODO: use nats
+		go workers.Sync(user.ID)
+
 		utils.DiscordSendTextMessage(
 			config.Config.Discord.Channel,
 			createDiscordReviewMessage(kyb, user, organization),
@@ -92,15 +96,19 @@ func kybVerificationGroup(router *gin.Engine) {
 			return
 		}
 
-		orgMembers, err := models.GetOrganizationMembers(org.ID)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
+		//Synchronize
+		go workers.Sync(verification.UserID)
+
+		//Add Achievements
+		referralAchievement := models.ReferralAchievement{
+			RefereeID:       verification.OrgID,
+			AchievementType: "REF_KYB",
+			Meta: map[string]any{
+				"verification": verification,
+				"organization": org,
+			},
 		}
-		for _, m := range orgMembers {
-			//TODO: use nats
-			go workers.Sync(m.UserID)
-		}
+		referralAchievement.Create(ctx)
 
 		c.JSON(http.StatusOK, gin.H{"message": "success"})
 	})
@@ -132,15 +140,8 @@ func kybVerificationGroup(router *gin.Engine) {
 			return
 		}
 
-		orgMembers, err := models.GetOrganizationMembers(org.ID)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		for _, m := range orgMembers {
-			//TODO: use nats
-			go workers.Sync(m.UserID)
-		}
+		//Synchronize
+		go workers.Sync(verification.UserID)
 
 		c.JSON(http.StatusOK, gin.H{"message": "success"})
 	})
