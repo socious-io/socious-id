@@ -4,9 +4,9 @@ WITH ip AS (
   WHERE user_id = $1
 )
 SELECT
-  (SELECT SUM(ip.total_points) FROM ip) AS total_points,
-  (SELECT SUM(ip.value) FROM ip) AS total_values,
-  (
+  COALESCE((SELECT SUM(ip.total_points) FROM ip), 0) AS total_points,
+  COALESCE((SELECT SUM(ip.value) FROM ip), 0) AS total_values,
+  COALESCE((
     SELECT json_agg(row_to_json(ipt))
     FROM (
       SELECT
@@ -16,4 +16,4 @@ SELECT
       FROM ip
       GROUP BY type
     ) AS ipt
-  ) AS total_per_type;
+  ), '[]') AS total_per_type;
