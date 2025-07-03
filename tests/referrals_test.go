@@ -42,7 +42,7 @@ func referralsGroup() {
 		router.ServeHTTP(w, req)
 		body := decodeBody(w.Body)
 		Expect(w.Code).To(Equal(http.StatusOK))
-		Expect(body["total_count"].(float64)).To(Equal(2.0))
+		Expect(body["total_count"].(float64)).To(Equal(1.0))
 	})
 
 	It("Should fetch referrals", func() {

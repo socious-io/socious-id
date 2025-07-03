@@ -1,7 +1,7 @@
 WITH ra AS (
   SELECT *
   FROM referral_achievements
-  WHERE referrer_id = $1
+  WHERE (referrer_id = $1 OR (referee_id = $1 AND referrer_id IS NULL))
 ),
 ri AS (
     (SELECT id FROM users WHERE referred_by = $1)

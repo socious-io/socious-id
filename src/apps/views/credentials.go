@@ -48,6 +48,17 @@ func credentialsGroup(router *gin.Engine) {
 
 			if currentVerificationStatus == nil && u.IdentityVerifiedAt != nil {
 				go workers.Sync(u.ID)
+
+				//Add Achievements
+				referralAchievement := models.ReferralAchievement{
+					RefereeID:       v.UserID,
+					AchievementType: "REF_KYC",
+					Meta: map[string]any{
+						"credential": v,
+						"user":       u,
+					},
+				}
+				referralAchievement.Create(ctx)
 			}
 		}
 

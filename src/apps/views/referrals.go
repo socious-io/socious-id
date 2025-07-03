@@ -2,12 +2,10 @@ package views
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
 	"socious-id/src/apps/utils"
-	"socious-id/src/config"
 
 	"github.com/gin-gonic/gin"
 	database "github.com/socious-io/pkg_database"
@@ -58,15 +56,6 @@ func referralsGroup(router *gin.Engine) {
 		referralAchievement := new(models.ReferralAchievement)
 		utils.Copy(form, referralAchievement)
 
-		//Search for the referer
-		referrerIdentity, err := models.GetReferrerIdentity(form.RefereeID)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("couldn't find the referrer user, err: %s\n", err.Error())})
-			return
-		}
-		referralAchievement.ReferrerID = referrerIdentity.ID
-		referralAchievement.RewardAmount = getRewardAmountByType(referralAchievement.AchievementType)
-
 		if err := referralAchievement.Create(ctx); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -98,16 +87,4 @@ func referralsGroup(router *gin.Engine) {
 		//Set all the rewards as claimed
 		panic("not implemented")
 	})
-}
-
-func getRewardAmountByType(t string) float32 {
-	rewards := config.Config.ReferralAchievements.Rewards
-
-	for _, reward := range rewards {
-		if reward.Type == t {
-			return reward.Amount
-		}
-	}
-
-	return 0
 }
