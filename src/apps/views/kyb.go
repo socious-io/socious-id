@@ -155,32 +155,45 @@ func createDiscordReviewMessage(kyb *models.KYBVerification, u *models.User, org
 		documents = fmt.Sprintf("%s\n%v. %s", documents, i, document.Url)
 	}
 
-	message := fmt.Sprintf("ID: %s\n", kyb.ID)
-	message += "\nUser--------------------------------\n"
-	message += fmt.Sprintf("ID: %s\n", u.ID)
+	approveUrl := fmt.Sprintf("%s/kybs/%s/approve?admin_access_token=%s", config.Config.Host, kyb.ID, config.Config.AdminToken)
+	rejectUrl := fmt.Sprintf("%s/kybs/%s/reject?admin_access_token=%s", config.Config.Host, kyb.ID, config.Config.AdminToken)
 
-	if u.FirstName != nil {
-		message += fmt.Sprintf("Firstname: %s\n", *u.FirstName)
-	} else {
-		message += "Firstname: N/A\n"
-	}
+	return utils.DedentString(fmt.Sprintf(
+		`
+			ID: %s
 
-	if u.LastName != nil {
-		message += fmt.Sprintf("Lastname: %s\n", *u.LastName)
-	} else {
-		message += "Lastname: N/A\n"
-	}
+			User--------------------------------
+			ID: %s
+			Firstname: %s
+			Lastname: %s
+			Email: %s
 
-	message += fmt.Sprintf("Email: %s\n", u.Email)
-	message += "\nOrganization------------------------\n"
-	message += fmt.Sprintf("ID: %s\n", org.ID)
-	message += fmt.Sprintf("Name: %v\n", org.Name)
-	message += fmt.Sprintf("Description: %v\n", org.Description)
-	message += fmt.Sprintf("\nDocuments---------------------------%s\n\n", documents)
-	message += "\nReviewing----------------------------\n"
-	message += fmt.Sprintf("Approve: <%s/kybs/%s/approve?admin_access_token=%s>\n", config.Config.Host, kyb.ID, config.Config.AdminToken)
-	message += fmt.Sprintf("Reject: <%s/kybs/%s/reject?admin_access_token=%s>\n", config.Config.Host, kyb.ID, config.Config.AdminToken)
+			Organization------------------------
+			ID: %s
+			Name: %v
+			Shortname: %s
+			Email: %s
+			Description: %s
 
-	return message
+			Documents---------------------------%s
+
+			Reviewing----------------------------
+			Approve: <%s>	
+			Reject: <%s>
+		`,
+		kyb.ID,
+		u.ID,
+		utils.NullableString(u.FirstName),
+		utils.NullableString(u.LastName),
+		u.Email,
+		org.ID,
+		utils.NullableString(org.Name),
+		org.Shortname,
+		utils.NullableString(org.Email),
+		utils.NullableString(org.Description),
+		documents,
+		approveUrl,
+		rejectUrl,
+	))
 
 }
