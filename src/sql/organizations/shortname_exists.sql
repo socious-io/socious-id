@@ -1,1 +1,0 @@
-SELECT * FROM organizations WHERE shortname=$1

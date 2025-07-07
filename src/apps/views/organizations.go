@@ -225,6 +225,13 @@ func organizationsGroup(router *gin.Engine) {
 		utils.Copy(form, organization)
 		organization.ReferredBy = user.ReferredBy
 
+		if _, err := models.GetOrganizationByShortname(form.Shortname); err == nil {
+			c.HTML(http.StatusBadRequest, "update-profile.html", gin.H{
+				"error": "Username is already in use. Please select different username.",
+			})
+			return
+		}
+
 		if err := organization.Create(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "org-register.html", gin.H{
 				"error": err.Error(),

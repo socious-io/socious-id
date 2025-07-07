@@ -84,23 +84,23 @@ const createProfile = () => {
 		}),
 		headers: { "Content-Type": "application/json" },
 	})
-		.then((response) => {
-			if (response.ok) {
-				if (response.redirected) {  // Detect if a redirect happened
-					window.location.href = response.url;  // Redirect user
-				} else {
-					return response.text();  // Handle normal response
-				}
+	.then((response) => {
+		if (response.ok) {
+			if (response.redirected) {  // Detect if a redirect happened
+				window.location.href = response.url;  // Redirect user
 			} else {
-				response.text().then(html=>{
-					const parser = new DOMParser();
-					const doc = parser.parseFromString(html, "text/html");
-					const error = window.document.getElementById("error");
-					error.innerHTML = doc.querySelector("#error").innerHTML;
-				});
+				return response.text();  // Handle normal response
 			}
-		})
-		.catch((error) => console.error("Error:", error));
+		} else {
+			response.text().then(html=>{
+				const parser = new DOMParser();
+				const doc = parser.parseFromString(html, "text/html");
+				const error = window.document.getElementById("error");
+				error.innerHTML = doc.querySelector("#error").innerHTML;
+			});
+		}
+	})
+	.catch((error) => console.error("Error:", error));
 
 	return false;
 };
@@ -185,16 +185,27 @@ const createOrganization = (e) => {
 		}),
 		headers: { "Content-Type": "application/json" },
 	})
-		.then((response) => {
+	.then((response) => {
+		if (response.ok) {
 			if (response.redirected) {  // Detect if a redirect happened
 				window.location.href = response.url;  // Redirect user
 			} else {
+				document.querySelector("#submit").removeAttribute("disabled");
 				return response.text();  // Handle normal response
 			}
-		})
-		.catch((error) => {
-			console.error("Error:", error)
-		});
+		} else {
+			response.text().then(html=>{
+				const parser = new DOMParser();
+				const doc = parser.parseFromString(html, "text/html");
+				const error = window.document.getElementById("error");
+				error.innerHTML = doc.querySelector("#error").innerHTML;
+				document.querySelector("#submit").removeAttribute("disabled");
+			});
+		}
+	})
+	.catch((error) => {
+		console.error("Error:", error)
+	});
 
 	return false;
 }   
