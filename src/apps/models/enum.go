@@ -5,12 +5,79 @@ import (
 	"fmt"
 )
 
-type OTPType string
+type (
+	OTPType                      string
+	AuthModeType                 string
+	UserVerificationType         string
+	OrganizationVerificationType string
+	UserStatusType               string
+	OrganizationStatusType       string
+	CredentialStatusType         string
+	ImpactPointType              string
+	KybVerificationStatusType    string
+	IdentityType                 string
+	OauthConnectedProviders      string
+	CredentialType               string
+)
 
 const (
+	//OTPType
 	ForgetPasswordOTP OTPType = "FORGET_PASSWORD"
 	SSOOTP            OTPType = "SSO"
 	VerificationOTP   OTPType = "VERIFICATION"
+
+	//AuthModeType
+	AuthModeRegister AuthModeType = "register"
+	AuthModeLogin    AuthModeType = "login"
+
+	//UserVerificationType
+	UserVerificationTypeEmail    UserVerificationType = "EMAIL"
+	UserVerificationTypePhone    UserVerificationType = "PHONE"
+	UserVerificationTypeIdentity UserVerificationType = "IDENTITY"
+
+	//OrganizationVerificationType
+	OrganizationVerificationTypeNormal OrganizationVerificationType = "NORMAL"
+	OrganizationVerificationTypeImpact OrganizationVerificationType = "IMPACT"
+
+	//UserStatusType
+	UserStatusTypeActive    UserStatusType = "ACTIVE"
+	UserStatusTypeInactive  UserStatusType = "INACTIVE"
+	UserStatusTypeSuspended UserStatusType = "SUSPENDED"
+
+	//OrganizationStatusType
+	OrganizationStatusTypeActive    OrganizationStatusType = "ACTIVE"
+	OrganizationStatusTypeNotActive OrganizationStatusType = "NOT_ACTIVE"
+	OrganizationStatusTypeSuspended OrganizationStatusType = "SUSPENDED"
+	OrganizationStatusTypePending   OrganizationStatusType = "PENDING"
+
+	//CredentialStatusType
+	CredentialStatusCreated   CredentialStatusType = "CREATED"
+	CredentialStatusRequested CredentialStatusType = "REQUESTED"
+	CredentialStatusVerified  CredentialStatusType = "VERIFIED"
+	CredentialStatusFailed    CredentialStatusType = "FAILED"
+
+	//ImpactPointType
+	ImpactPointTypeWorkSubmit ImpactPointType = "WORKSUBMIT"
+	ImpactPointTypeDonation   ImpactPointType = "DONATION"
+	ImpactPointTypeVolunteer  ImpactPointType = "VOLUNTEER"
+	ImpactPointTypeOther      ImpactPointType = "OTHER"
+
+	//KybVerificationStatusType
+	KYBStatusPending  KybVerificationStatusType = "PENDING"
+	KYBStatusApproved KybVerificationStatusType = "APPROVED"
+	KYBStatusRejected KybVerificationStatusType = "REJECTED"
+
+	//IdentityType
+	IdentityTypeUsers         IdentityType = "users"
+	IdentityTypeOrganizations IdentityType = "organizations"
+
+	//OauthConnectedProviders
+	OauthConnectedProvidersStripe   OauthConnectedProviders = "STRIPE"
+	OauthConnectedProvidersStripeJp OauthConnectedProviders = "STRIPE_JP"
+
+	//CredentialType
+	CredentialTypeKYC    CredentialType = "KYC"
+	CredentialTypeBadges CredentialType = "BADGES"
 )
 
 func (pt *OTPType) Scan(value interface{}) error {
@@ -21,13 +88,6 @@ func (pt OTPType) Value() (driver.Value, error) {
 	return string(pt), nil
 }
 
-type AuthModeType string
-
-const (
-	AuthModeRegister AuthModeType = "register"
-	AuthModeLogin    AuthModeType = "login"
-)
-
 func (amt *AuthModeType) Scan(value interface{}) error {
 	return scanEnum(value, (*string)(amt))
 }
@@ -35,14 +95,6 @@ func (amt *AuthModeType) Scan(value interface{}) error {
 func (amt AuthModeType) Value() (driver.Value, error) {
 	return string(amt), nil
 }
-
-type UserVerificationType string
-
-const (
-	UserVerificationTypeEmail   UserVerificationType = "EMAIL"
-	UserVerificationTypePhone   UserVerificationType = "PHONE"
-	UserVerificationTypeIdenity UserVerificationType = "IDENTITY"
-)
 
 func (uvt *UserVerificationType) Scan(value interface{}) error {
 	return scanEnum(value, (*string)(uvt))
@@ -52,13 +104,6 @@ func (uvt UserVerificationType) Value() (driver.Value, error) {
 	return string(uvt), nil
 }
 
-type OrganizationVerificationType string
-
-const (
-	OrganizationVerificationTypeNormal OrganizationVerificationType = "NORMAL"
-	OrganizationVerificationTypeImpact OrganizationVerificationType = "IMPACT"
-)
-
 func (ovt *OrganizationVerificationType) Scan(value interface{}) error {
 	return scanEnum(value, (*string)(ovt))
 }
@@ -67,30 +112,13 @@ func (ovt OrganizationVerificationType) Value() (driver.Value, error) {
 	return string(ovt), nil
 }
 
-type StatusType string
-
-const (
-	StatusTypeActive    StatusType = "ACTIVE"
-	StatusTypeInactive  StatusType = "INACTIVE"
-	StatusTypeSuspended StatusType = "SUSPENDED"
-)
-
-func (st *StatusType) Scan(value interface{}) error {
-	return scanEnum(value, (*string)(st))
+func (ust *UserStatusType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(ust))
 }
 
-func (st StatusType) Value() (driver.Value, error) {
-	return string(st), nil
+func (ust UserStatusType) Value() (driver.Value, error) {
+	return string(ust), nil
 }
-
-type OrganizationStatusType string
-
-const (
-	OrganizationStatusTypeActive    OrganizationStatusType = "ACTIVE"
-	OrganizationStatusTypeNotActive OrganizationStatusType = "NOT_ACTIVE"
-	OrganizationStatusTypeSuspended OrganizationStatusType = "SUSPENDED"
-	OrganizationStatusTypePending   OrganizationStatusType = "PENDING"
-)
 
 func (ost *OrganizationStatusType) Scan(value interface{}) error {
 	return scanEnum(value, (*string)(ost))
@@ -98,6 +126,54 @@ func (ost *OrganizationStatusType) Scan(value interface{}) error {
 
 func (ost OrganizationStatusType) Value() (driver.Value, error) {
 	return string(ost), nil
+}
+
+func (cst *CredentialStatusType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(cst))
+}
+
+func (cst CredentialStatusType) Value() (driver.Value, error) {
+	return string(cst), nil
+}
+
+func (c *ImpactPointType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(c))
+}
+
+func (c ImpactPointType) Value() (driver.Value, error) {
+	return string(c), nil
+}
+
+func (kvst *KybVerificationStatusType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(kvst))
+}
+
+func (kvst KybVerificationStatusType) Value() (driver.Value, error) {
+	return string(kvst), nil
+}
+
+func (it *IdentityType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(it))
+}
+
+func (it IdentityType) Value() (driver.Value, error) {
+	return string(it), nil
+}
+
+func (ocp *OauthConnectedProviders) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(ocp))
+}
+
+func (ocp OauthConnectedProviders) Value() (driver.Value, error) {
+	return string(ocp), nil
+}
+
+func (vt *CredentialType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(vt))
+}
+
+func (vt CredentialType) Value() (driver.Value, error) {
+	return string(vt), nil
 }
 
 func scanEnum(value interface{}, target interface{}) error {
@@ -110,93 +186,4 @@ func scanEnum(value interface{}, target interface{}) error {
 		return fmt.Errorf("failed to scan type: %v", value) // Error on unsupported type.
 	}
 	return nil
-}
-
-type VerificationStatusType string
-
-const (
-	VerificationStatusCreated   VerificationStatusType = "CREATED"
-	VerificationStatusRequested VerificationStatusType = "REQUESTED"
-	VerificationStatusVerified  VerificationStatusType = "VERIFIED"
-	VerificationStatusFailed    VerificationStatusType = "FAILED"
-)
-
-func (c *VerificationStatusType) Scan(value interface{}) error {
-	switch v := value.(type) {
-	case []byte:
-		*c = VerificationStatusType(string(v))
-	case string:
-		*c = VerificationStatusType(v)
-	default:
-		return fmt.Errorf("failed to scan credential type: %v", value)
-	}
-	return nil
-}
-
-func (c VerificationStatusType) Value() (driver.Value, error) {
-	return string(c), nil
-}
-
-type ImpactPointType string
-
-const (
-	ImpactPointTypeWorkSubmit ImpactPointType = "WORKSUBMIT"
-	ImpactPointTypeDonation   ImpactPointType = "DONATION"
-	ImpactPointTypeVolunteer  ImpactPointType = "VOLUNTEER"
-	ImpactPointTypeOther      ImpactPointType = "OTHER"
-)
-
-func (c *ImpactPointType) Scan(value interface{}) error {
-	switch v := value.(type) {
-	case []byte:
-		*c = ImpactPointType(string(v))
-	case string:
-		*c = ImpactPointType(v)
-	default:
-		return fmt.Errorf("failed to scan credential type: %v", value)
-	}
-	return nil
-}
-
-func (c ImpactPointType) Value() (driver.Value, error) {
-	return string(c), nil
-}
-
-type KybVerificationStatusType string
-
-const (
-	KYBStatusPending  KybVerificationStatusType = "PENDING"
-	KYBStatusApproved KybVerificationStatusType = "APPROVED"
-	KYBStatusRejected KybVerificationStatusType = "REJECTED"
-)
-
-func (kvst *KybVerificationStatusType) Scan(value interface{}) error {
-	switch v := value.(type) {
-	case []byte:
-		*kvst = KybVerificationStatusType(string(v))
-	case string:
-		*kvst = KybVerificationStatusType(v)
-	default:
-		return fmt.Errorf("failed to scan credential type: %v", value)
-	}
-	return nil
-}
-
-func (kvst KybVerificationStatusType) Value() (driver.Value, error) {
-	return string(kvst), nil
-}
-
-type IdentityType string
-
-const (
-	IdentityTypeUsers         IdentityType = "users"
-	IdentityTypeOrganizations IdentityType = "organizations"
-)
-
-func (it *IdentityType) Scan(value interface{}) error {
-	return scanEnum(value, (*string)(it))
-}
-
-func (it IdentityType) Value() (driver.Value, error) {
-	return string(it), nil
 }

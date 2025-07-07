@@ -29,9 +29,10 @@ type ConfigType struct {
 		Templates map[string]string `mapstructure:"templates"`
 	} `mapstructure:"sendgrid"`
 	Wallet struct {
-		Agent       string `mapstructure:"agent"`
-		AgentApiKey string `mapstructure:"agent_api_key"`
-		Connect     string `mapstructure:"connect"`
+		Agent         string `mapstructure:"agent"`
+		AgentApiKey   string `mapstructure:"agent_api_key"`
+		AgentTrustDID string `mapstructure:"agent_trust_did"`
+		Connect       string `mapstructure:"connect"`
 	} `mapstructure:"wallet"`
 	Upload struct {
 		Bucket      string `mapstructure:"bucket"`
@@ -53,11 +54,23 @@ type ConfigType struct {
 			ID     string `mapstructure:"id"`
 			Secret string `mapstructure:"secret"`
 		} `mapstructure:"google"`
+		Apple struct {
+			ID             string `mapstructure:"id"`
+			PrivateKeyPath string `mapstructure:"private_key_path"`
+			TeamID         string `mapstructure:"team_id"`
+			KeyID          string `mapstructure:"key_id"`
+		} `mapstructure:"apple"`
 	} `mapstructure:"oauth"`
 	AdminToken string `mapstructure:"admin_token"`
 	Discord    struct {
 		Channel string `mapstructure:"channel"`
 	} `mapstructure:"discord"`
+	ReferralAchievements struct {
+		Rewards []struct {
+			Type   string  `mapstructure:"type"`
+			Amount float32 `mapstructure:"amount"`
+		} `mapstructure:"rewards"`
+	} `mapstructure:"referral_achievements"`
 	Payment struct {
 		Chains gopay.Chains `mapstructure:"chains"`
 		Fiats  gopay.Fiats  `mapstructure:"fiats"`

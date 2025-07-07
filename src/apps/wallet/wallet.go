@@ -80,6 +80,27 @@ func ProofRequest(connectionID string, challenge string) (string, error) {
 	return body["presentationId"].(string), nil
 }
 
+func SendCredentials(connectionID, issuingDID string, claims H) (H, error) {
+	time.Sleep(time.Second)
+
+	res, _, err := makeRequest("/cloud-agent/issue-credentials/credential-offers", "POST", H{
+		"connectionId":      connectionID,
+		"claims":            claims,
+		"issuingDID":        issuingDID,
+		"schemaId":          nil,
+		"automaticIssuance": true,
+	})
+	if err != nil {
+		return H{}, err
+	}
+	var body H
+
+	if err := json.Unmarshal(res, &body); err != nil {
+		return H{}, err
+	}
+	return body, nil
+}
+
 func ProofVerify(presentID string) (H, error) {
 	path := fmt.Sprintf("/cloud-agent/present-proof/presentations/%s", presentID)
 	res, err := getRequest(path)

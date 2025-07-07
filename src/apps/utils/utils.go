@@ -9,6 +9,8 @@ import (
 	"io"
 	"math/big"
 	"strings"
+
+	"github.com/jmoiron/sqlx/types"
 )
 
 const RandCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -100,4 +102,15 @@ func GenerateChecksum(file io.Reader) (string, error) {
 	}
 	checksum := hash.Sum(nil)
 	return fmt.Sprintf("%x", checksum), nil
+}
+
+func MapToJSONText(m map[string]interface{}) (*types.JSONText, error) {
+	b, err := json.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+
+	jt := types.JSONText(b)
+
+	return &jt, nil
 }

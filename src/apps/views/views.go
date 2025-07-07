@@ -8,9 +8,9 @@ func Init(r *gin.Engine) {
 	usersGroup(r)
 	organizationsGroup(r)
 	mediaGroup(r)
-	verificationsGroup(r)
+	credentialsGroup(r)
 	impactPointsGroup(r)
 	kybVerificationGroup(r)
 	paymentsGroup(r)
-	referralAchievementsGroup(r)
+	referralsGroup(r)
 }

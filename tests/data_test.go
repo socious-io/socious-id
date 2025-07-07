@@ -75,6 +75,7 @@ var (
 			"meta": gin.H{
 				"test": "test",
 			},
+			"unique_tag": "unique_1",
 		},
 		{
 			"type":                  "DONATION",
@@ -84,10 +85,11 @@ var (
 			"meta": gin.H{
 				"test": "test",
 			},
+			"unique_tag": "unique_2",
 		},
 	}
 
-	verificationsData = []gin.H{}
+	credentialsData = []gin.H{}
 
 	cardsData = []gin.H{
 		{
@@ -118,7 +120,7 @@ var (
 		},
 		{
 			"referee_id":       "auto:<referee_id>",
-			"achievement_type": "CREATE_ACCOUNT",
+			"achievement_type": "REF_KYC",
 			"meta":             types.JSONText(`{"meta_key": "test2"}`),
 		},
 	}
