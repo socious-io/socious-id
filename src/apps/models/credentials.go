@@ -118,6 +118,10 @@ func (c *Credential) HandleByType(ctx context.Context) error {
 		return c.SendBadges(ctx)
 	}
 
+	//KYC
+	if c.PresentID == nil {
+		c.ProofRequest(ctx)
+	}
 	return c.ProofVerify(ctx)
 }
 
