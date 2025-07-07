@@ -214,6 +214,9 @@ func (v *Credential) SendBadges(ctx context.Context) error {
 }
 
 func GetSimilarCredential(ctx context.Context, currentVC *Credential, data wallet.H) (*Credential, error) {
+	if config.Config.Env == "development" {
+		return nil, nil
+	}
 	v := new(Credential)
 	err := database.Get(
 		v,
