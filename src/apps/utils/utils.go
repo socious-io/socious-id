@@ -114,3 +114,18 @@ func MapToJSONText(m map[string]interface{}) (*types.JSONText, error) {
 
 	return &jt, nil
 }
+
+func NullableString(s *string) string {
+	if s != nil {
+		return *s
+	}
+	return "N/A"
+}
+
+func DedentString(s string) string {
+	lines := strings.Split(s, "\n")
+	for i, line := range lines {
+		lines[i] = strings.TrimLeft(line, " \t")
+	}
+	return strings.Join(lines, "\n")
+}

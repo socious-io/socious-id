@@ -10,7 +10,7 @@ import (
 var Config *ConfigType
 
 type ConfigType struct {
-	Env       string `mapstructure:"env"`
+	Env       string `mapstructure:"env"` //development, production, testing
 	Port      int    `mapstructure:"port"`
 	Debug     bool   `mapstructure:"debug"`
 	Secret    string `mapstructure:"secret"`
