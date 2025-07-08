@@ -28,9 +28,9 @@
                         <input placeholder="Your organization email" type="email" id="email" name="email" oninput="validateOrgForm()" />
                     </div>
                 </div>
-                {{if .error}}
-                    <p style="color: red">{{.error}}</p>
-                    {{end}}
+                <p id="error" style="color: red">
+                    {{.error}}
+                </p>
                 <div name="button-section" class="section">
                     <button id="submit" onclick="createOrganization()" theme="primary" disabled>Continue</button>
                 </div>

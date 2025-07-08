@@ -229,9 +229,9 @@ func GetOrganizationByMember(id uuid.UUID, userId uuid.UUID) (*Organization, err
 	return o, nil
 }
 
-func GetOrganizationByShortname(shortname string, identity uuid.UUID) (*Organization, error) {
+func GetOrganizationByShortname(shortname string) (*Organization, error) {
 	o := new(Organization)
-	if err := database.Fetch(o, identity.String()); err != nil {
+	if err := database.Get(o, "organizations/get_by_shortname", shortname); err != nil {
 		return nil, err
 	}
 	return o, nil

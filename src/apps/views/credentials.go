@@ -36,7 +36,9 @@ func credentialsGroup(router *gin.Engine) {
 			return
 		}
 
-		v.HandleByType(ctx)
+		v.HandleByType(ctx, models.HandleCredentialParams{
+			CheckPresentID: false,
+		})
 
 		if v.Type == models.CredentialTypeKYC && v.Status == models.CredentialStatusVerified {
 			if err := u.Verify(ctx, models.UserVerificationTypeIdentity); err != nil {
@@ -121,7 +123,9 @@ func credentialsGroup(router *gin.Engine) {
 			return
 		}
 
-		if err := v.HandleByType(ctx); err != nil {
+		if err := v.HandleByType(ctx, models.HandleCredentialParams{
+			CheckPresentID: true,
+		}); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
