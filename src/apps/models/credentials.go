@@ -39,6 +39,10 @@ type Credential struct {
 	UserJson types.JSONText `db:"user" json:"-"`
 }
 
+type HandleCredentialParams struct {
+	CheckPresentID bool
+}
+
 func (Credential) TableName() string {
 	return "credentials"
 }
@@ -112,14 +116,14 @@ func (v *Credential) ProofRequest(ctx context.Context) error {
 	return nil
 }
 
-func (c *Credential) HandleByType(ctx context.Context) error {
+func (c *Credential) HandleByType(ctx context.Context, params HandleCredentialParams) error {
 	switch c.Type {
 	case CredentialTypeBadges:
 		return c.SendBadges(ctx)
 	}
 
 	//KYC
-	if c.PresentID == nil {
+	if c.PresentID == nil && params.CheckPresentID {
 		c.ProofRequest(ctx)
 	}
 	return c.ProofVerify(ctx)
