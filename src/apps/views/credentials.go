@@ -2,7 +2,6 @@ package views
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/url"
 	"socious-id/src/apps/auth"
@@ -61,8 +60,7 @@ func credentialsGroup(router *gin.Engine) {
 						"user":       u,
 					},
 				}
-				err := referralAchievement.Create(ctx)
-				fmt.Println(referralAchievement, err)
+				referralAchievement.Create(ctx)
 			}
 		}
 
