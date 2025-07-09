@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"socious-id/src/apps/utils"
 	"socious-id/src/config"
-	"strings"
 	"time"
 
 	database "github.com/socious-io/pkg_database"
@@ -80,19 +79,16 @@ func (ra *ReferralAchievement) Create(ctx context.Context) error {
 
 	referralAchievements := []*ReferralAchievement{}
 
-	if strings.HasPrefix(ra.AchievementType, "REF_") {
-		referrerIdentity, err := GetReferrerIdentity(ra.RefereeID)
-		if err == nil {
-			ra.ReferrerID = &referrerIdentity.ID
-			referralAchievements = append(referralAchievements, ra)
-		}
-	}
-
 	referralAchievements = append(referralAchievements, &ReferralAchievement{
 		RefereeID:       ra.RefereeID,
-		AchievementType: strings.TrimPrefix(ra.AchievementType, "REF_"),
+		AchievementType: ra.AchievementType,
 		Meta:            ra.Meta,
 	})
+
+	if referrerIdentity, err := GetReferrerIdentity(ra.RefereeID); err == nil {
+		ra.ReferrerID = &referrerIdentity.ID
+		referralAchievements = append(referralAchievements, ra)
+	}
 
 	for _, ra := range referralAchievements {
 		ra.MetaJson, err = utils.MapToJSONText(ra.Meta)
