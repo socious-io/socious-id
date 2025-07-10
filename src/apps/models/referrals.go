@@ -177,6 +177,19 @@ func GetReferrals(identityID uuid.UUID, p database.Paginate) ([]Referral, int, e
 	return referrals, fetchList[0].TotalCount, nil
 }
 
+func ClaimAllReferralAchievements(ctx context.Context, identityID uuid.UUID) error {
+	rows, err := database.Query(
+		ctx,
+		"referrals/claim_all_achievements",
+		identityID,
+	)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	return nil
+}
+
 func getRewardAmountByType(t string) float32 {
 	rewards := config.Config.ReferralAchievements.Rewards
 
