@@ -26,8 +26,13 @@
                     </div>
                     <div class="input-label">
                         <label for="email">Username</label>
-                        <input placeholder="Choose a username" type="text" id="username" name="username" oninput="validateForm()" />
+                        <input placeholder="Choose a username" type="text" id="username" name="username"
+                            pattern="^[a-z0-9_]+$" oninput="validateForm()" />
                         <span class="input-hints">This will be your unique identifier across all platforms</span>
+                        <span id="username-error" class="error-message" style="display: none;">
+                            Username can only contain lowercase letters, numbers, and underscores. No spaces, dashes, or
+                            uppercase letters.
+                        </span>
                     </div>
                     <div class="input-label">
                         <label for="email">Password</label>

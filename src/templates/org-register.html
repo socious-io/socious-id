@@ -20,8 +20,12 @@
                     </div>
                     <div class="input-label">
                         <label for="shortname">Organization username*</label>
-                        <input placeholder="Choose a username" type="text" id="shortname" name="shortname" oninput="validateOrgForm()" />
+                        <input placeholder="Choose a username" type="text" id="shortname" name="shortname" pattern="^[a-z0-9_]+$" oninput="validateOrgForm()" />
                         <span class="input-hints">This will be your unique identifier across all platforms</span>
+                        <span id="shortname-error" class="error-message" style="display: none;">
+                            Username can only contain lowercase letters, numbers, and underscores. No spaces, dashes, or
+                            uppercase letters.
+                        </span>
                     </div>
                     <div class="input-label">
                         <label for="email">Organization email*</label>
