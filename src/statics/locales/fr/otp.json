@@ -1,0 +1,14 @@
+{
+    "otp-header": "Vérifiez votre email",
+    "otp-subheader": "Nous avons envoyé un code de vérification à",
+    "otp-verify-button": "Vérifier l'email",
+    "otp-didn't-receive": "Vous n’avez pas reçu l’email ? ",
+    "otp-resend": "Cliquez pour renvoyer",
+    "otp-find-code": "Vous ne trouvez pas le code ?",
+    "otp-find-code-step1": "Vérifiez votre dossier spam",
+    "otp-find-code-step2": "Assurez-vous d’avoir saisi le bon email",
+    "otp-find-code-step3": "Les codes expirent après 10 minutes",
+    "otp-help": "Besoin d’aide ? ",
+    "otp-contact-us": "Contactez-nous",
+    "otp-back-signin": "Retour à la connexion"
+}

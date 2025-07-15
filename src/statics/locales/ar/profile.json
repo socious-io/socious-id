@@ -1,0 +1,18 @@
+{
+    "profile-header": "أنشئ ملفك الشخصي",
+    "profile-subheader": "أخبرنا عن نفسك",
+    "profile-add-photo": "أضف صورة (اختياري)",
+    "profile-first-name": "الاسم الأول",
+    "profile-first-name-placeholder": "اسمك الأول",
+    "profile-last-name": "اسم العائلة",
+    "profile-last-name-placeholder": "اسم عائلتك",
+    "profile-username": "اسم المستخدم",
+    "profile-username-placeholder": "اختر اسم مستخدم",
+    "profile-username-hint": "سيكون هذا معرفك الفريد عبر جميع المنصات",
+    "profile-username-error": "يمكن أن يحتوي اسم المستخدم فقط على أحرف صغيرة، أرقام، وشرطات سفلية. لا يسمح بالمسافات، أو الشرطات، أو الأحرف الكبيرة.",
+    "profile-password": "كلمة المرور",
+    "profile-password-placeholder": "أنشئ كلمة مرور",
+    "profile-password-hint1": "يجب أن تكون 8 أحرف على الأقل",
+    "profile-password-hint2": "يجب أن تحتوي على حرف خاص واحد على الأقل",
+    "profile-create-button": "إنشاء الملف الشخصي"
+}

@@ -1,0 +1,14 @@
+{
+    "org-register-header": "تفاصيل المنظمة",
+    "org-register-subheader": "أخبرنا عن منظمتك",
+    "org-register-add-photo": "أضف صورة (اختياري)",
+    "org-register-name": "اسم المنظمة*",
+    "org-register-name-placeholder": "اسم منظمتك",
+    "org-register-username": "اسم مستخدم المنظمة*",
+    "org-register-username-placeholder": "اختر اسم مستخدم",
+    "org-register-username-hint": "سيكون هذا هو المعرف الفريد الخاص بك عبر جميع المنصات",
+    "org-register-username-error": "يمكن أن يحتوي اسم المستخدم فقط على أحرف صغيرة، أرقام، وشرطات سفلية. لا يسمح بالمسافات أو الشرطات أو الأحرف الكبيرة.",
+    "org-register-email": "البريد الإلكتروني للمنظمة*",
+    "org-register-email-placeholder": "البريد الإلكتروني لمنظمتك",
+    "org-register-continue-button": "متابعة"
+}

@@ -1,0 +1,12 @@
+{
+    "login-header": "使用 Socious ID 登录",
+    "login-subheader": "访问您所有的影响力平台",
+    "login-email-placeholder": "请输入您的电子邮件",
+    "login-password-placeholder": "请输入您的密码",
+    "login-forget-password": "忘记密码？",
+    "login-button": "登录",
+    "login-or": "或",
+    "login-continue-with-google": "使用 Google 继续",
+    "login-login-with-apple": "使用Apple登录",
+    "login-create-account": "创建账户"
+}

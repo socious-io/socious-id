@@ -1,0 +1,11 @@
+{
+    "register-header": "输入你的邮箱",
+    "register-subheader": "我们将发送验证码给你",
+    "register-email-label": "邮箱*",
+    "register-email-placeholder": "请输入你的邮箱",
+    "register-continue-button": "继续",
+    "register-what-next": "接下来会发生什么？",
+    "register-what-next-step1": "我们将向你的邮箱发送验证码",
+    "register-what-next-step2": "输入验证码以验证邮箱",
+    "register-what-next-step3": "完成你的 Socious ID 个人资料"
+}
