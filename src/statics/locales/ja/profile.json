@@ -1,0 +1,18 @@
+{
+    "profile-header": "プロフィールを作成",
+    "profile-subheader": "あなたについて教えてください",
+    "profile-add-photo": "写真を追加（任意）",
+    "profile-first-name": "名",
+    "profile-first-name-placeholder": "あなたの名前",
+    "profile-last-name": "姓",
+    "profile-last-name-placeholder": "あなたの名字",
+    "profile-username": "ユーザー名",
+    "profile-username-placeholder": "ユーザー名を選んでください",
+    "profile-username-hint": "これはすべてのプラットフォームでのあなたの一意の識別子になります",
+    "profile-username-error": "ユーザー名は6〜24文字で、小文字、数字、アンダースコアのみ使用できます（スペース、ハイフン、ドット、大文字は使用不可）。",
+    "profile-password": "パスワード",
+    "profile-password-placeholder": "パスワードを作成してください",
+    "profile-password-hint1": "8文字以上である必要があります",
+    "profile-password-hint2": "特殊文字を1つ以上含める必要があります",
+    "profile-create-button": "プロフィールを作成"
+}

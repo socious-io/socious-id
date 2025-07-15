@@ -1,0 +1,14 @@
+{
+    "otp-header": "メールを確認してください",
+    "otp-subheader": "認証コードを送信しました：",
+    "otp-verify-button": "メールを確認",
+    "otp-didn't-receive": "メールが届いていませんか？",
+    "otp-resend": "再送信するにはこちらをクリック",
+    "otp-find-code": "コードが見つかりませんか？",
+    "otp-find-code-step1": "迷惑メールフォルダを確認してください",
+    "otp-find-code-step2": "正しいメールアドレスを入力したか確認してください",
+    "otp-find-code-step3": "コードの有効期限は10分です",
+    "otp-help": "お困りですか？ ",
+    "otp-contact-us": "お問い合わせ",
+    "otp-back-signin": "サインインに戻る"
+}

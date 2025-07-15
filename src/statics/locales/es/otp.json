@@ -1,0 +1,14 @@
+{
+    "otp-header": "Revisa tu correo electrónico",
+    "otp-subheader": "Hemos enviado un código de verificación a",
+    "otp-verify-button": "Verificar correo",
+    "otp-didn't-receive": "¿No recibiste el correo? ",
+    "otp-resend": "Haz clic para reenviar",
+    "otp-find-code": "¿No puedes encontrar el código?",
+    "otp-find-code-step1": "Revisa tu carpeta de spam",
+    "otp-find-code-step2": "Asegúrate de haber introducido el correo correcto",
+    "otp-find-code-step3": "Los códigos caducan después de 10 minutos",
+    "otp-help": "¿Necesitas ayuda? ",
+    "otp-contact-us": "Contáctanos",
+    "otp-back-signin": "Volver a iniciar sesión"
+}

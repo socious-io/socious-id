@@ -1,0 +1,12 @@
+{
+    "login-header": "Sign in with Socious ID",
+    "login-subheader": "Your access for all your impact platforms",
+    "login-email-placeholder": "Enter your email",
+    "login-password-placeholder": "Enter your password",
+    "login-forget-password": "Forget password?",
+    "login-button": "Sign in",
+    "login-or": "OR",
+    "login-continue-with-google": "Continue with Google",
+    "login-login-with-apple": "Login with Apple",
+    "login-create-account": "Create account"
+}

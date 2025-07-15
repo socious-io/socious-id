@@ -1,4 +1,5 @@
 {{template "header" .}}
+
 <body onload="displayEmail()">
     <form action="/auth/otp/confirm" method="get">
         <div class="intro">
@@ -7,9 +8,11 @@
                     <img src="/statics/icons/mail.svg" alt="Login Lock" width="24" height="24" />
                 </div>
                 <div name="header" class="header">
-                    <h2>Check your email</h2>
+                    <h2 data-i18n="otp-header">Check your email</h2>
                     <div class="flex flex-col">
-                        <span class="text-grey leading-6">We sent a verification code to</span>
+                        <span data-i18n="otp-subheader" class="text-grey leading-6">
+                            We sent a verification code to
+                        </span>
                         <span class="text-primary font-medium leading-6" id="user-email"></span>
                     </div>
                 </div>
@@ -17,32 +20,38 @@
                     <div class="otp-container">
                         <div class="input-wrapper">
                             <input type="text" class="otp-input" maxlength="1" inputmode="numeric"
-                                oninput="moveToNext(this, 1)" onkeyup="checkOTP()" onpaste="handlePaste(event)" onkeydown="handleBackspace(event, this)" />
+                                oninput="moveToNext(this, 1)" onkeyup="checkOTP()" onpaste="handlePaste(event)"
+                                onkeydown="handleBackspace(event, this)" />
                             <div class="otp-placeholder"></div>
                         </div>
                         <div class="input-wrapper">
                             <input type="text" class="otp-input" maxlength="1" inputmode="numeric"
-                                oninput="moveToNext(this, 2)" onkeyup="checkOTP()" onpaste="handlePaste(event)" onkeydown="handleBackspace(event, this)" />
+                                oninput="moveToNext(this, 2)" onkeyup="checkOTP()" onpaste="handlePaste(event)"
+                                onkeydown="handleBackspace(event, this)" />
                             <div class="otp-placeholder"></div>
                         </div>
                         <div class="input-wrapper">
                             <input type="text" class="otp-input" maxlength="1" inputmode="numeric"
-                                oninput="moveToNext(this, 3)" onkeyup="checkOTP()" onpaste="handlePaste(event)" onkeydown="handleBackspace(event, this)" />
+                                oninput="moveToNext(this, 3)" onkeyup="checkOTP()" onpaste="handlePaste(event)"
+                                onkeydown="handleBackspace(event, this)" />
                             <div class="otp-placeholder"></div>
                         </div>
                         <div class="input-wrapper">
                             <input type="text" class="otp-input" maxlength="1" inputmode="numeric"
-                                oninput="moveToNext(this, 4)" onkeyup="checkOTP()" onpaste="handlePaste(event)" onkeydown="handleBackspace(event, this)" />
+                                oninput="moveToNext(this, 4)" onkeyup="checkOTP()" onpaste="handlePaste(event)"
+                                onkeydown="handleBackspace(event, this)" />
                             <div class="otp-placeholder"></div>
                         </div>
                         <div class="input-wrapper">
                             <input type="text" class="otp-input" maxlength="1" inputmode="numeric"
-                                oninput="moveToNext(this, 5)" onkeyup="checkOTP()" onpaste="handlePaste(event)" onkeydown="handleBackspace(event, this)" />
+                                oninput="moveToNext(this, 5)" onkeyup="checkOTP()" onpaste="handlePaste(event)"
+                                onkeydown="handleBackspace(event, this)" />
                             <div class="otp-placeholder"></div>
                         </div>
                         <div class="input-wrapper">
                             <input type="text" class="otp-input" maxlength="1" inputmode="numeric"
-                                oninput="moveToNext(this, 6)" onkeyup="checkOTP()" onpaste="handlePaste(event)" onkeydown="handleBackspace(event, this)" />
+                                oninput="moveToNext(this, 6)" onkeyup="checkOTP()" onpaste="handlePaste(event)"
+                                onkeydown="handleBackspace(event, this)" />
                             <div class="otp-placeholder"></div>
                         </div>
                     </div>
@@ -51,25 +60,30 @@
                 <input type="text" name="email" hidden value="{{.email}}" />
 
                 <div name="button-section" class="section">
-                    <button type="submit" theme="primary" disabled>Verify email</button>
+                    <button data-i18n="otp-verify-button" type="submit" theme="primary" disabled>Verify email</button>
                 </div>
-                <span class="text-sm text-grey text-center">Didn’t receive the email? <a
-                        class="font-semibold text-primary">Click to resend</a></span>
+                <span class="text-sm text-grey text-center">
+                    <span data-i18n="otp-didn't-receive">Didn’t receive the email? </span>
+                    <a data-i18n="otp-resend" class="font-semibold text-primary">Click to resend</a>
+                </span>
                 <div class="steps font-semibold">
-                    Can't find the code?
+                    <span data-i18n="otp-find-code">Can't find the code?</span>
                     <ol class="text-sm font-normal text-grey leading-5">
-                        <li>Check your spam folder</li>
-                        <li>Make sure you entered the correct email</li>
-                        <li>Codes expire after 10 minutes</li>
+                        <li data-i18n="otp-find-code-step1">Check your spam folder</li>
+                        <li data-i18n="otp-find-code-step2">Make sure you entered the correct email</li>
+                        <li data-i18n="otp-find-code-step3">Codes expire after 10 minutes</li>
                     </ol>
                     {{if .error}}
                     <p style="color: red">{{.error}}</p>
                     {{end}}
                 </div>
-                <span class="text-sm text-grey text-center">Need help? <a class="font-semibold text-primary">Contact
-                        us</a></span>
+                <span class="text-sm text-grey text-center">
+                    <span data-i18n="otp-help">Need help? </span>
+                    <a data-i18n="otp-contact-us" class="font-semibold text-primary">Contact us</a>
+                </span>
             </div>
         </div>
     </form>
 </body>
+
 {{template "footer" .}}

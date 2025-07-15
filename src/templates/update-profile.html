@@ -6,60 +6,67 @@
             <div class="card">
                 <div name="content-section" class="section">
                     <div name="header" class="header">
-                        <h2>Create your profile</h2>
-                        <span class="text-grey leading-6">Tell us about yourself</span>
+                        <h2 data-i18n="profile-header">Create your profile</h2>
+                        <span data-i18n="profile-subheader" class="text-grey leading-6">Tell us about yourself</span>
                     </div>
                     <div class="upload">
                         <img id="avatar" src="/statics/images/avatar.svg" alt="avatar" width="64" height="64"
                             class="upload-img" />
-                        <span class="text-grey text-sm leading-5">Add a photo (optional)</span>
+                        <span data-i18n="profile-add-photo" class="text-grey text-sm leading-5">
+                            Add a photo (optional)
+                        </span>
                         <input id="upload" type="file" class="upload-input" oninput="onUploadProfile()" />
                         <input id="avatar-id" hidden type="text" />
                     </div>
                     <div class="input-groups">
                         <div class="input-label">
-                            <label for="email">First name</label>
-                            <input placeholder="Your first name" type="text" id="first" name="first_name"
-                                oninput="validateForm()" />
+                            <label data-i18n="profile-first-name" for="first">First name</label>
+                            <input data-i18n-placeholder="profile-first-name-placeholder" placeholder="Your first name"
+                                type="text" id="first" name="first_name" oninput="validateForm()" />
                         </div>
                         <div class="input-label">
-                            <label for="email">Last name</label>
-                            <input placeholder="Your last name" type="text" id="last" name="last_name"
-                                oninput="validateForm()" />
+                            <label data-i18n="profile-last-name" for="last">Last name</label>
+                            <input data-i18n-placeholder="profile-last-name-placeholder" placeholder="Your last name"
+                                type="text" id="last" name="last_name" oninput="validateForm()" />
                         </div>
                     </div>
                     <div class="input-label">
-                        <label for="email">Username</label>
-                        <input placeholder="Choose a username" type="text" id="username" name="username"
-                            pattern="^[a-z0-9_]+$" minlength="6" maxlength="24" oninput="validateForm()" />
-                        <span class="input-hints">This will be your unique identifier across all platforms</span>
-                        <span id="username-error" class="error-message" style="display: none;">
+                        <label data-i18n="profile-username" for="username">Username</label>
+                        <input data-i18n-placeholder="profile-username-placeholder" placeholder="Choose a username"
+                            type="text" id="username" name="username" pattern="^[a-z0-9_]+$" minlength="6"
+                            maxlength="24" oninput="validateForm()" />
+                        <span data-i18n="profile-username-hint" class="input-hints">This will be your unique identifier
+                            across all platforms</span>
+                        <span data-i18n="profile-username-error" id="username-error" class="error-message"
+                            style="display: none;">
                             Username must be 6–24 characters and can only contain lowercase letters, numbers, and
                             underscores (no spaces, dashes, dots, or uppercase letters).
                         </span>
                     </div>
                     <div class="input-label">
-                        <label for="email">Password</label>
+                        <label data-i18n="profile-password" for="pass">Password</label>
                         <div class="input-container">
-                            <input placeholder="Create a password" type="password" id="pass" name="password"
-                                autocomplete="current-password" oninput="validateForm()" />
+                            <input data-i18n-placeholder="profile-password-placeholder" placeholder="Create a password"
+                                type="password" id="pass" name="password" autocomplete="current-password"
+                                oninput="validateForm()" />
                             <img src="/statics/icons/eye.svg" alt="show-password" width="20" height="20"
                                 class="input-end-icon cursor-pointer" onclick="togglePassword(this)" />
                         </div>
                         <div class="input-hints">
                             <div class="flex items-center gap-2">
                                 <img src="/statics/icons/check-grey.svg" width="20" height="20" id="length-hint" />
-                                Must be at least 8 characters
+                                <span data-i18n="profile-password-hint1">Must be at least 8 characters</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <img src="/statics/icons/check-grey.svg" width="20" height="20" id="character-hint" />
-                                Must contain one special character
+                                <span data-i18n="profile-password-hint2">Must contain one special character</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div name="button-section" class="section">
-                    <button type="submit" theme="primary" disabled>Create profile</button>
+                    <button data-i18n="profile-create-button" type="submit" theme="primary" disabled>Create
+                        profile</button>
                 </div>
                 <p id="error" style="color: red">
                     {{.error}}

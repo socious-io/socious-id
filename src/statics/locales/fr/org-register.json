@@ -1,0 +1,14 @@
+{
+    "org-register-header": "Détails de l'organisation",
+    "org-register-subheader": "Parlez-nous de votre organisation",
+    "org-register-add-photo": "Ajouter une photo (optionnel)",
+    "org-register-name": "Nom de l'organisation*",
+    "org-register-name-placeholder": "Nom de votre organisation",
+    "org-register-username": "Nom d'utilisateur de l'organisation*",
+    "org-register-username-placeholder": "Choisissez un nom d'utilisateur",
+    "org-register-username-hint": "Ce sera votre identifiant unique sur toutes les plateformes",
+    "org-register-username-error": "Le nom d'utilisateur doit comporter entre 6 et 24 caractères et ne peut contenir que des lettres minuscules, des chiffres et des underscores (pas d'espaces, de tirets, de points ou de lettres majuscules).",
+    "org-register-email": "Email de l'organisation*",
+    "org-register-email-placeholder": "Email de votre organisation",
+    "org-register-continue-button": "Continuer"
+}
