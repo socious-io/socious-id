@@ -1,0 +1,14 @@
+{
+    "otp-header": "请检查你的邮箱",
+    "otp-subheader": "我们已发送验证码至",
+    "otp-verify-button": "验证邮箱",
+    "otp-didn't-receive": "没有收到邮件？",
+    "otp-resend": "点击重新发送",
+    "otp-find-code": "找不到验证码？",
+    "otp-find-code-step1": "检查垃圾邮箱",
+    "otp-find-code-step2": "确保输入了正确的邮箱地址",
+    "otp-find-code-step3": "验证码10分钟后失效",
+    "otp-help": "需要帮助？",
+    "otp-contact-us": "联系我们",
+    "otp-back-signin": "返回登录"
+}
