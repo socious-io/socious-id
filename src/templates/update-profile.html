@@ -1,4 +1,5 @@
 {{template "header" .}}
+
 <body>
     <form onsubmit="return createProfile()">
         <div class="intro">
@@ -9,7 +10,8 @@
                         <span class="text-grey leading-6">Tell us about yourself</span>
                     </div>
                     <div class="upload">
-                        <img id="avatar" src="/statics/images/avatar.svg" alt="avatar" width="64" height="64" class="upload-img" />
+                        <img id="avatar" src="/statics/images/avatar.svg" alt="avatar" width="64" height="64"
+                            class="upload-img" />
                         <span class="text-grey text-sm leading-5">Add a photo (optional)</span>
                         <input id="upload" type="file" class="upload-input" oninput="onUploadProfile()" />
                         <input id="avatar-id" hidden type="text" />
@@ -17,21 +19,23 @@
                     <div class="input-groups">
                         <div class="input-label">
                             <label for="email">First name</label>
-                            <input placeholder="Your first name" type="text" id="first" name="first_name" oninput="validateForm()" />
+                            <input placeholder="Your first name" type="text" id="first" name="first_name"
+                                oninput="validateForm()" />
                         </div>
                         <div class="input-label">
                             <label for="email">Last name</label>
-                            <input placeholder="Your last name" type="text" id="last" name="last_name" oninput="validateForm()" />
+                            <input placeholder="Your last name" type="text" id="last" name="last_name"
+                                oninput="validateForm()" />
                         </div>
                     </div>
                     <div class="input-label">
                         <label for="email">Username</label>
                         <input placeholder="Choose a username" type="text" id="username" name="username"
-                            pattern="^[a-z0-9_]+$" oninput="validateForm()" />
+                            pattern="^[a-z0-9_]+$" minlength="6" maxlength="24" oninput="validateForm()" />
                         <span class="input-hints">This will be your unique identifier across all platforms</span>
                         <span id="username-error" class="error-message" style="display: none;">
-                            Username can only contain lowercase letters, numbers, and underscores. No spaces, dashes, or
-                            uppercase letters.
+                            Username must be 6–24 characters and can only contain lowercase letters, numbers, and
+                            underscores (no spaces, dashes, dots, or uppercase letters).
                         </span>
                     </div>
                     <div class="input-label">
@@ -54,7 +58,6 @@
                         </div>
                     </div>
                 </div>
-            
                 <div name="button-section" class="section">
                     <button type="submit" theme="primary" disabled>Create profile</button>
                 </div>

@@ -1,45 +1,50 @@
 {{template "header" .}}
+
 <body>
     <!-- <form method="POST" onsubmit="createOrganization()"> -->
-        <div class="intro">
-            <div class="card">
-                <div name="content-section" class="section">
-                    <div name="header" class="header">
-                        <h2>Organization details</h2>
-                        <span class="text-grey leading-6">Tell us about your organization</span>
-                    </div>
-                    <div class="upload">
-                        <img id="logo" src="/statics/images/avatar.svg" alt="logo" width="64" height="64" class="upload-img" />
-                        <span class="text-grey text-sm leading-5">Add a photo (optional)</span>
-                        <input id="upload" type="file" class="upload-input" oninput="onUploadLogo()" />
-                        <input id="logo-id" name="logo_id" hidden type="text" />
-                    </div>
-                    <div class="input-label">
-                        <label for="name">Organization name*</label>
-                        <input placeholder="Your organization name" type="text" id="name" name="name" oninput="validateOrgForm()" />
-                    </div>
-                    <div class="input-label">
-                        <label for="shortname">Organization username*</label>
-                        <input placeholder="Choose a username" type="text" id="shortname" name="shortname" pattern="^[a-z0-9_]+$" oninput="validateOrgForm()" />
-                        <span class="input-hints">This will be your unique identifier across all platforms</span>
-                        <span id="shortname-error" class="error-message" style="display: none;">
-                            Username can only contain lowercase letters, numbers, and underscores. No spaces, dashes, or
-                            uppercase letters.
-                        </span>
-                    </div>
-                    <div class="input-label">
-                        <label for="email">Organization email*</label>
-                        <input placeholder="Your organization email" type="email" id="email" name="email" oninput="validateOrgForm()" />
-                    </div>
+    <div class="intro">
+        <div class="card">
+            <div name="content-section" class="section">
+                <div name="header" class="header">
+                    <h2>Organization details</h2>
+                    <span class="text-grey leading-6">Tell us about your organization</span>
                 </div>
-                <p id="error" style="color: red">
-                    {{.error}}
-                </p>
-                <div name="button-section" class="section">
-                    <button id="submit" onclick="createOrganization()" theme="primary" disabled>Continue</button>
+                <div class="upload">
+                    <img id="logo" src="/statics/images/avatar.svg" alt="logo" width="64" height="64"
+                        class="upload-img" />
+                    <span class="text-grey text-sm leading-5">Add a photo (optional)</span>
+                    <input id="upload" type="file" class="upload-input" oninput="onUploadLogo()" />
+                    <input id="logo-id" name="logo_id" hidden type="text" />
+                </div>
+                <div class="input-label">
+                    <label for="name">Organization name*</label>
+                    <input placeholder="Your organization name" type="text" id="name" name="name"
+                        oninput="validateOrgForm()" />
+                </div>
+                <div class="input-label">
+                    <label for="shortname">Organization username*</label>
+                    <input placeholder="Choose a username" type="text" id="shortname" name="shortname"
+                        pattern="^[a-z0-9_]+$" minlength="6" maxlength="24" oninput="validateOrgForm()" />
+                    <span class="input-hints">This will be your unique identifier across all platforms</span>
+                    <span id="shortname-error" class="error-message" style="display: none;">
+                        Username must be 6–24 characters and can only contain lowercase letters, numbers, and
+                        underscores (no spaces, dashes, dots, or uppercase letters).
+                    </span>
+                </div>
+                <div class="input-label">
+                    <label for="email">Organization email*</label>
+                    <input placeholder="Your organization email" type="email" id="email" name="email"
+                        oninput="validateOrgForm()" />
                 </div>
             </div>
+            <p id="error" style="color: red">
+                {{.error}}
+            </p>
+            <div name="button-section" class="section">
+                <button id="submit" onclick="createOrganization()" theme="primary" disabled>Continue</button>
+            </div>
         </div>
+    </div>
     <!-- </form> -->
 </body>
 
