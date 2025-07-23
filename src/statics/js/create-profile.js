@@ -1,3 +1,18 @@
+const isValidUsername = (username) => {
+  const allowedPattern = /^[a-z0-9._-]+$/;
+  const startsWithInvalidChar = /^[._]/;
+  const hasConsecutiveSpecials = /[._]{2,}/;
+
+  return (
+    username &&
+    username.length >= 6 &&
+    username.length <= 24 &&
+    allowedPattern.test(username) &&
+    !startsWithInvalidChar.test(username) &&
+    !hasConsecutiveSpecials.test(username)
+  );
+};
+
 const onUploadProfile = async () => {
 	const input = document.getElementById("upload");
 	const avatarId = document.getElementById("avatar-id");
@@ -48,8 +63,7 @@ const onUploadProfile = async () => {
 const validateForm = () => {
     const first = document.getElementById("first").value.trim();
     const last = document.getElementById("last").value.trim();
-    const usernameInput = document.getElementById("username");
-    const username = usernameInput.value.trim();
+    const username = document.getElementById("username").value.trim();
     const errorSpan = document.getElementById("username-error");
     const password = document.getElementById("pass").value.trim();
     const lengthHint = document.getElementById("length-hint");
@@ -62,8 +76,8 @@ const validateForm = () => {
     charHint.src = `/statics/icons/check-${/[\W_]/.test(password) ? 'green': 'grey'}.svg`;
 
     //Username Validation
-    const isUsernameValid = username && usernameInput.checkValidity();
-    if (!usernameInput.checkValidity()) {
+    const isUsernameValid = isValidUsername(username);
+    if (!isUsernameValid) {
         errorSpan.style.display = "block";
     } else {
         errorSpan.style.display = "none";
@@ -164,16 +178,15 @@ const onUploadLogo = async () => {
 
 const validateOrgForm = () => {
 	const name = document.getElementById("name").value.trim();
-	const shortnameInput = document.getElementById("shortname");
-    const shortname = shortnameInput.value.trim();
+    const shortname = document.getElementById("shortname").value.trim();
 	const errorSpan = document.getElementById("shortname-error");
 	const emailInput = document.getElementById("email");
 	const email = emailInput.value.trim();
 	const submitBtn = document.querySelector("#submit");
 
     //Shortname Validation
-    const isShortnameValid = shortname && shortnameInput.checkValidity();
-    if (!shortnameInput.checkValidity()) {
+    const isShortnameValid = isValidUsername(shortname);
+    if (!isShortnameValid) {
         errorSpan.style.display = "block";
     } else {
         errorSpan.style.display = "none";
