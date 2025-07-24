@@ -12,6 +12,7 @@ import (
 	"socious-id/src/apps/models"
 	"socious-id/src/apps/utils"
 	"socious-id/src/config"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/sessions"
@@ -551,11 +552,19 @@ func authGroup(router *gin.Engine) {
 
 	g.GET("/logout", func(c *gin.Context) {
 		session := sessions.Default(c)
+		referer := c.GetHeader("Referer")
+
 		id := session.Get("user_id")
 		if id != nil {
 			session.Delete("user_id")
 			session.Save()
 		}
+
+		if referer != "" && !strings.Contains(referer, config.Config.Host) {
+			c.Redirect(http.StatusSeeOther, referer)
+			return
+		}
+
 		c.Redirect(http.StatusSeeOther, "/auth/login")
 	})
 
