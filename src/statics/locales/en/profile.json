@@ -1,0 +1,18 @@
+{
+    "profile-header": "Create your profile",
+    "profile-subheader": "Tell us about yourself",
+    "profile-add-photo": "Add a photo (optional)",
+    "profile-first-name": "First name",
+    "profile-first-name-placeholder": "Your first name",
+    "profile-last-name": "Last name",
+    "profile-last-name-placeholder": "Your last name",
+    "profile-username": "Username",
+    "profile-username-placeholder": "Choose a username",
+    "profile-username-hint": "This will be your unique identifier across all platforms",
+    "profile-username-error": "Username must be 6–24 characters and can only contain lowercase letters, numbers, and underscores (no spaces, dashes, dots, or uppercase letters).",
+    "profile-password": "Password",
+    "profile-password-placeholder": "Create a password",
+    "profile-password-hint1": "Must be at least 8 characters",
+    "profile-password-hint2": "Must contain one special character",
+    "profile-create-button": "Create profile"
+}
