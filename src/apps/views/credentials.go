@@ -54,7 +54,7 @@ func credentialsGroup(router *gin.Engine) {
 				//Add Achievements
 				referralAchievement := models.ReferralAchievement{
 					RefereeID:       v.UserID,
-					AchievementType: "REF_KYC",
+					AchievementType: "KYC",
 					Meta: map[string]any{
 						"credential": v,
 						"user":       u,

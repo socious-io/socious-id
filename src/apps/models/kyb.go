@@ -62,6 +62,15 @@ func (k *KYBVerification) Create(ctx context.Context, documents []string) error 
 	}
 	rows.Close()
 
+	rows, err = database.TxQuery(ctx, tx, "kyb/delete_documents",
+		k.ID,
+	)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	rows.Close()
+
 	for _, document := range documents {
 		rows, err = database.TxQuery(ctx, tx, "kyb/create_document",
 			k.ID, document,

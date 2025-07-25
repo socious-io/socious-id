@@ -102,7 +102,7 @@ func kybVerificationGroup(router *gin.Engine) {
 		//Add Achievements
 		referralAchievement := models.ReferralAchievement{
 			RefereeID:       verification.OrgID,
-			AchievementType: "REF_KYB",
+			AchievementType: "KYB",
 			Meta: map[string]any{
 				"verification": verification,
 				"organization": org,
