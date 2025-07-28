@@ -56,7 +56,7 @@ func Init() *gin.Engine {
 
 	//Request sanitizer (XSS Attacks prevention)
 	router.Use(views.SecureHeaders(config.Config.Env))
-	router.Use(views.SecureRequest(bluemonday.StrictPolicy()))
+	router.Use(views.SecureRequest(bluemonday.UGCPolicy()))
 
 	if config.Config.Debug {
 		router.Static("/statics", config.Config.Statics)
