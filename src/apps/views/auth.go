@@ -12,6 +12,7 @@ import (
 	"socious-id/src/apps/models"
 	"socious-id/src/apps/utils"
 	"socious-id/src/config"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/sessions"
@@ -457,7 +458,12 @@ func authGroup(router *gin.Engine) {
 
 		//Fetching user
 		u, err := models.GetUserByEmail(form.Email)
-		if err != nil {
+		if err != nil && errors.Is(err, sql.ErrNoRows) {
+			c.HTML(http.StatusBadRequest, "forget-password.html", gin.H{
+				"error": "Error: User with this email is not registered",
+			})
+			return
+		} else if err != nil {
 			c.HTML(http.StatusBadRequest, "forget-password.html", gin.H{
 				"error": err.Error(),
 			})
@@ -551,11 +557,19 @@ func authGroup(router *gin.Engine) {
 
 	g.GET("/logout", func(c *gin.Context) {
 		session := sessions.Default(c)
+		referer := c.GetHeader("Referer")
+
 		id := session.Get("user_id")
 		if id != nil {
 			session.Delete("user_id")
 			session.Save()
 		}
+
+		if referer != "" && !strings.Contains(referer, config.Config.Host) {
+			c.Redirect(http.StatusSeeOther, referer)
+			return
+		}
+
 		c.Redirect(http.StatusSeeOther, "/auth/login")
 	})
 

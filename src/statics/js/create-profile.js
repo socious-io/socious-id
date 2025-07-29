@@ -1,3 +1,18 @@
+const isValidUsername = (username) => {
+  const allowedPattern = /^[a-z0-9._-]+$/;
+  const startsWithInvalidChar = /^[._]/;
+  const hasConsecutiveSpecials = /[._]{2,}/;
+
+  return (
+    username &&
+    username.length >= 6 &&
+    username.length <= 24 &&
+    allowedPattern.test(username) &&
+    !startsWithInvalidChar.test(username) &&
+    !hasConsecutiveSpecials.test(username)
+  );
+};
+
 const onUploadProfile = async () => {
 	const input = document.getElementById("upload");
 	const avatarId = document.getElementById("avatar-id");
@@ -46,25 +61,34 @@ const onUploadProfile = async () => {
 };
 
 const validateForm = () => {
-	const first = document.getElementById("first").value.trim();
-	const last = document.getElementById("last").value.trim();
-	const username = document.getElementById("username").value.trim();
-	const password = document.getElementById("pass").value.trim();
-	const lengthHint = document.getElementById("length-hint");
-	const charHint = document.getElementById("character-hint");
-	const isPasswordValid = password.length >= 8 && /[\W_]/g.test(password);
-	const submitBtn = document.querySelector("form button[type='submit']");
+    const first = document.getElementById("first").value.trim();
+    const last = document.getElementById("last").value.trim();
+    const username = document.getElementById("username").value.trim();
+    const errorSpan = document.getElementById("username-error");
+    const password = document.getElementById("pass").value.trim();
+    const lengthHint = document.getElementById("length-hint");
+    const charHint = document.getElementById("character-hint");
+    const submitBtn = document.querySelector("form button[type='submit']");
+    
+    //Password Validation
+    const isPasswordValid = password.length >= 8 && /[\W_]/g.test(password);
+    lengthHint.src = `/statics/icons/check-${password.length >= 8 ? 'green': 'grey'}.svg`;
+    charHint.src = `/statics/icons/check-${/[\W_]/.test(password) ? 'green': 'grey'}.svg`;
 
-	lengthHint.src = `/statics/icons/check-${password.length >= 8 ? "green" : "grey"}.svg`;
+    //Username Validation
+    const isUsernameValid = isValidUsername(username);
+    if (!isUsernameValid) {
+        errorSpan.style.display = "block";
+    } else {
+        errorSpan.style.display = "none";
+    }
 
-	charHint.src = `/statics/icons/check-${/[\W_]/.test(password) ? "green" : "grey"}.svg`;
-
-	if (first && last && username && isPasswordValid) {
-		submitBtn.removeAttribute("disabled");
-	} else {
-		submitBtn.setAttribute("disabled", "true");
-	}
-};
+    if(first && last && isUsernameValid && isPasswordValid) {
+        submitBtn.removeAttribute("disabled");
+    } else {
+        submitBtn.setAttribute("disabled", "true");
+    }
+}
 
 const createProfile = () => {
 	const first_name = document.getElementById("first").value.trim();
@@ -154,17 +178,28 @@ const onUploadLogo = async () => {
 
 const validateOrgForm = () => {
 	const name = document.getElementById("name").value.trim();
-	const shortname = document.getElementById("shortname").value.trim();
-	const email = document.getElementById("email").value.trim();
+    const shortname = document.getElementById("shortname").value.trim();
+	const errorSpan = document.getElementById("shortname-error");
+	const emailInput = document.getElementById("email");
+	const email = emailInput.value.trim();
 	const submitBtn = document.querySelector("#submit");
 
-	if (name && email && shortname) {
+    //Shortname Validation
+    const isShortnameValid = isValidUsername(shortname);
+    if (!isShortnameValid) {
+        errorSpan.style.display = "block";
+    } else {
+        errorSpan.style.display = "none";
+    }
+
+	//Email Validation
+	const isEmailValid = email && emailInput.checkValidity();
+
+	if (name && isShortnameValid && isEmailValid) {
 		submitBtn.removeAttribute("disabled");
 	} else {
 		submitBtn.setAttribute("disabled", "true");
 	}
-
-	
 };
 
 const createOrganization = (e) => {
