@@ -14,6 +14,7 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 func Init() *gin.Engine {
@@ -53,6 +54,10 @@ func Init() *gin.Engine {
 	//Cache
 	router.Use(views.NoCache())
 
+	//Request sanitizer (XSS Attacks prevention)
+	router.Use(views.SecureHeaders(config.Config.Env))
+	router.Use(views.SecureRequest(bluemonday.UGCPolicy()))
+
 	if config.Config.Debug {
 		router.Static("/statics", config.Config.Statics)
 	}
@@ -61,7 +66,7 @@ func Init() *gin.Engine {
 
 	views.Init(router)
 
-	//docs
+	//Docs
 	opts := middleware.SwaggerUIOpts{SpecURL: "/swagger.yaml"}
 	router.GET("/docs", gin.WrapH(middleware.SwaggerUI(opts, nil)))
 	router.GET("/swagger.yaml", gin.WrapH(http.FileServer(http.Dir("./docs"))))

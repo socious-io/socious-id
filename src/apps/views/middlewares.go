@@ -2,16 +2,21 @@ package views
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
+	"socious-id/src/apps/utils"
 	"socious-id/src/config"
 	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/microcosm-cc/bluemonday"
 	database "github.com/socious-io/pkg_database"
+	"github.com/unrolled/secure"
 
 	"github.com/gin-gonic/gin"
 )
@@ -117,12 +122,12 @@ func clientSecretRequired() gin.HandlerFunc {
 
 func NoCache() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Continue to handler
-		c.Next()
-
 		c.Writer.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
 		c.Writer.Header().Set("Pragma", "no-cache")
 		c.Writer.Header().Set("Expires", "0")
+
+		// Continue to handler
+		c.Next()
 	}
 }
 
@@ -139,6 +144,78 @@ func adminAccessRequired() gin.HandlerFunc {
 			return
 		}
 
+		c.Next()
+	}
+}
+
+func SecureHeaders(env string) gin.HandlerFunc {
+
+	isProduction := env == "production"
+
+	secureMiddleware := secure.New(secure.Options{
+		FrameDeny:          true, // X-Frame-Options: DENY
+		ContentTypeNosniff: true, // X-Content-Type-Options: nosniff
+		BrowserXssFilter:   true, // X-XSS-Protection: 1; mode=block (legacy)
+		// ReferrerPolicy:        "no-referrer",
+		ContentSecurityPolicy: "default-src 'self'", // Very important for XSS
+		// HSTS:
+		SSLRedirect:          isProduction,
+		STSSeconds:           31536000,
+		STSIncludeSubdomains: true,
+		STSPreload:           true,
+	})
+
+	return func(c *gin.Context) {
+		err := secureMiddleware.Process(c.Writer, c.Request)
+		if err != nil {
+			c.AbortWithStatus(500)
+			return
+		}
+		c.Next()
+	}
+}
+
+func SecureRequest(p *bluemonday.Policy) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Check content type
+		isUrlEncodedContent := strings.Contains(c.GetHeader("Content-Type"), "application/x-www-form-urlencoded")
+		isMultipartContent := strings.Contains(c.GetHeader("Content-Type"), "multipart/form-data")
+		isJsonContent := strings.Contains(c.GetHeader("Content-Type"), "application/json")
+
+		// --- 1. Sanitize Query Parameters ---
+		q := c.Request.URL.Query()
+		utils.SanitizeURLValues(q, p)
+		c.Request.URL.RawQuery = q.Encode()
+
+		// --- 2. Sanitize Form Data (application/x-www-form-urlencoded or multipart) ---
+		if isUrlEncodedContent || isMultipartContent {
+			if err := c.Request.ParseForm(); err != nil {
+				c.AbortWithStatusJSON(400, gin.H{
+					"error": fmt.Sprintf("Invalid body payload, err: %v", err),
+				})
+				return
+			}
+			utils.SanitizeURLValues(c.Request.PostForm, p)
+		} else if isJsonContent {
+			var bodyBytes []byte
+			if c.Request.Body != nil {
+				bodyBytes, _ = io.ReadAll(c.Request.Body)
+			}
+
+			if len(bodyBytes) > 0 {
+				var data map[string]interface{}
+				if err := json.Unmarshal(bodyBytes, &data); err != nil {
+					c.AbortWithStatusJSON(400, gin.H{
+						"error": fmt.Sprintf("Invalid body payload, err: %v", err),
+					})
+					return
+				}
+
+				utils.SanitizeMap(data, p)
+				safeBody, _ := json.Marshal(data)
+				c.Request.Body = io.NopCloser(bytes.NewReader(safeBody))
+			}
+		}
 		c.Next()
 	}
 }
