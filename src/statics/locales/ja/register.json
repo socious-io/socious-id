@@ -1,0 +1,11 @@
+{
+    "register-header": "メールアドレスを入力してください",
+    "register-subheader": "認証コードをお送りします",
+    "register-email-label": "メールアドレス*",
+    "register-email-placeholder": "メールアドレスを入力してください",
+    "register-continue-button": "続ける",
+    "register-what-next": "次に何が起こるの？",
+    "register-what-next-step1": "認証コードをメールで送信します",
+    "register-what-next-step2": "コードを入力してメールアドレスを認証します",
+    "register-what-next-step3": "Socious IDのプロフィールを完成させます"
+}

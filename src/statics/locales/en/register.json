@@ -1,0 +1,11 @@
+{
+    "register-header": "Enter your email",
+    "register-subheader": "We'll send you a verification code",
+    "register-email-label": "Email*",
+    "register-email-placeholder": "Enter your email",
+    "register-continue-button": "Continue",
+    "register-what-next": "What happens next?",
+    "register-what-next-step1": "We'll send a verification code to your email",
+    "register-what-next-step2": "Enter the code to verify your email",
+    "register-what-next-step3": "Complete your Socious ID profile"
+}
