@@ -10,7 +10,7 @@
                     </div>
                     <div class="upload">
                         <img id="avatar" src="/statics/images/avatar.svg" alt="avatar" width="64" height="64"
-                            class="upload-img" nonce="{{.nonce}}" />
+                            class="upload-img" />
                         <span class="text-grey text-sm leading-5">Add a photo (optional)</span>
                         <input id="upload" type="file" class="upload-input" data-event="on-upload-avatar" />
                         <input id="avatar-id" hidden type="text" />
@@ -43,15 +43,15 @@
                             <input placeholder="Create a password" type="password" id="pass" name="password"
                                 autocomplete="current-password" data-event="validate-form" />
                             <img src="/statics/icons/eye.svg" alt="show-password" width="20" height="20"
-                                class="input-end-icon cursor-pointer" data-event="toggle-password"  nonce="{{.nonce}}"/>
+                                class="input-end-icon cursor-pointer" data-event="toggle-password" />
                         </div>
                         <div class="input-hints">
                             <div class="flex items-center gap-2">
-                                <img src="/statics/icons/check-grey.svg" width="20" height="20" id="length-hint" nonce="{{.nonce}}" />
+                                <img src="/statics/icons/check-grey.svg" width="20" height="20" id="length-hint" />
                                 Must be at least 8 characters
                             </div>
                             <div class="flex items-center gap-2">
-                                <img src="/statics/icons/check-grey.svg" width="20" height="20" id="character-hint" nonce="{{.nonce}}" />
+                                <img src="/statics/icons/check-grey.svg" width="20" height="20" id="character-hint" />
                                 Must contain one special character
                             </div>
                         </div>

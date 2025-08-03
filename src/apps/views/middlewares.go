@@ -156,7 +156,7 @@ func SecureHeaders(env string) gin.HandlerFunc {
 		ContentTypeNosniff: true, // X-Content-Type-Options: nosniff
 		BrowserXssFilter:   true, // X-XSS-Protection: 1; mode=block (legacy)
 		// ReferrerPolicy:        "no-referrer",
-		ContentSecurityPolicy: "default-src 'self'; script-src 'self' $NONCE", // Very important for XSS
+		ContentSecurityPolicy: "default-src 'self'; script-src 'self' $NONCE; img-src 'self' https: http:;", // Very important for XSS
 		// HSTS:
 		SSLRedirect:          true,
 		STSSeconds:           31536000,
