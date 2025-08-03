@@ -5,25 +5,23 @@
 		<form method="post">
 			<div class="card">
 				<div class="logo">
-					<img src="/statics/icons/lock.svg" alt="Login Lock" width="24" height="24" />
+					<img src="/statics/icons/lock.svg" alt="Login Lock" width="24" height="24" nonce="{{.nonce}}" />
 				</div>
 				<input hidden value="1" type="number" name="confirmed" />
 				<input hidden id="identity_id" type="text" name="identity_id" />
 				<div name="header" class="header">
 					<h2>Sign in with Socious ID</h2>
 					<span class="text-grey leading-6">Choose an account</span>
-					<a data-event="logout" href="#">
-						<button type="button" theme="primary-outline">Or login with other account</button>
-					</a>
+					<button data-event="logout" type="button" theme="primary-outline">Or login with other account</button>
 				</div>
 				<div name="content-section" class="section">
 					<div name="individual" class="consent-account-label">
 						Your individual profile
 						<button type="submit" class="consent-account" data-event="select-account" data-identity-id="{{ .User.ID }}">
 							{{ if .User.Avatar }}
-								<img src="{{ .User.Avatar.URL }}" alt="Profile Image" width="40" height="40" />
+								<img src="{{ .User.Avatar.URL }}" alt="Profile Image" width="40" height="40" nonce="{{.nonce}}" />
 							{{ else }}
-								<img src="/statics/images/avatar-default.jpg" alt="Profile Image" width="40" height="40" />
+								<img src="/statics/images/avatar-default.jpg" alt="Profile Image" width="40" height="40" nonce="{{.nonce}}" />
 							{{ end }}
 							<div class="consent-account-name">
 								{{ .User.FirstName }} {{ .User.LastName }}
@@ -40,9 +38,9 @@
 							{{ range .Organizations }}
 							<button class="consent-account" data-event="select-account" data-identity-id="{{ .ID }}">
 								{{ if .Logo }}
-									<img src="{{ .Logo.URL }}" alt="Profile Image" width="40" height="40" />
+									<img src="{{ .Logo.URL }}" alt="Profile Image" width="40" height="40" nonce="{{.nonce}}" />
 								{{ else }}
-									<img src="/statics/images/logo-default.png" alt="Profile Image" width="40" height="40" />
+									<img src="/statics/images/logo-default.png" alt="Profile Image" width="40" height="40" nonce="{{.nonce}}" />
 								{{ end }}
 								<div class="consent-account-name">
 									{{.Name}}
