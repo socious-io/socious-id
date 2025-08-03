@@ -1,7 +1,6 @@
 {{template "header" .}}
 
 <body>
-    <form onsubmit="return createProfile()">
         <div class="intro">
             <div class="card">
                 <div name="content-section" class="section">
@@ -13,25 +12,25 @@
                         <img id="avatar" src="/statics/images/avatar.svg" alt="avatar" width="64" height="64"
                             class="upload-img" />
                         <span class="text-grey text-sm leading-5">Add a photo (optional)</span>
-                        <input id="upload" type="file" class="upload-input" oninput="onUploadProfile()" />
+                        <input id="upload" type="file" class="upload-input" data-event="on-upload-avatar" />
                         <input id="avatar-id" hidden type="text" />
                     </div>
                     <div class="input-groups">
                         <div class="input-label">
                             <label for="email">First name</label>
                             <input placeholder="Your first name" type="text" id="first" name="first_name"
-                                oninput="validateForm()" />
+                                data-event="validate-form" />
                         </div>
                         <div class="input-label">
                             <label for="email">Last name</label>
                             <input placeholder="Your last name" type="text" id="last" name="last_name"
-                                oninput="validateForm()" />
+                                data-event="validate-form" />
                         </div>
                     </div>
                     <div class="input-label">
                         <label for="email">Username</label>
                         <input placeholder="Choose a username" type="text" id="username" name="username"
-                            pattern="^[a-z0-9_]+$" minlength="6" maxlength="24" oninput="validateForm()" />
+                            pattern="^[a-z0-9_]+$" minlength="6" maxlength="24" data-event="validate-form" />
                         <span class="input-hints">This will be your unique identifier across all platforms</span>
                         <span id="username-error" class="error-message" style="display: none;">
                             Username must be 6–24 characters and can only contain lowercase letters, numbers, and
@@ -42,9 +41,9 @@
                         <label for="email">Password</label>
                         <div class="input-container">
                             <input placeholder="Create a password" type="password" id="pass" name="password"
-                                autocomplete="current-password" oninput="validateForm()" />
+                                autocomplete="current-password" data-event="validate-form" />
                             <img src="/statics/icons/eye.svg" alt="show-password" width="20" height="20"
-                                class="input-end-icon cursor-pointer" onclick="togglePassword(this)" />
+                                class="input-end-icon cursor-pointer" data-event="toggle-password" />
                         </div>
                         <div class="input-hints">
                             <div class="flex items-center gap-2">
@@ -59,14 +58,13 @@
                     </div>
                 </div>
                 <div name="button-section" class="section">
-                    <button type="submit" theme="primary" disabled>Create profile</button>
+                    <button data-event="on-submit-profile" theme="primary" disabled>Create profile</button>
                 </div>
                 <p id="error" style="color: red">
                     {{.error}}
                 </p>
             </div>
         </div>
-    </form>
 </body>
 
 {{ template "footer" . }}

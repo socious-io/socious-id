@@ -12,14 +12,14 @@
 				<div name="header" class="header">
 					<h2>Sign in with Socious ID</h2>
 					<span class="text-grey leading-6">Choose an account</span>
-					<a href="#" onclick="window.location.href = '/auth/logout?t=' + Date.now(); return false;">
+					<a data-event="logout" href="#">
 						<button type="button" theme="primary-outline">Or login with other account</button>
 					</a>
 				</div>
 				<div name="content-section" class="section">
 					<div name="individual" class="consent-account-label">
 						Your individual profile
-						<button onclick="document.getElementById('identity_id').value = '{{ .User.ID }}'; this.form.submit();" type="submit" class="consent-account">
+						<button type="submit" class="consent-account" data-event="select-account" data-identity-id="{{ .User.ID }}">
 							{{ if .User.Avatar }}
 								<img src="{{ .User.Avatar.URL }}" alt="Profile Image" width="40" height="40" />
 							{{ else }}
@@ -38,7 +38,7 @@
 						Your organization profiles
 						<div class="consent-accounts">
 							{{ range .Organizations }}
-							<button onclick="document.getElementById('identity_id').value = '{{ .ID }}'; this.form.submit();" class="consent-account">
+							<button class="consent-account" data-event="select-account" data-identity-id="{{ .ID }}">
 								{{ if .Logo }}
 									<img src="{{ .Logo.URL }}" alt="Profile Image" width="40" height="40" />
 								{{ else }}

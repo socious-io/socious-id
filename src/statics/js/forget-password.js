@@ -19,13 +19,13 @@ const handleForgotPassword = ()  => {
     return false;
 }
 
-const displayEmail = () => {
-    const params = new URLSearchParams(window.location.search);
-    const email = params.get("email");
-    if (email) {
-        document.getElementById("user-email").textContent = decodeURIComponent(email);
-    }
-}
+// const displayEmail = () => {
+//     const params = new URLSearchParams(window.location.search);
+//     const email = params.get("email");
+//     if (email) {
+//         document.getElementById("user-email").textContent = decodeURIComponent(email);
+//     }
+// }
 
 const verifyOTP = () => {
     const inputs = document.querySelectorAll(".otp-input");

@@ -150,27 +150,30 @@ func adminAccessRequired() gin.HandlerFunc {
 
 func SecureHeaders(env string) gin.HandlerFunc {
 
-	isProduction := env == "production"
-
-	secureMiddleware := secure.New(secure.Options{
+	IsDevelopment := env != "production"
+	options := secure.Options{
 		FrameDeny:          true, // X-Frame-Options: DENY
 		ContentTypeNosniff: true, // X-Content-Type-Options: nosniff
 		BrowserXssFilter:   true, // X-XSS-Protection: 1; mode=block (legacy)
 		// ReferrerPolicy:        "no-referrer",
-		ContentSecurityPolicy: "default-src 'self'", // Very important for XSS
+		ContentSecurityPolicy: "default-src 'self'; script-src 'self' $NONCE", // Very important for XSS
 		// HSTS:
-		SSLRedirect:          isProduction,
+		SSLRedirect:          true,
 		STSSeconds:           31536000,
 		STSIncludeSubdomains: true,
 		STSPreload:           true,
-	})
+		IsDevelopment:        IsDevelopment,
+	}
 
 	return func(c *gin.Context) {
-		err := secureMiddleware.Process(c.Writer, c.Request)
+		s := secure.New(options)
+		nonce, err := s.ProcessAndReturnNonce(c.Writer, c.Request)
 		if err != nil {
 			c.AbortWithStatus(500)
 			return
 		}
+		c.Set("nonce", nonce)
+
 		c.Next()
 	}
 }
