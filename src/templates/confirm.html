@@ -17,7 +17,7 @@
 				<div name="content-section" class="section">
 					<div name="individual" class="consent-account-label">
 						Your individual profile
-						<button type="submit" class="consent-account" data-event="select-account" data-identity-id="{{ .User.ID }}">
+						<button type="button" class="consent-account" data-event="select-account" data-identity-id="{{ .User.ID }}">
 							{{ if .User.Avatar }}
 								<img src="{{ .User.Avatar.URL }}" alt="Profile Image" width="40" height="40" />
 							{{ else }}
@@ -36,7 +36,7 @@
 						Your organization profiles
 						<div class="consent-accounts">
 							{{ range .Organizations }}
-							<button class="consent-account" data-event="select-account" data-identity-id="{{ .ID }}">
+							<button type="button" class="consent-account" data-event="select-account" data-identity-id="{{ .ID }}">
 								{{ if .Logo }}
 									<img src="{{ .Logo.URL }}" alt="Profile Image" width="40" height="40" />
 								{{ else }}
