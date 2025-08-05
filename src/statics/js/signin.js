@@ -6,5 +6,5 @@ function logout(){
 function confirmIdentity(target){
     const identityIdInput = document.querySelector("#identity_id");
     identityIdInput.value = target.getAttribute("data-identity-id");
-    target.form.submit();
+    target.closest('form').submit();
 }

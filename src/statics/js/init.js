@@ -39,6 +39,8 @@ function initOnClicks(){
 		el.addEventListener("paste", handlePaste);
 		el.addEventListener("keydown", (e) => handleBackspace(e, e.target));
 	});
+
+	stopLoader();
 }
 
 document.addEventListener("DOMContentLoaded", initOnClicks);

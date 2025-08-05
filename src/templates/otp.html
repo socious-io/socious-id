@@ -1,5 +1,6 @@
 {{template "header" .}}
 <body data-event="display-email">
+    {{template "loader" .}}
     <form action="/auth/otp/confirm" method="get">
         <div class="intro">
             <div class="card">

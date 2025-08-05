@@ -1,0 +1,15 @@
+.loader {
+    position: fixed;
+    opacity: 1;
+    transition: opacity 300ms 0s;
+    z-index: 1300;
+    top: 0px;
+    right: 0px;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    text-align: center;
+    align-content: center;
+    font-size: 10rem;
+    color: white;
+}
