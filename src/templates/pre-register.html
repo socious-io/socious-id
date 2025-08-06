@@ -4,18 +4,18 @@
 	{{template "loader" .}}	
 	<div class="wrapper">
 		<div class="custom-select-desktop">
-			<div class="input-control" onclick="toggleDropdown('desktop-options')">
+			<div class="input-control" data-event="toggle-lang-dropdown">
 				<span id="desktop-selected">English (US)</span>
 				<img src="/statics/icons/chevron-down.svg"  alt="chevron-down" width="20" height="20" />
 			</div>
 			<ul id="desktop-options" class="options">
-				<li data-value="en" onclick="changeLanguage(this, 'en')">English (US)</li>
-				<li data-value="ja" onclick="changeLanguage(this, 'ja')">Japanese 日本語</li>
-				<li data-value="es" onclick="changeLanguage(this,'es')">Spanish Español</li>
-				<li data-value="ko" onclick="changeLanguage(this,'ko')">Korean 한국어</li>
-				<li data-value="ar" onclick="changeLanguage(this,'ar')">Arabic العربية</li>
-				<li data-value="zh-CN" onclick="changeLanguage(this,'zh-CN')">Chinese 中文简体</li>
-				<li data-value="fr" onclick="changeLanguage(this,'fr')">French Français</li>
+				<li data-value="en" data-event="change-language">English (US)</li>
+				<li data-value="ja" data-event="change-language">Japanese 日本語</li>
+				<li data-value="es" data-event="change-language">Spanish Español</li>
+				<li data-value="ko" data-event="change-language">Korean 한국어</li>
+				<li data-value="ar" data-event="change-language">Arabic العربية</li>
+				<li data-value="zh-CN" data-event="change-language">Chinese 中文简体</li>
+				<li data-value="fr" data-event="change-language">French Français</li>
 			</ul>
 		</div>
 		<div class="intro">
@@ -104,13 +104,13 @@
 						<img src="/statics/icons/chevron-down.svg"  alt="chevron-down" width="20" height="20" />
 					</div>
 					<ul id="mobile-options" class="options">
-						<li data-value="en" onclick="changeLanguage(this, 'en')">English (US)</li>
-						<li data-value="ja" onclick="changeLanguage(this, 'ja')">Japanese 日本語</li>
-						<li data-value="es" onclick="changeLanguage(this,'es')">Spanish Español</li>
-						<li data-value="ko" onclick="changeLanguage(this,'ko')">Korean 한국어</li>
-						<li data-value="ar" onclick="changeLanguage(this,'ar')">Arabic العربية</li>
-						<li data-value="zh-CN" onclick="changeLanguage(this,'zh-CN')">Chinese 中文简体</li>
-						<li data-value="fr" onclick="changeLanguage(this,'fr')">French Français</li>
+						<li data-value="en" data-event="change-language">English (US)</li>
+						<li data-value="ja" data-event="change-language">Japanese 日本語</li>
+						<li data-value="es" data-event="change-language">Spanish Español</li>
+						<li data-value="ko" data-event="change-language">Korean 한국어</li>
+						<li data-value="ar" data-event="change-language">Arabic العربية</li>
+						<li data-value="zh-CN" data-event="change-language">Chinese 中文简体</li>
+						<li data-value="fr" data-event="change-language">French Français</li>
 					</ul>
 				</div>
 			</div>
