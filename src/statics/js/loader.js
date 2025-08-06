@@ -1,6 +1,7 @@
 // const topBarConfig = {}
 
 function startLoader(){
+  console.log("calling start loader")
     topbar.show()
     document.getElementById("loader").style.opacity = 1;
     document.getElementById("loader").hidden = false;
@@ -12,13 +13,11 @@ function stopLoader(){
     document.getElementById("loader").hidden = true;
 }
 
-const observer = new MutationObserver(() => {
-  const body = document.body;
-  if (body) {
-    observer.disconnect();
-    startLoader()
+(function check() {
+  if (document.body) {
+    startLoader();
+  } else {
+    requestAnimationFrame(check); // wait for next frame
   }
-});
-
-observer.observe(document.documentElement, { childList: true });
+})();
 

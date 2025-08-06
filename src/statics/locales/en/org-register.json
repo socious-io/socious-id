@@ -1,0 +1,14 @@
+{
+    "org-register-header": "Organization details",
+    "org-register-subheader": "Tell us about your organization",
+    "org-register-add-photo": "Add a photo (optional)",
+    "org-register-name": "Organization name*",
+    "org-register-name-placeholder": "Your organization name",
+    "org-register-username": "Organization username*",
+    "org-register-username-placeholder": "Choose a username",
+    "org-register-username-hint": "This will be your unique identifier across all platforms",
+    "org-register-username-error": "Username must be 6–24 characters and can only contain lowercase letters, numbers, and underscores (no spaces, dashes, dots, or uppercase letters).",
+    "org-register-email": "Organization email*",
+    "org-register-email-placeholder": "Your organization email",
+    "org-register-continue-button": "Continue"
+}

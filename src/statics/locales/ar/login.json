@@ -1,0 +1,12 @@
+{
+    "login-header": "تسجيل الدخول باستخدام هوية Socious",
+    "login-subheader": "وصولك إلى جميع منصات التأثير الخاصة بك",
+    "login-email-placeholder": "أدخل بريدك الإلكتروني",
+    "login-password-placeholder": "أدخل كلمة المرور الخاصة بك",
+    "login-forget-password": "هل نسيت كلمة المرور؟",
+    "login-button": "تسجيل الدخول",
+    "login-or": "أو",
+    "login-continue-with-google": "المتابعة باستخدام Google",
+    "login-login-with-apple": "تسجيل الدخول باستخدام Apple",
+    "login-create-account": "إنشاء حساب"
+}

@@ -10,13 +10,13 @@
 				</div>
 				<input hidden value="1" type="number" name="confirmed" />
 				<div name="header" class="header">
-					<h2>Sign in with Socious ID</h2>
-					<span class="text-grey leading-6">Choose an account</span>
-					<a href="/auth/logout?t={{ .now }}" theme="primary-outline">Or login with other account</a>
+					<h2 data-i18n="confirm-header">Sign in with Socious ID</h2>
+					<span data-i18n="confirm-subheader" class="text-grey leading-6">Choose an account</span>
+					<a href="/auth/logout?t={{ .now }}" data-i18n="confirm-login-other-button" theme="primary-outline">Or login with other account</a>
 				</div>
 				<div name="content-section" class="section">
 					<div name="individual" class="consent-account-label">
-						Your individual profile
+						<span data-i18n="confirm-individual">Your individual profile</span>
 						<button type="submit" class="consent-account" name="identity_id" value="{{ .User.ID }}">
 							{{ if .User.Avatar }}
 								<img src="{{ .User.Avatar.URL }}" alt="Profile Image" width="40" height="40" />
@@ -33,7 +33,7 @@
 						{{end}}
 					</div>
 					<div name="organization" class="consent-account-label">
-						Your organization profiles
+						<span data-i18n="confirm-organization">Your organization profiles</span>
 						<div class="consent-accounts">
 							{{ range .Organizations }}
 							<button type="submit" class="consent-account" name="identity_id" value="{{ .ID }}">

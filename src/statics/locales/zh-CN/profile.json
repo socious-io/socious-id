@@ -1,0 +1,18 @@
+{
+    "profile-header": "创建你的个人资料",
+    "profile-subheader": "请介绍一下你自己",
+    "profile-add-photo": "添加照片（可选）",
+    "profile-first-name": "名字",
+    "profile-first-name-placeholder": "你的名字",
+    "profile-last-name": "姓氏",
+    "profile-last-name-placeholder": "你的姓氏",
+    "profile-username": "用户名",
+    "profile-username-placeholder": "选择一个用户名",
+    "profile-username-hint": "这将是你在所有平台上的唯一标识符",
+    "profile-username-error": "用户名必须为6到24个字符，只能包含小写字母、数字和下划线（不能包含空格、短横线、点或大写字母）。",
+    "profile-password": "密码",
+    "profile-password-placeholder": "创建密码",
+    "profile-password-hint1": "至少 8 个字符",
+    "profile-password-hint2": "必须包含一个特殊字符",
+    "profile-create-button": "创建个人资料"
+}

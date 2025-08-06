@@ -25,6 +25,12 @@ function initOnClicks(){
 	document.querySelectorAll('input[data-event="on-submit-profile"]').forEach((el)=>{
 		el.addEventListener("submit",createProfile);
 	});
+	document.querySelectorAll('[data-event="change-language"]').forEach((el)=>{
+		el.addEventListener("click",(e)=>changeLanguage(e.target, e.target.getAttribute('data-value')));
+	});
+	document.querySelectorAll('[data-event="toggle-lang-dropdown"]').forEach((el)=>{
+		el.addEventListener("click",()=>toggleDropdown('desktop-options'));
+	});
 	document.querySelectorAll('[data-event="otp-input"]').forEach((el, idx, all)=>{
 		el.addEventListener("input", (e) => moveToNext(e.target, idx+1, all));
 		el.addEventListener("keyup", checkOTP);

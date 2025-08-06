@@ -1,0 +1,14 @@
+{
+    "otp-header": "이메일을 확인하세요",
+    "otp-subheader": "인증 코드를 보냈습니다:",
+    "otp-verify-button": "이메일 인증",
+    "otp-didn't-receive": "이메일을 받지 못하셨나요? ",
+    "otp-resend": "다시 보내려면 클릭하세요",
+    "otp-find-code": "코드를 찾을 수 없나요?",
+    "otp-find-code-step1": "스팸 메일함을 확인하세요",
+    "otp-find-code-step2": "올바른 이메일을 입력했는지 확인하세요",
+    "otp-find-code-step3": "코드는 10분 후에 만료됩니다",
+    "otp-help": "도움이 필요하신가요? ",
+    "otp-contact-us": "문의하기",
+    "otp-back-signin": "로그인으로 돌아가기"
+}
