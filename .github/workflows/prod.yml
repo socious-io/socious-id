@@ -1,4 +1,4 @@
-name: CI/CD Development Env
+name: CI/CD Production Env
 
 on:
   push:

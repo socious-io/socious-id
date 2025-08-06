@@ -75,6 +75,7 @@ func (ip *ImpactPoint) Create(ctx context.Context) error {
 		ip.AccessID,
 		ip.Meta,
 		ip.UniqueTag,
+		ip.Value,
 	)
 	if err != nil {
 		return err

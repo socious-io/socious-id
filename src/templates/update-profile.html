@@ -1,7 +1,7 @@
 {{template "header" .}}
 
 <body>
-    <form onsubmit="return createProfile()">
+    {{template "loader" .}}
         <div class="intro">
             <div class="card">
                 <div name="content-section" class="section">
@@ -15,26 +15,26 @@
                         <span data-i18n="profile-add-photo" class="text-grey text-sm leading-5">
                             Add a photo (optional)
                         </span>
-                        <input id="upload" type="file" class="upload-input" oninput="onUploadProfile()" />
+                        <input id="upload" type="file" class="upload-input" data-event="on-upload-avatar" />
                         <input id="avatar-id" hidden type="text" />
                     </div>
                     <div class="input-groups">
                         <div class="input-label">
                             <label data-i18n="profile-first-name" for="first">First name</label>
                             <input data-i18n-placeholder="profile-first-name-placeholder" placeholder="Your first name"
-                                type="text" id="first" name="first_name" oninput="validateForm()" />
+                                type="text" id="first" name="first_name" data-event="validate-form" />
                         </div>
                         <div class="input-label">
                             <label data-i18n="profile-last-name" for="last">Last name</label>
                             <input data-i18n-placeholder="profile-last-name-placeholder" placeholder="Your last name"
-                                type="text" id="last" name="last_name" oninput="validateForm()" />
+                                type="text" id="last" name="last_name" data-event="validate-form" />
                         </div>
                     </div>
                     <div class="input-label">
                         <label data-i18n="profile-username" for="username">Username</label>
                         <input data-i18n-placeholder="profile-username-placeholder" placeholder="Choose a username"
                             type="text" id="username" name="username" pattern="^[a-z0-9_]+$" minlength="6"
-                            maxlength="24" oninput="validateForm()" />
+                            maxlength="24" data-event="validate-form" />
                         <span data-i18n="profile-username-hint" class="input-hints">This will be your unique identifier
                             across all platforms</span>
                         <span data-i18n="profile-username-error" id="username-error" class="error-message"
@@ -48,9 +48,9 @@
                         <div class="input-container">
                             <input data-i18n-placeholder="profile-password-placeholder" placeholder="Create a password"
                                 type="password" id="pass" name="password" autocomplete="current-password"
-                                oninput="validateForm()" />
+                                data-event="validate-form" />
                             <img src="/statics/icons/eye.svg" alt="show-password" width="20" height="20"
-                                class="input-end-icon cursor-pointer" onclick="togglePassword(this)" />
+                                class="input-end-icon cursor-pointer" data-event="toggle-password" />
                         </div>
                         <div class="input-hints">
                             <div class="flex items-center gap-2">
@@ -65,15 +65,13 @@
                     </div>
                 </div>
                 <div name="button-section" class="section">
-                    <button data-i18n="profile-create-button" type="submit" theme="primary" disabled>Create
-                        profile</button>
+                    <button data-i18n="profile-create-button" data-event="on-submit-profile" theme="primary" disabled>Create profile</button>
                 </div>
                 <p id="error" style="color: red">
                     {{.error}}
                 </p>
             </div>
         </div>
-    </form>
 </body>
 
 {{ template "footer" . }}

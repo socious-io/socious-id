@@ -59,6 +59,7 @@ const (
 	//ImpactPointType
 	ImpactPointTypeWorkSubmit ImpactPointType = "WORKSUBMIT"
 	ImpactPointTypeDonation   ImpactPointType = "DONATION"
+	ImpactPointTypeVoting     ImpactPointType = "VOTING"
 	ImpactPointTypeVolunteer  ImpactPointType = "VOLUNTEER"
 	ImpactPointTypeOther      ImpactPointType = "OTHER"
 

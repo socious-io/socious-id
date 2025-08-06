@@ -1,11 +1,11 @@
 {{template "header" .}}
-
-<body onload="displayEmail()">
+<body data-event="display-email">
+    {{template "loader" .}}
     <form action="/auth/otp/confirm" method="get">
         <div class="intro">
             <div class="card">
                 <div class="logo">
-                    <img src="/statics/icons/mail.svg" alt="Login Lock" width="24" height="24" />
+                    <img src="/statics/icons/mail.svg" alt="Login Lock" width="24" height="24"/>
                 </div>
                 <div name="header" class="header">
                     <h2 data-i18n="otp-header">Check your email</h2>
@@ -13,45 +13,39 @@
                         <span data-i18n="otp-subheader" class="text-grey leading-6">
                             We sent a verification code to
                         </span>
-                        <span class="text-primary font-medium leading-6" id="user-email"></span>
+                        <span class="text-primary font-medium leading-6" id="user-email">{{.email}}</span>
                     </div>
                 </div>
                 <div name="content-section" class="section">
                     <div class="otp-container">
                         <div class="input-wrapper">
                             <input type="text" class="otp-input" maxlength="1" inputmode="numeric"
-                                oninput="moveToNext(this, 1)" onkeyup="checkOTP()" onpaste="handlePaste(event)"
-                                onkeydown="handleBackspace(event, this)" />
+                                data-event="otp-input" />
                             <div class="otp-placeholder"></div>
                         </div>
                         <div class="input-wrapper">
                             <input type="text" class="otp-input" maxlength="1" inputmode="numeric"
-                                oninput="moveToNext(this, 2)" onkeyup="checkOTP()" onpaste="handlePaste(event)"
-                                onkeydown="handleBackspace(event, this)" />
+                                data-event="otp-input" />
                             <div class="otp-placeholder"></div>
                         </div>
                         <div class="input-wrapper">
                             <input type="text" class="otp-input" maxlength="1" inputmode="numeric"
-                                oninput="moveToNext(this, 3)" onkeyup="checkOTP()" onpaste="handlePaste(event)"
-                                onkeydown="handleBackspace(event, this)" />
+                                data-event="otp-input" />
                             <div class="otp-placeholder"></div>
                         </div>
                         <div class="input-wrapper">
                             <input type="text" class="otp-input" maxlength="1" inputmode="numeric"
-                                oninput="moveToNext(this, 4)" onkeyup="checkOTP()" onpaste="handlePaste(event)"
-                                onkeydown="handleBackspace(event, this)" />
+                                data-event="otp-input" />
                             <div class="otp-placeholder"></div>
                         </div>
                         <div class="input-wrapper">
                             <input type="text" class="otp-input" maxlength="1" inputmode="numeric"
-                                oninput="moveToNext(this, 5)" onkeyup="checkOTP()" onpaste="handlePaste(event)"
-                                onkeydown="handleBackspace(event, this)" />
+                                data-event="otp-input" />
                             <div class="otp-placeholder"></div>
                         </div>
                         <div class="input-wrapper">
                             <input type="text" class="otp-input" maxlength="1" inputmode="numeric"
-                                oninput="moveToNext(this, 6)" onkeyup="checkOTP()" onpaste="handlePaste(event)"
-                                onkeydown="handleBackspace(event, this)" />
+                                data-event="otp-input" />
                             <div class="otp-placeholder"></div>
                         </div>
                     </div>

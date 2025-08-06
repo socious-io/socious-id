@@ -25,6 +25,8 @@ func authGroup(router *gin.Engine) {
 	g := router.Group("auth")
 
 	g.GET("/confirm", auth.LoginRequired(), func(c *gin.Context) {
+		nonce := c.MustGet("nonce")
+
 		if authSession := loadAuthSession(c); authSession != nil {
 			user := c.MustGet("user").(*models.User)
 			organizations, _ := models.GetOrganizationsByMember(user.ID)
@@ -32,6 +34,8 @@ func authGroup(router *gin.Engine) {
 				"User":          user,
 				"Organizations": organizations,
 				"AuthSession":   authSession,
+				"nonce":         nonce,
+				"now":           time.Now().UnixMilli(),
 			})
 		}
 
@@ -54,6 +58,7 @@ func authGroup(router *gin.Engine) {
 		if authSession == nil {
 			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
 				"error": "not accepted without auth session",
+				"now":   time.Now().UnixMilli(),
 			})
 			return
 		}
@@ -87,6 +92,7 @@ func authGroup(router *gin.Engine) {
 		if err := otp.Create(ctx); err != nil {
 			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
 				"error": err.Error(),
+				"now":   time.Now().UnixMilli(),
 			})
 			return
 		}
@@ -100,7 +106,13 @@ func authGroup(router *gin.Engine) {
 	})
 
 	g.GET("/login", auth.CheckLogin(), func(c *gin.Context) {
-		c.HTML(http.StatusOK, "login.html", gin.H{})
+		nonce := c.MustGet("nonce")
+		fmt.Println(gin.H{
+			"nonce": nonce,
+		})
+		c.HTML(http.StatusOK, "login.html", gin.H{
+			"nonce": nonce,
+		})
 	})
 
 	g.POST("/login", auth.CheckLogin(), func(c *gin.Context) {
@@ -226,11 +238,13 @@ func authGroup(router *gin.Engine) {
 
 	g.POST("/apple/callback", func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
+		nonce := c.MustGet("nonce")
 
 		form := new(auth.AppleLoginForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
 				"error": err.Error(),
+				"nonce": nonce,
 			})
 			return
 		}
@@ -239,6 +253,7 @@ func authGroup(router *gin.Engine) {
 		if err != nil {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
 				"error": "Error: Apple login failed",
+				"nonce": nonce,
 			})
 			return
 		}
@@ -256,6 +271,7 @@ func authGroup(router *gin.Engine) {
 			if err = u.Create(ctx); err != nil {
 				c.HTML(http.StatusBadRequest, "login.html", gin.H{
 					"error": err.Error(),
+					"nonce": nonce,
 				})
 				return
 			}
@@ -267,6 +283,7 @@ func authGroup(router *gin.Engine) {
 			if err != nil {
 				c.HTML(http.StatusBadRequest, "login.html", gin.H{
 					"error": err.Error(),
+					"nonce": nonce,
 				})
 				return
 			}
@@ -289,11 +306,14 @@ func authGroup(router *gin.Engine) {
 		email := c.Query("email")
 		code := c.Query("code")
 		ctx := c.MustGet("ctx").(context.Context)
+		nonce := c.MustGet("nonce")
 
 		otp, err := models.GetOTPByEmailAndCode(email, code)
 		if err != nil {
 			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
 				"error": err.Error(),
+				"email": email,
+				"nonce": nonce,
 			})
 			return
 		}
@@ -301,6 +321,8 @@ func authGroup(router *gin.Engine) {
 		if otp.ExpireAt.Before(time.Now()) || otp.VerifiedAt != nil {
 			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
 				"error": "code has been expired",
+				"email": email,
+				"nonce": nonce,
 			})
 			return
 		}
@@ -316,6 +338,8 @@ func authGroup(router *gin.Engine) {
 		if err := otp.Verify(ctx, false); err != nil {
 			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
 				"error": err.Error(),
+				"email": email,
+				"nonce": nonce,
 			})
 			return
 		}
@@ -323,6 +347,8 @@ func authGroup(router *gin.Engine) {
 		if err := otp.User.Verify(ctx, models.UserVerificationTypeEmail); err != nil {
 			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
 				"error": err.Error(),
+				"email": email,
+				"nonce": nonce,
 			})
 			return
 		}
@@ -341,9 +367,11 @@ func authGroup(router *gin.Engine) {
 
 	g.GET("/otp", func(c *gin.Context) {
 		email := c.Query("email")
+		nonce := c.MustGet("nonce")
 
 		c.HTML(http.StatusOK, "otp.html", gin.H{
 			"email": email,
+			"nonce": nonce,
 		})
 	})
 
@@ -351,11 +379,13 @@ func authGroup(router *gin.Engine) {
 		authSession := loadAuthSession(c)
 
 		ctx := c.MustGet("ctx").(context.Context)
+		nonce := c.MustGet("nonce")
 
 		form := new(auth.OTPForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{
 				"error": err.Error(),
+				"nonce": nonce,
 			})
 			return
 		}
@@ -370,6 +400,7 @@ func authGroup(router *gin.Engine) {
 		if err := u.Create(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{
 				"error": "Email is already in use. Please select different email.",
+				"nonce": nonce,
 			})
 			return
 		}
@@ -387,6 +418,7 @@ func authGroup(router *gin.Engine) {
 		if err := otp.Create(ctx); err != nil {
 			c.HTML(http.StatusNotAcceptable, "register.html", gin.H{
 				"error": err.Error(),
+				"nonce": nonce,
 			})
 			return
 		}
@@ -407,11 +439,17 @@ func authGroup(router *gin.Engine) {
 	})
 
 	g.GET("/register", auth.CheckLogin(), func(c *gin.Context) {
-		c.HTML(http.StatusOK, "register.html", gin.H{})
+		nonce := c.MustGet("nonce")
+		c.HTML(http.StatusOK, "register.html", gin.H{
+			"nonce": nonce,
+		})
 	})
 
 	g.GET("/register/pre", auth.CheckLogin(), func(c *gin.Context) {
-		c.HTML(http.StatusOK, "pre-register.html", gin.H{})
+		nonce := c.MustGet("nonce")
+		c.HTML(http.StatusOK, "pre-register.html", gin.H{
+			"nonce": nonce,
+		})
 	})
 
 	g.PUT("/password", auth.LoginRequired(), func(c *gin.Context) {
@@ -445,22 +483,30 @@ func authGroup(router *gin.Engine) {
 	})
 
 	g.POST("/password/forget", auth.CheckLogin(), func(c *gin.Context) {
-
 		ctx := c.MustGet("ctx").(context.Context)
+		nonce := c.MustGet("nonce")
 
 		form := new(auth.OTPForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.HTML(http.StatusBadRequest, "forget-password.html", gin.H{
 				"error": err.Error(),
+				"nonce": nonce,
 			})
 			return
 		}
 
 		//Fetching user
 		u, err := models.GetUserByEmail(form.Email)
-		if err != nil {
+		if err != nil && errors.Is(err, sql.ErrNoRows) {
+			c.HTML(http.StatusBadRequest, "forget-password.html", gin.H{
+				"error": "Error: User with this email is not registered",
+				"nonce": nonce,
+			})
+			return
+		} else if err != nil {
 			c.HTML(http.StatusBadRequest, "forget-password.html", gin.H{
 				"error": err.Error(),
+				"nonce": nonce,
 			})
 			return
 		}
@@ -469,6 +515,7 @@ func authGroup(router *gin.Engine) {
 		if u.Status == models.UserStatusTypeInactive {
 			c.HTML(http.StatusBadRequest, "forget-password.html", gin.H{
 				"error": "Error: User couldn't be found/is not registered on Socious",
+				"nonce": nonce,
 			})
 			return
 		}
@@ -487,6 +534,7 @@ func authGroup(router *gin.Engine) {
 		if err := otp.Create(ctx); err != nil {
 			c.HTML(http.StatusNotAcceptable, "forget-password.html", gin.H{
 				"error": err.Error(),
+				"nonce": nonce,
 			})
 			return
 		}
@@ -507,18 +555,23 @@ func authGroup(router *gin.Engine) {
 	})
 
 	g.GET("/password/forget", auth.CheckLogin(), func(c *gin.Context) {
-		c.HTML(http.StatusOK, "forget-password.html", gin.H{})
+		nonce := c.MustGet("nonce")
+		c.HTML(http.StatusOK, "forget-password.html", gin.H{
+			"nonce": nonce,
+		})
 	})
 
 	g.POST("/password/set", auth.LoginRequired(), func(c *gin.Context) {
 
 		user := c.MustGet("user").(*models.User)
 		ctx := c.MustGet("ctx").(context.Context)
+		nonce := c.MustGet("nonce")
 
 		form := new(auth.SetPasswordForm)
 		if err := c.ShouldBind(form); err != nil {
 			c.HTML(http.StatusBadRequest, "set-password.html", gin.H{
 				"error": err.Error(),
+				"nonce": nonce,
 			})
 			return
 		}
@@ -528,6 +581,7 @@ func authGroup(router *gin.Engine) {
 		if err := user.UpdatePassword(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "set-password.html", gin.H{
 				"error": err.Error(),
+				"nonce": nonce,
 			})
 			return
 		}
@@ -536,11 +590,17 @@ func authGroup(router *gin.Engine) {
 	})
 
 	g.GET("/password/set", auth.LoginRequired(), func(c *gin.Context) {
-		c.HTML(http.StatusOK, "set-password.html", gin.H{})
+		nonce := c.MustGet("nonce")
+		c.HTML(http.StatusOK, "set-password.html", gin.H{
+			"nonce": nonce,
+		})
 	})
 
 	g.GET("/password/set/confirm", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "post-set-password.html", gin.H{})
+		nonce := c.MustGet("nonce")
+		c.HTML(http.StatusOK, "post-set-password.html", gin.H{
+			"nonce": nonce,
+		})
 	})
 
 	g.DELETE("/logout", auth.LoginRequired(), func(c *gin.Context) {

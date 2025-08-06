@@ -1,11 +1,12 @@
 {{template "header" .}}
 
 <body>
+    {{template "loader" .}}
     <form method="post">
         <div class="intro">
             <div class="card">
                 <div class="logo">
-                    <img src="/statics/icons/mail.svg" alt="Login Lock" width="24" height="24" />
+                    <img src="/statics/icons/mail.svg" alt="Login Lock" width="24" height="24"/>
                 </div>
                 <div name="header" class="header">
                     <h2 data-i18n="register-header">Enter your email</h2>
@@ -17,7 +18,7 @@
                     <div class="input-label">
                         <label data-i18n="register-email-label" for="email">Email*</label>
                         <input data-i18n-placeholder="register-email-placeholder" placeholder="Enter your email"
-                            type="email" id="email" name="email" autocomplete="email" oninput="validateEmail()" />
+                            type="email" id="email" name="email" autocomplete="email" data-event="validate-email" />
                     </div>
                 </div>
                 <div name="button-section" class="section">

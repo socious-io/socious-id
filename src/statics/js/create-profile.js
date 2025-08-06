@@ -68,7 +68,8 @@ const validateForm = () => {
     const password = document.getElementById("pass").value.trim();
     const lengthHint = document.getElementById("length-hint");
     const charHint = document.getElementById("character-hint");
-    const submitBtn = document.querySelector("form button[type='submit']");
+	const submitBtn = document.querySelector('button[data-event="on-submit-profile"]');
+	
     
     //Password Validation
     const isPasswordValid = password.length >= 8 && /[\W_]/g.test(password);
@@ -109,6 +110,7 @@ const createProfile = () => {
 		headers: { "Content-Type": "application/json" },
 	})
 	.then((response) => {
+		console.log(response)
 		if (response.ok) {
 			if (response.redirected) {  // Detect if a redirect happened
 				window.location.href = response.url;  // Redirect user
@@ -182,7 +184,7 @@ const validateOrgForm = () => {
 	const errorSpan = document.getElementById("shortname-error");
 	const emailInput = document.getElementById("email");
 	const email = emailInput.value.trim();
-	const submitBtn = document.querySelector("#submit");
+	const submitBtn = document.querySelector('button[data-event="create-organization"]');
 
     //Shortname Validation
     const isShortnameValid = isValidUsername(shortname);
@@ -202,13 +204,14 @@ const validateOrgForm = () => {
 	}
 };
 
-const createOrganization = (e) => {
+const createOrganization = () => {
 	const name = document.getElementById("name").value.trim();
 	const shortname = document.getElementById("shortname").value.trim();
 	const email = document.getElementById("email").value.trim();
 	const logoId = document.getElementById("logo-id").value.trim();
+	const submitBtn = document.querySelector('button[data-event="create-organization"]');
 
-	document.querySelector("#submit").setAttribute("disabled", "true");
+	submitBtn.setAttribute("disabled", "true");
 	
     fetch("/organizations/register", {
 		method: "POST",
@@ -225,7 +228,7 @@ const createOrganization = (e) => {
 			if (response.redirected) {  // Detect if a redirect happened
 				window.location.href = response.url;  // Redirect user
 			} else {
-				document.querySelector("#submit").removeAttribute("disabled");
+				submitBtn.removeAttribute("disabled");
 				return response.text();  // Handle normal response
 			}
 		} else {
@@ -234,7 +237,7 @@ const createOrganization = (e) => {
 				const doc = parser.parseFromString(html, "text/html");
 				const error = window.document.getElementById("error");
 				error.innerHTML = doc.querySelector("#error").innerHTML;
-				document.querySelector("#submit").removeAttribute("disabled");
+				submitBtn.removeAttribute("disabled");
 			});
 		}
 	})

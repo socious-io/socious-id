@@ -95,7 +95,10 @@ func usersGroup(router *gin.Engine) {
 	})
 
 	g.GET("/profile", auth.LoginRequired(), func(c *gin.Context) {
-		c.HTML(http.StatusOK, "update-profile.html", gin.H{})
+		nonce := c.MustGet("nonce")
+		c.HTML(http.StatusOK, "update-profile.html", gin.H{
+			"nonce": nonce,
+		})
 	})
 
 	g.PUT("/:id/status", clientSecretRequired(), func(c *gin.Context) {

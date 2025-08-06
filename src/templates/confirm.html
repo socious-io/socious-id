@@ -1,6 +1,7 @@
 {{template "header" .}}
 
 <body>
+	{{template "loader" .}}
 	<div class="intro">
 		<form method="post">
 			<div class="card">
@@ -8,18 +9,15 @@
 					<img src="/statics/icons/lock.svg" alt="Login Lock" width="24" height="24" />
 				</div>
 				<input hidden value="1" type="number" name="confirmed" />
-				<input hidden id="identity_id" type="text" name="identity_id" />
 				<div name="header" class="header">
 					<h2 data-i18n="confirm-header">Sign in with Socious ID</h2>
 					<span data-i18n="confirm-subheader" class="text-grey leading-6">Choose an account</span>
-					<a href="#" onclick="window.location.href = '/auth/logout?t=' + Date.now(); return false;">
-						<button data-i18n="confirm-login-other-button" type="button" theme="primary-outline">Or login with other account</button>
-					</a>
+					<a href="/auth/logout?t={{ .now }}" data-i18n="confirm-login-other-button" theme="primary-outline">Or login with other account</a>
 				</div>
 				<div name="content-section" class="section">
 					<div name="individual" class="consent-account-label">
 						<span data-i18n="confirm-individual">Your individual profile</span>
-						<button onclick="document.getElementById('identity_id').value = '{{ .User.ID }}'; this.form.submit();" type="submit" class="consent-account">
+						<button type="submit" class="consent-account" name="identity_id" value="{{ .User.ID }}">
 							{{ if .User.Avatar }}
 								<img src="{{ .User.Avatar.URL }}" alt="Profile Image" width="40" height="40" />
 							{{ else }}
@@ -31,14 +29,14 @@
 							</div>
 						</button>
 						{{if .error}}
-						<p style="color: red">{{.error}}</p>
+							<p style="color: red">{{.error}}</p>
 						{{end}}
 					</div>
 					<div name="organization" class="consent-account-label">
 						<span data-i18n="confirm-organization">Your organization profiles</span>
 						<div class="consent-accounts">
 							{{ range .Organizations }}
-							<button onclick="document.getElementById('identity_id').value = '{{ .ID }}'; this.form.submit();" class="consent-account">
+							<button type="submit" class="consent-account" name="identity_id" value="{{ .ID }}">
 								{{ if .Logo }}
 									<img src="{{ .Logo.URL }}" alt="Profile Image" width="40" height="40" />
 								{{ else }}
