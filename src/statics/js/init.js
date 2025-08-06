@@ -18,9 +18,6 @@ function initOnClicks(){
 	document.querySelectorAll('img[data-event="toggle-password"]').forEach((el)=>{
 		el.addEventListener("click",(e)=>togglePassword(e.target));
 	});
-	document.querySelectorAll('[data-event="select-account"]').forEach((el)=>{
-		el.addEventListener("click",(e)=>confirmIdentity(e.target));
-	});
 	document.querySelectorAll('[data-event="display-email"]').forEach((el)=>{
 		el.addEventListener("load",displayEmail);
 	});
