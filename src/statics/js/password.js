@@ -28,17 +28,3 @@ const validatePassword = () => {
         submitBtn.setAttribute("disabled", "true");
     }
 }
-
-const onSetPassword = () => {
-    const confirmPassword = document.getElementById("confirm-pass").value;
-    const params = new URLSearchParams(window.location.search);
-    const isForgetFlow = params.get("forget");
-
-    if(!confirmPassword) {
-        return false;
-    }
-
-    //BE logic with confirm password
-    window.location.href = isForgetFlow === 'true' ? './reset-password.html' : './congrats.html';
-    return false;
-}

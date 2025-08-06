@@ -14,12 +14,22 @@
 				</div>
 				<div name="content-section" class="section">
 					<input placeholder="Enter your email" type="email" name="email" autocomplete="email" />
-					<input
-						placeholder="Enter your password"
-						type="password"
-						name="password"
-						autocomplete="current-password"
-					/>
+					<div class="input-container">
+						<input
+							placeholder="Enter your password"
+							type="password"
+							name="password"
+							autocomplete="current-password"
+						/>
+						<img
+							src="/statics/icons/eye.svg"
+							alt="show-password"
+							width="20"
+							height="20"
+							class="input-end-icon cursor-pointer"
+							data-event="toggle-password"
+						/>
+					</div>
 					<a class="self-end" href="/auth/password/forget">Forget password?</a>
 				</div>
 				<div name="button-section" class="section">

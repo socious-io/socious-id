@@ -1,11 +1,9 @@
 function initOnClicks(){
-	document.querySelector('button[data-event="logout"]')?.addEventListener("click",logout);
 	document.querySelector('button[data-event="create-organization"]')?.addEventListener("click", createOrganization);
 	document.querySelector('button[data-event="on-submit-profile"]')?.addEventListener("click", createProfile);
 	document.querySelectorAll('input[data-event="validate-password"]').forEach((el)=>{
 		el.addEventListener("input",validatePassword);
 	});
-	
 	document.querySelectorAll('input[data-event="validate-email"]').forEach((el)=>{
 		el.addEventListener("input",(e)=>validateEmail(e.target));
 	});
@@ -17,9 +15,6 @@ function initOnClicks(){
 	});
 	document.querySelectorAll('img[data-event="toggle-password"]').forEach((el)=>{
 		el.addEventListener("click",(e)=>togglePassword(e.target));
-	});
-	document.querySelectorAll('[data-event="display-email"]').forEach((el)=>{
-		el.addEventListener("load",displayEmail);
 	});
 	document.querySelectorAll('input[data-event="on-upload-logo"]').forEach((el)=>{
 		el.addEventListener("input",onUploadLogo);

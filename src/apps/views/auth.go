@@ -35,6 +35,7 @@ func authGroup(router *gin.Engine) {
 				"Organizations": organizations,
 				"AuthSession":   authSession,
 				"nonce":         nonce,
+				"now":           time.Now().UnixMilli(),
 			})
 		}
 
@@ -57,6 +58,7 @@ func authGroup(router *gin.Engine) {
 		if authSession == nil {
 			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
 				"error": "not accepted without auth session",
+				"now":   time.Now().UnixMilli(),
 			})
 			return
 		}
@@ -90,6 +92,7 @@ func authGroup(router *gin.Engine) {
 		if err := otp.Create(ctx); err != nil {
 			c.HTML(http.StatusNotAcceptable, "confirm.html", gin.H{
 				"error": err.Error(),
+				"now":   time.Now().UnixMilli(),
 			})
 			return
 		}
