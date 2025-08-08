@@ -34,6 +34,7 @@ func authGroup(router *gin.Engine) {
 				"User":          user,
 				"Organizations": organizations,
 				"AuthSession":   authSession,
+				"Policies":      getAccessPolicies(user, organizations, authSession),
 				"nonce":         nonce,
 				"now":           time.Now().UnixMilli(),
 			})
@@ -815,4 +816,12 @@ func setUserReferrer(c *gin.Context, u *models.User) error {
 	}
 
 	return e
+}
+
+func getAccessPolicies(_ *models.User, organizations []models.Organization, authSession *models.AuthSession) gin.H {
+	policies := authSession.Access.Policies
+	return gin.H{
+		"AllowUserSelection": !utils.ArrayContains(policies, string(models.PolicyTypePreventUserAccountSelection)),
+		"RequireOrgCreation": utils.ArrayContains(policies, string(models.PolicyTypeRequireAtleastOneOrg)) && len(organizations) == 0,
+	}
 }

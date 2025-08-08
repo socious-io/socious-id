@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx/types"
+	"github.com/lib/pq"
 	database "github.com/socious-io/pkg_database"
 )
 
@@ -21,6 +22,8 @@ type Access struct {
 	SyncURL             *string    `db:"sync_url" json:"sync_url"`
 	DestinationSyncedAt *time.Time `db:"destination_synced_at" json:"destination_synced_at"`
 	SourceSyncedAt      *time.Time `db:"source_synced_at" json:"source_synced_at"`
+
+	Policies pq.StringArray `db:"policies" json:"policies"`
 
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
