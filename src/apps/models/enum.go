@@ -8,6 +8,7 @@ import (
 type (
 	OTPType                      string
 	AuthModeType                 string
+	PolicyType                   string
 	UserVerificationType         string
 	OrganizationVerificationType string
 	UserStatusType               string
@@ -29,6 +30,10 @@ const (
 	//AuthModeType
 	AuthModeRegister AuthModeType = "register"
 	AuthModeLogin    AuthModeType = "login"
+
+	//PolicyType
+	PolicyTypePreventUserAccountSelection PolicyType = "PREVENT_USER_ACCOUNT_SELECTION"
+	PolicyTypeRequireAtleastOneOrg        PolicyType = "REQUIRE_ATLEAST_ONE_ORG"
 
 	//UserVerificationType
 	UserVerificationTypeEmail    UserVerificationType = "EMAIL"
@@ -95,6 +100,14 @@ func (amt *AuthModeType) Scan(value interface{}) error {
 
 func (amt AuthModeType) Value() (driver.Value, error) {
 	return string(amt), nil
+}
+
+func (pt *PolicyType) Scan(value interface{}) error {
+	return scanEnum(value, (*string)(pt))
+}
+
+func (pt PolicyType) Value() (driver.Value, error) {
+	return string(pt), nil
 }
 
 func (uvt *UserVerificationType) Scan(value interface{}) error {
