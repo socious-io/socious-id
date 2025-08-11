@@ -40,8 +40,11 @@ func Init() *gin.Engine {
 	})
 
 	//Cors
+
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     config.Config.Cors.Origins,
+		AllowOriginFunc: func(origin string) bool {
+			return utils.ArrayContains(config.Config.Cors.Origins, origin)
+		},
 		AllowMethods:     []string{"*"},
 		AllowHeaders:     []string{"*"},
 		AllowCredentials: true,
