@@ -19,7 +19,8 @@ type ClientSecretForm struct {
 }
 
 type AuthSessionForm struct {
-	RedirectURL string `json:"redirect_url" form:"redirect_url" validate:"required"`
+	RedirectURL string    `json:"redirect_url" form:"redirect_url" validate:"required"`
+	Policies    *[]string `json:"policies" form:"policies" validate:"required"`
 }
 
 type GetTokenForm struct {

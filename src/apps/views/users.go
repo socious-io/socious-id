@@ -84,6 +84,7 @@ func usersGroup(router *gin.Engine) {
 
 		session := sessions.Default(c)
 
+		//TODO: needs to be handled by PolicyTypeEnforceOrgCreation
 		if session.Get("org_onboard") != nil && session.Get("org_onboard").(bool) {
 			c.Redirect(http.StatusSeeOther, "/organizations/register/pre")
 			return

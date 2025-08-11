@@ -34,6 +34,7 @@ func authGroup(router *gin.Engine) {
 				"User":          user,
 				"Organizations": organizations,
 				"AuthSession":   authSession,
+				"Policies":      enforceSessionPolicies(user, organizations, c, authSession),
 				"nonce":         nonce,
 				"now":           time.Now().UnixMilli(),
 			})
@@ -640,8 +641,13 @@ func authGroup(router *gin.Engine) {
 
 		access := c.MustGet("access").(*models.Access)
 
+		if form.Policies == nil {
+			form.Policies = &[]string{}
+		}
+
 		authSession := &models.AuthSession{
 			RedirectURL: form.RedirectURL,
+			Policies:    *form.Policies,
 			AccessID:    access.ID,
 			ExpireAt:    time.Now().Add(time.Minute * 10),
 		}
@@ -687,7 +693,7 @@ func authGroup(router *gin.Engine) {
 
 		session := sessions.Default(c)
 		session.Set("auth_session_id", authSession.ID.String())
-		session.Set("org_onboard", orgOnboard == "true")
+		session.Set("org_onboard", orgOnboard == "true") //TODO: needs to be handled by PolicyTypeEnforceOrgCreation
 		if referredBy != "" {
 			session.Set("referred_by", referredBy)
 		}
@@ -815,4 +821,33 @@ func setUserReferrer(c *gin.Context, u *models.User) error {
 	}
 
 	return e
+}
+
+func enforceSessionPolicies(_ *models.User, organizations []models.Organization, c *gin.Context, authSession *models.AuthSession) gin.H {
+	ctx := c.MustGet("ctx").(context.Context)
+	policies := authSession.Policies
+
+	const (
+		preventUserSelection = string(models.PolicyTypePreventUserAccountSelection)
+		requireAtLeastOneOrg = string(models.PolicyTypeRequireAtleastOneOrg)
+		enforceOrgCreation   = string(models.PolicyTypeEnforceOrgCreation)
+	)
+	hasPolicy := func(policy string) bool {
+		return utils.ArrayContains(policies, policy)
+	}
+
+	//Enforce policies
+	if hasPolicy(enforceOrgCreation) {
+		authSession.UpdatePolicies(ctx, utils.ArrayRemove(policies, enforceOrgCreation))
+		c.Redirect(http.StatusSeeOther, "/organizations/register/pre")
+		// optionally: c.Abort()
+	}
+
+	//Reform policies for rendering
+	sessionPolicies := gin.H{
+		"AllowUserSelection": !hasPolicy(preventUserSelection),
+		"RequireOrgCreation": hasPolicy(requireAtLeastOneOrg) && len(organizations) == 0,
+	}
+
+	return sessionPolicies
 }
