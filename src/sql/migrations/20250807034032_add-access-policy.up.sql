@@ -1,7 +1,8 @@
-CREATE TYPE access_policy_type AS ENUM (
+CREATE TYPE session_policy_type AS ENUM (
   'REQUIRE_ATLEAST_ONE_ORG',
-  'PREVENT_USER_ACCOUNT_SELECTION'
+  'PREVENT_USER_ACCOUNT_SELECTION',
+  'ENFORCE_ORG_CREATION'
 );
 
-ALTER TABLE accesses
-ADD COLUMN policies access_policy_type[] NOT NULL DEFAULT '{}';
+ALTER TABLE auth_sessions
+ADD COLUMN policies session_policy_type[] NOT NULL DEFAULT '{}';

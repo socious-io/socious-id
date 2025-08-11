@@ -53,6 +53,21 @@ func ArrayContains[T comparable](arr []T, x T) bool {
 	return false
 }
 
+func ArrayRemove[T comparable](arr []T, x T) []T {
+	// Make a copy of the original slice
+	result := make([]T, len(arr))
+	copy(result, arr)
+
+	n := 0
+	for _, v := range result {
+		if v != x {
+			result[n] = v
+			n++
+		}
+	}
+	return result[:n]
+}
+
 func AppendIfNotExists[T comparable](arr []T, x T) []T {
 	if !ArrayContains(arr, x) {
 		arr = append(arr, x)

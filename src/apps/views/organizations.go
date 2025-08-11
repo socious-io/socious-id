@@ -259,6 +259,7 @@ func organizationsGroup(router *gin.Engine) {
 			return
 		}
 
+		//TODO: needs to be handled by PolicyTypeEnforceOrgCreation
 		if session.Get("org_onboard") != nil && session.Get("org_onboard").(bool) {
 			session.Delete("org_onboard")
 			session.Save()

@@ -34,6 +34,7 @@ const (
 	//PolicyType
 	PolicyTypePreventUserAccountSelection PolicyType = "PREVENT_USER_ACCOUNT_SELECTION"
 	PolicyTypeRequireAtleastOneOrg        PolicyType = "REQUIRE_ATLEAST_ONE_ORG"
+	PolicyTypeEnforceOrgCreation          PolicyType = "ENFORCE_ORG_CREATION"
 
 	//UserVerificationType
 	UserVerificationTypeEmail    UserVerificationType = "EMAIL"
