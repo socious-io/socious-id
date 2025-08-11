@@ -37,6 +37,7 @@ func authGroup() {
 					"redirect_url": "<ANY>",
 					"access_id":    "<ANY>",
 					"access":       "<ANY>",
+					"policies":     "<ANY>",
 					"expire_at":    "<ANY>",
 					"verified_at":  "<ANY>",
 					"updated_at":   "<ANY>",

@@ -641,9 +641,13 @@ func authGroup(router *gin.Engine) {
 
 		access := c.MustGet("access").(*models.Access)
 
+		if form.Policies == nil {
+			form.Policies = &[]string{}
+		}
+
 		authSession := &models.AuthSession{
 			RedirectURL: form.RedirectURL,
-			Policies:    form.Policies,
+			Policies:    *form.Policies,
 			AccessID:    access.ID,
 			ExpireAt:    time.Now().Add(time.Minute * 10),
 		}
