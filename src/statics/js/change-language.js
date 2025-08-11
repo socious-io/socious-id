@@ -17,9 +17,14 @@ const RTL_LANGUAGES = ['ar', 'he', 'fa', 'ur'];
 async function loadResources(lng) {
     const resources = {};
 
-    for (const ns of NAMESPACES) {
-        const res = await fetch(`/statics/locales/${lng}/${ns}.json`).then(r => r.json());
-        Object.assign(resources, res);
+    const results = await Promise.all(
+        NAMESPACES.map(ns =>
+            fetch(`/statics/locales/${lng}/${ns}.json`).then(r => r.json())
+        )
+    );
+
+    for (const result of results) {
+        Object.assign(resources, result);
     }
 
     return { translation: resources };
