@@ -31,6 +31,9 @@ function initOnClicks(){
 	document.querySelectorAll('[data-event="toggle-lang-dropdown"]').forEach((el)=>{
 		el.addEventListener("click",()=>toggleDropdown('desktop-options'));
 	});
+	document.querySelectorAll('[data-event="toggle-lang-dropdown-mobile"]').forEach((el)=>{
+		el.addEventListener("click",()=>toggleDropdown('mobile-options'));
+	});
 	document.querySelectorAll('[data-event="otp-input"]').forEach((el, idx, all)=>{
 		el.addEventListener("input", (e) => moveToNext(e.target, idx+1, all));
 		el.addEventListener("keyup", checkOTP);
