@@ -25,8 +25,17 @@ async function loadResources(lng) {
     return { translation: resources };
 }
 
+function getPreferredLanguage() {
+  const queryLang = new URLSearchParams(window.location.search).get('lang');
+  const savedLang = localStorage.getItem('lang');
+  const browserLang = navigator.language.split('-')[0];
+  if (queryLang) localStorage.setItem('lang', queryLang);
+
+  return queryLang || savedLang || browserLang || 'en';
+}
+
 async function initI18next() {
-    const lng = localStorage.getItem('i18nextLng') || 'en';
+    const lng =  getPreferredLanguage();
     const resources = await loadResources(lng);
 
     i18next.init(
@@ -88,9 +97,20 @@ function updateSelectedLanguageUI(lng) {
 
 function changeLanguage(element, lng) {
     const parentElementId = element.parentElement.id;
-    localStorage.setItem('i18nextLng', lng);
+    localStorage.setItem('lang', lng);
+
+    const searchParams = new URLSearchParams(window.location.search);
+    const queryLang = searchParams.get('lang');
+    if (queryLang) {
+        searchParams.set('lang', lng);
+        window.location.href = `${window.location.pathname}?${searchParams}`;
+        return;
+    }
+
     updateSelectedLanguageUI(lng);
     initI18next();
+
+    window.location.reload();
     toggleDropdown(parentElementId);
 }
 
