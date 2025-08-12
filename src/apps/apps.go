@@ -42,9 +42,8 @@ func Init() *gin.Engine {
 	//Cors
 
 	router.Use(cors.New(cors.Config{
-		AllowOriginFunc: func(origin string) bool {
-			return utils.ArrayContains(config.Config.Cors.Origins, origin)
-		},
+		AllowOrigins:     config.Config.Cors.Origins,
+		CustomSchemas:    []string{"capacitor://"},
 		AllowMethods:     []string{"*"},
 		AllowHeaders:     []string{"*"},
 		AllowCredentials: true,
