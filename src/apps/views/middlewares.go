@@ -159,6 +159,7 @@ func SecureHeaders(env string) gin.HandlerFunc {
 		ContentSecurityPolicy: "default-src 'self'; script-src 'self' $NONCE; img-src 'self' https: http:;", // Very important for XSS
 		// HSTS:
 		SSLRedirect:          true,
+		SSLProxyHeaders:      map[string]string{"X-Forwarded-Proto": "https"},
 		STSSeconds:           31536000,
 		STSIncludeSubdomains: true,
 		STSPreload:           true,
