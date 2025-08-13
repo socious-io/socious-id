@@ -9,31 +9,31 @@ import (
 )
 
 type ConfirmForm struct {
-	Confirmed  bool   `json:"confirmed" form:"confirmed"`
-	IdentityId string `json:"identity_id" form:"identity_id"`
+	Confirmed  bool   `json:"confirmed" form:"confirmed" binding:"required"`
+	IdentityId string `json:"identity_id" form:"identity_id" binding:"omitempty,uuid4"`
 }
 
 type ClientSecretForm struct {
-	ClientSecret string `json:"client_secret" form:"client_secret" validate:"required"`
-	ClientID     string `json:"client_id" form:"client_id" validate:"required"`
+	ClientSecret string `json:"client_secret" form:"client_secret" binding:"required"`
+	ClientID     string `json:"client_id" form:"client_id" binding:"required"`
 }
 
 type AuthSessionForm struct {
-	RedirectURL string    `json:"redirect_url" form:"redirect_url" validate:"required"`
-	Policies    *[]string `json:"policies" form:"policies" validate:"required"`
+	RedirectURL string    `json:"redirect_url" form:"redirect_url" binding:"required"`
+	Policies    *[]string `json:"policies" form:"policies" binding:"required"`
 }
 
 type GetTokenForm struct {
-	Code string `json:"code" form:"code" validate:"required"`
+	Code string `json:"code" form:"code" binding:"required"`
 }
 
 type RefreshTokenForm struct {
-	RefreshToken string `json:"refresh_token" form:"refresh_token" validate:"required"`
+	RefreshToken string `json:"refresh_token" form:"refresh_token" binding:"required,jwt"`
 }
 
 type UserForm struct {
-	Username string  `json:"username" form:"username"`
-	Phone    *string `json:"phone" form:"phone"`
+	Username string  `json:"username" form:"username" binding:"required"`
+	Phone    *string `json:"phone" form:"phone" binding:"required"` //?
 
 	FirstName *string `json:"first_name" form:"first_name"`
 	LastName  *string `json:"last_name" form:"last_name"`
@@ -45,14 +45,14 @@ type UserForm struct {
 	Address           *string `json:"address" form:"address"`
 	MobileCountryCode *string `json:"mobile_country_code" form:"mobile_country_code"`
 
-	AvatarID *uuid.UUID `json:"avatar_id" form:"avatar_id"`
-	CoverID  *uuid.UUID `json:"cover_id" form:"cover_id"`
+	AvatarID *uuid.UUID `json:"avatar_id" form:"avatar_id" binding:"omitempty,uuid4"`
+	CoverID  *uuid.UUID `json:"cover_id" form:"cover_id" binding:"omitempty,uuid4"`
 }
 
 type UserCreateForm struct {
-	FirstName string `json:"first_name" form:"first_name"`
-	LastName  string `json:"last_name" form:"last_name"`
-	Email     string `json:"email" form:"email"`
+	FirstName string `json:"first_name" form:"first_name" binding:"required"`
+	LastName  string `json:"last_name" form:"last_name" binding:"required"`
+	Email     string `json:"email" form:"email" binding:"required,email"`
 	Username  string `json:"username" form:"username"`
 }
 
@@ -61,15 +61,15 @@ type UserUpdateStatusForm struct {
 }
 
 type OrganizationUpdateStatusForm struct {
-	Status models.OrganizationStatusType `json:"status" form:"status" validate:"required"`
+	Status models.OrganizationStatusType `json:"status" form:"status" validate:"required,oneof=ACTIVE NOT_ACTIVE SUSPENDED PENDING"`
 }
 
 type OrganizationVerificationForm struct {
-	Status models.OrganizationStatusType `json:"status" form:"status" validate:"required"`
+	Status models.OrganizationStatusType `json:"status" form:"status" validate:"required,oneof=ACTIVE NOT_ACTIVE SUSPENDED PENDING"`
 }
 
 type OrganizationForm struct {
-	Shortname   string  `json:"shortname" form:"shortname"`
+	Shortname   string  `json:"shortname" form:"shortname" validate:"required"`
 	Name        *string `json:"name" form:"name"`
 	Bio         *string `json:"bio" form:"bio"`
 	Description *string `json:"description" form:"description"`
@@ -84,8 +84,8 @@ type OrganizationForm struct {
 	Mission *string `json:"mission" form:"mission"`
 	Culture *string `json:"culture" form:"culture"`
 
-	LogoID  *uuid.UUID `json:"logo_id" form:"logo_id"`
-	CoverID *uuid.UUID `json:"cover_id" form:"cover_id"`
+	LogoID  *uuid.UUID `json:"logo_id" form:"logo_id" binding:"omitempty,uuid4"`
+	CoverID *uuid.UUID `json:"cover_id" form:"cover_id" binding:"omitempty,uuid4"`
 }
 
 type ImpactPointForm struct {
@@ -94,7 +94,7 @@ type ImpactPointForm struct {
 	SocialCause         string                 `json:"social_cause" form:"social_cause"`
 	SocialCauseCategory string                 `json:"social_cause_category" form:"social_cause_category"`
 	Value               float64                `json:"value" form:"value"`
-	Type                models.ImpactPointType `json:"type" form:"type" validate:"required,oneof=WORKSUBMIT DONATION VOLUNTEER OTHER"`
+	Type                models.ImpactPointType `json:"type" form:"type" validate:"required,oneof=WORKSUBMIT DONATION VOLUNTEER VOTING OTHER"`
 	AccessID            *uuid.UUID             `json:"access_id" form:"access_id"`
 	Meta                *json.RawMessage       `json:"meta" form:"meta"`
 	UniqueTag           string                 `json:"unique_tag" form:"unique_tag" validate:"required"`
