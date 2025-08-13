@@ -49,6 +49,13 @@ type UserForm struct {
 	CoverID  *uuid.UUID `json:"cover_id" form:"cover_id"`
 }
 
+type UserCreateForm struct {
+	FirstName string `json:"first_name" form:"first_name"`
+	LastName  string `json:"last_name" form:"last_name"`
+	Email     string `json:"email" form:"email"`
+	Username  string `json:"username" form:"username"`
+}
+
 type UserUpdateStatusForm struct {
 	Status models.UserStatusType `json:"status" form:"status" validate:"required"`
 }

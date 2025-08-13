@@ -83,6 +83,24 @@ func (u *User) Create(ctx context.Context) error {
 	return database.Fetch(u, u.ID)
 }
 
+func (u *User) Upsert(ctx context.Context) error {
+	rows, err := database.Query(
+		ctx,
+		"users/upsert",
+		u.FirstName, u.LastName, u.Username, u.Email,
+	)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		if err := rows.StructScan(u); err != nil {
+			return err
+		}
+	}
+	return database.Fetch(u, u.ID)
+}
+
 func (u *User) Verify(ctx context.Context, vtype UserVerificationType) error {
 	rows, err := database.Query(
 		ctx,
