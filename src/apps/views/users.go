@@ -21,6 +21,34 @@ func usersGroup(router *gin.Engine) {
 		c.JSON(http.StatusOK, user)
 	})
 
+	g.POST("", clientSecretRequired(), func(c *gin.Context) {
+		ctx := c.MustGet("ctx").(context.Context)
+
+		form := new(UserCreateForm)
+		if err := c.ShouldBindJSON(form); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		//Duplicate username safeguarding
+		for {
+			form.Username = auth.GenerateUsername(form.Email)
+			_, err := models.GetUserByUsername(&form.Username)
+			if err != nil {
+				break
+			}
+		}
+
+		user := new(models.User)
+		utils.Copy(form, user)
+		if err := user.Upsert(ctx); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, user)
+	})
+
 	g.PUT("", auth.LoginRequired(), func(c *gin.Context) {
 		user := c.MustGet("user").(*models.User)
 		ctx := c.MustGet("ctx").(context.Context)
