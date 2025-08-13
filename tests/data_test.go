@@ -15,6 +15,7 @@ var (
 		"client_id":     "string",
 		"client_secret": "string",
 		"redirect_url":  "string",
+		"policies":      []string{},
 	}
 
 	sessionsData = []gin.H{}
@@ -46,7 +47,7 @@ var (
 			"city":        "TestCity",
 			"country":     "TestCountry",
 			"address":     "TestAddress",
-			"website":     "TestWebsite",
+			"website":     "https://my.website.org",
 			"mission":     "TestMission",
 			"culture":     "TestCulture",
 		},
@@ -60,7 +61,7 @@ var (
 			"city":        "TestCity2",
 			"country":     "TestCountry2",
 			"address":     "TestAddress2",
-			"website":     "TestWebsite2",
+			"website":     "https://my.website2.org",
 			"mission":     "TestMission2",
 			"culture":     "TestCulture2",
 		},
@@ -75,6 +76,7 @@ var (
 			"meta": gin.H{
 				"test": "test",
 			},
+			"value":      0.0,
 			"unique_tag": "unique_1",
 		},
 		{
@@ -85,6 +87,7 @@ var (
 			"meta": gin.H{
 				"test": "test",
 			},
+			"value":      1.0,
 			"unique_tag": "unique_2",
 		},
 	}
