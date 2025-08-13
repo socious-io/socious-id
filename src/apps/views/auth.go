@@ -138,7 +138,10 @@ func authGroup(router *gin.Engine) {
 			})
 			return
 		}
-		if u.Password == nil {
+		if u.Password == nil && u.PasswordExpired {
+			c.Redirect(http.StatusSeeOther, "/auth/password/set")
+			return
+		} else if u.Password == nil {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
 				"error": "Error: email/password not match",
 			})
@@ -345,13 +348,24 @@ func authGroup(router *gin.Engine) {
 			return
 		}
 
-		if err := otp.User.Verify(ctx, models.UserVerificationTypeEmail); err != nil {
-			c.HTML(http.StatusBadRequest, "otp.html", gin.H{
-				"error": err.Error(),
-				"email": email,
-				"nonce": nonce,
-			})
-			return
+		switch otp.Type {
+		case models.VerificationOTP:
+			if err := otp.User.Verify(ctx, models.UserVerificationTypeEmail); err != nil {
+				c.HTML(http.StatusBadRequest, "otp.html", gin.H{
+					"error": err.Error(),
+					"email": email,
+					"nonce": nonce,
+				})
+				return
+			}
+		case models.ForgetPasswordOTP:
+			if err := otp.User.ExpirePassword(ctx); err != nil {
+				c.HTML(http.StatusBadRequest, "otp.html", gin.H{
+					"error": err.Error(),
+					"email": email,
+					"nonce": nonce,
+				})
+			}
 		}
 
 		//Saving into session
@@ -359,9 +373,10 @@ func authGroup(router *gin.Engine) {
 		session.Set("user_id", otp.User.ID.String())
 		session.Save()
 
-		if otp.Type == models.VerificationOTP {
+		switch otp.Type {
+		case models.VerificationOTP:
 			c.Redirect(http.StatusSeeOther, "/users/profile")
-		} else if otp.Type == models.ForgetPasswordOTP {
+		case models.ForgetPasswordOTP:
 			c.Redirect(http.StatusSeeOther, "/auth/password/set")
 		}
 	})
