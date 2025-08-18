@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx/types"
+	"github.com/lib/pq"
 	database "github.com/socious-io/pkg_database"
 )
 
@@ -33,6 +34,8 @@ type AuthSession struct {
 	AccessID   uuid.UUID      `db:"access_id" json:"access_id"`
 	Access     *Access        `db:"-" json:"access"`
 	AccessJson types.JSONText `db:"access" json:"-"`
+
+	Policies pq.StringArray `db:"policies" json:"policies"`
 
 	ExpireAt   time.Time  `db:"expire_at" json:"expire_at"`
 	VerifiedAt *time.Time `db:"verified_at" json:"verified_at"`
@@ -115,7 +118,7 @@ func (a *AuthSession) Create(ctx context.Context) error {
 	rows, err := database.Query(
 		ctx,
 		"auth/create_auth_session",
-		a.RedirectURL, a.AccessID,
+		a.RedirectURL, a.AccessID, a.Policies,
 	)
 	if err != nil {
 		return err
@@ -131,6 +134,20 @@ func (a *AuthSession) Create(ctx context.Context) error {
 
 func (a *AuthSession) Verify(ctx context.Context) error {
 	rows, err := database.Query(ctx, "auth/auth_session_verify", a.ID)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		if err := rows.StructScan(a); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (a *AuthSession) UpdatePolicies(ctx context.Context, policies pq.StringArray) error {
+	rows, err := database.Query(ctx, "auth/auth_session_update_policies", a.ID, policies)
 	if err != nil {
 		return err
 	}

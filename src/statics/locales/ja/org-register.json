@@ -1,0 +1,14 @@
+{
+    "org-register-header": "組織の詳細",
+    "org-register-subheader": "組織について教えてください",
+    "org-register-add-photo": "写真を追加（任意）",
+    "org-register-name": "組織名*",
+    "org-register-name-placeholder": "あなたの組織名",
+    "org-register-username": "組織のユーザー名*",
+    "org-register-username-placeholder": "ユーザー名を選択してください",
+    "org-register-username-hint": "これはすべてのプラットフォームでの一意の識別子になります",
+    "org-register-username-error": "ユーザー名は6〜24文字で、小文字、数字、アンダースコアのみ使用できます（スペース、ハイフン、ドット、大文字は使用不可）。",
+    "org-register-email": "組織のメールアドレス*",
+    "org-register-email-placeholder": "あなたの組織のメールアドレス",
+    "org-register-continue-button": "続行"
+}

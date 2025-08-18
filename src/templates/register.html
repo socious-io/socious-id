@@ -1,37 +1,44 @@
 {{template "header" .}}
+
 <body>
+    {{template "loader" .}}
     <form method="post">
         <div class="intro">
             <div class="card">
                 <div class="logo">
-                    <img src="/statics/icons/mail.svg" alt="Login Lock" width="24" height="24" />
+                    <img src="/statics/icons/mail.svg" alt="Login Lock" width="24" height="24"/>
                 </div>
                 <div name="header" class="header">
-                    <h2>Enter your email</h2>
-                    <span class="text-grey leading-6">We'll send you a verification code</span>
+                    <h2 data-i18n="register-header">Enter your email</h2>
+                    <span data-i18n="register-subheader" class="text-grey leading-6">
+                        We'll send you a verification code
+                    </span>
                 </div>
                 <div name="content-section" class="section">
                     <div class="input-label">
-                        <label for="email">Email*</label>
-                        <input placeholder="Enter your email" type="email" id="email" name="email" autocomplete="email" oninput="validateEmail()" />
+                        <label data-i18n="register-email-label" for="email">Email*</label>
+                        <input data-i18n-placeholder="register-email-placeholder" placeholder="Enter your email"
+                            type="email" id="email" name="email" autocomplete="email" data-event="validate-email" />
                     </div>
                 </div>
                 <div name="button-section" class="section">
-                    <button type="submit" theme="primary" disabled>Continue</button>
+                    <button data-i18n="register-continue-button" type="submit" theme="primary"
+                        disabled>Continue</button>
                 </div>
                 <div class="steps font-semibold">
-                    What happens next?
+                    <span data-i18n="register-what-next">What happens next?</span>
                     <ol class="text-sm font-normal text-grey leading-5">
-                        <li>We'll send a verification code to your email</li>
-                        <li>Enter the code to verify your email</li>
-                        <li>Complete your Socious ID profile</li>
+                        <li data-i18n="register-what-next-step1">We'll send a verification code to your email</li>
+                        <li data-i18n="register-what-next-step2">Enter the code to verify your email</li>
+                        <li data-i18n="register-what-next-step3">Complete your Socious ID profile</li>
                     </ol>
                     {{if .error}}
-                        <p style="color: red">{{.error}}</p>
+                    <p style="color: red">{{.error}}</p>
                     {{end}}
                 </div>
             </div>
         </div>
     </form>
 </body>
+
 {{template "footer" .}}

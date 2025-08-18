@@ -1,70 +1,121 @@
 {{template "header" .}}
+
 <body>
-	<div class="intro">
-		<div class="card">
-			<div class="logo">
-				<img src="/statics/icons/lock.svg" alt="Login Lock" width="24" height="24" />
+	{{template "loader" .}}	
+	<div class="wrapper">
+		<div class="custom-select-desktop">
+			<div class="input-control" data-event="toggle-lang-dropdown">
+				<span id="desktop-selected">English (US)</span>
+				<img src="/statics/icons/chevron-down.svg"  alt="chevron-down" width="20" height="20" />
 			</div>
-			<div name="header" class="header">
-				<h2>Create your Socious ID</h2>
-				<span class="text-grey leading-6">One account for all your impact platforms</span>
-			</div>
-			<div name="content-section" class="section">
-				<div class="steps">
-					<div class="step">
-						<div class="logo step-logo">
-							<img src="/statics/icons/key.svg" alt="step-1" width="24" height="24" />
+			<ul id="desktop-options" class="options">
+				<li data-value="en" data-event="change-language">English (US)</li>
+				<li data-value="ja" data-event="change-language">Japanese 日本語</li>
+				<li data-value="es" data-event="change-language">Spanish Español</li>
+				<li data-value="ko" data-event="change-language">Korean 한국어</li>
+				<li data-value="ar" data-event="change-language">Arabic العربية</li>
+				<li data-value="zh-CN" data-event="change-language">Chinese 中文简体</li>
+				<li data-value="fr" data-event="change-language">French Français</li>
+			</ul>
+		</div>
+		<div class="intro">
+			<div class="card">
+				<div class="logo">
+					<img src="/statics/icons/lock.svg" alt="Login Lock" width="24" height="24" />
+				</div>
+				<div name="header" class="header">
+					<h2 data-i18n="pre-register-header">Create your Socious ID</h2>
+					<span data-i18n="pre-register-subheader" class="text-grey leading-6">
+						One account for all your impact platforms
+					</span>
+				</div>
+				<div name="content-section" class="section">
+					<div class="steps">
+						<div class="step">
+							<div class="logo step-logo">
+								<img src="/statics/icons/key.svg" alt="step-1" width="24" height="24" />
+							</div>
+							<div class="step-title">
+								<span data-i18n="pre-register-access-title"
+									class="text-md font-semibold leading-6 text-black">Access all platforms</span>
+								<span data-i18n="pre-register-access-subtitle">
+									Single sign-in for Talent Marketplace, Shin credentials and Socious Innovation Fund
+								</span>
+							</div>
 						</div>
-						<div class="step-title">
-							<span class="text-md font-semibold leading-6 text-black">Access all platforms</span>
-							Single sign-in for Talent Marketplace, Shin credentials and Socious Innovation Fund
+						<div class="step">
+							<div class="logo step-logo">
+								<img src="/statics/icons/shield-tick.svg" alt="step-1" width="24" height="24" />
+							</div>
+							<div class="step-title">
+								<span data-i18n="pre-register-impact-title"
+									class="text-md font-semibold leading-6 text-black">Verified impact profile</span>
+								<span data-i18n="pre-register-impact-subtitle">
+									Build trust with verified credentials and impact history
+								</span>
+							</div>
 						</div>
-					</div>
-					<div class="step">
-						<div class="logo step-logo">
-							<img src="/statics/icons/shield-tick.svg" alt="step-1" width="24" height="24" />
-						</div>
-						<div class="step-title">
-							<span class="text-md font-semibold leading-6 text-black">Verified impact profile</span>
-							Build trust with verified credentials and impact history
-						</div>
-					</div>
-					<div class="step">
-						<div class="logo step-logo">
-							<img src="/statics/icons/chart-breakout-square.svg" alt="step-1" width="24" height="24" />
-						</div>
-						<div class="step-title">
-							<span class="text-md font-semibold leading-6 text-black">Track your impact</span>
-							Measure and showcase your social impact across all platforms
+						<div class="step">
+							<div class="logo step-logo">
+								<img src="/statics/icons/chart-breakout-square.svg" alt="step-1" width="24"
+									height="24" />
+							</div>
+							<div class="step-title">
+								<span data-i18n="pre-register-track-title"
+									class="text-md font-semibold leading-6 text-black">Track your impact</span>
+								<span data-i18n="pre-register-track-subtitle">
+									Measure and showcase your social impact across all platforms
+								</span>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div name="button-section" class="section">
-				<a href="/auth/register">
-					<button type="button" theme="primary">Continue with email</button>
-				</a>
-				<div class="separator">
-					<div class="separator-text">OR</div>
+				<div name="button-section" class="section">
+					<a href="/auth/register">
+						<button data-i18n="pre-register-continue-with-email" type="button" theme="primary">
+							Continue with email
+						</button>
+					</a>
+					<div class="separator">
+						<div data-i18n="pre-register-or" class="separator-text">OR</div>
+					</div>
+					<a href="/auth/google">
+						<button type="button" theme="secondary-outline">
+							<img src="/statics/icons/google.svg" alt="Google" width="24" height="24" />
+							<span data-i18n="pre-register-continue-with-google">Continue with Google</span>
+						</button>
+					</a>
+					<a href="/auth/apple">
+						<button type="button" theme="secondary-outline">
+							<img src="/statics/icons/apple.svg" alt="Apple" width="24" height="24" />
+							<span data-i18n="pre-register-login-with-apple">Login with Apple</span>
+						</button>
+					</a>
+					<span class="text-sm text-grey text-center">
+						<span data-i18n="pre-register-accept">By continuing, you accept our </span>
+						<a data-i18n="pre-register-accept-privacy" class="font-medium text-primary">
+							Terms of Use and Privacy Policy.
+						</a>
+					</span>
 				</div>
-				<a href="/auth/google">
-					<button type="button" theme="secondary-outline">
-						<img src="/statics/icons/google.svg" alt="Google" width="24" height="24" />
-						Continue with Google
-					</button>
-				</a>
-				<a href="/auth/apple">
-					<button type="button" theme="secondary-outline">
-						<img src="/statics/icons/apple.svg" alt="Apple" width="24" height="24" />
-						Login with Apple
-					</button>
-				</a>
-				<span class="text-sm text-grey text-center"
-					>By continuing, you accept our
-					<a class="font-medium text-primary">Terms of Use and Privacy Policy.</a></span
-				>
+				<div class="custom-select-mobile">
+					<div class="input-control" data-event="toggle-lang-dropdown-mobile">
+						<span id="mobile-selected">English (US)</span>
+						<img src="/statics/icons/chevron-down.svg"  alt="chevron-down" width="20" height="20" />
+					</div>
+					<ul id="mobile-options" class="options">
+						<li data-value="en" data-event="change-language">English (US)</li>
+						<li data-value="ja" data-event="change-language">Japanese 日本語</li>
+						<li data-value="es" data-event="change-language">Spanish Español</li>
+						<li data-value="ko" data-event="change-language">Korean 한국어</li>
+						<li data-value="ar" data-event="change-language">Arabic العربية</li>
+						<li data-value="zh-CN" data-event="change-language">Chinese 中文简体</li>
+						<li data-value="fr" data-event="change-language">French Français</li>
+					</ul>
+				</div>
 			</div>
 		</div>
 	</div>
 </body>
+
 {{template "footer" .}}

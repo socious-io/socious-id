@@ -1,0 +1,12 @@
+{
+    "login-header": "Socious IDでサインイン",
+    "login-subheader": "すべてのインパクトプラットフォームへのアクセス",
+    "login-email-placeholder": "メールアドレスを入力してください",
+    "login-password-placeholder": "パスワードを入力してください",
+    "login-forget-password": "パスワードをお忘れですか？",
+    "login-button": "サインイン",
+    "login-or": "または",
+    "login-continue-with-google": "Googleで続ける",
+    "login-login-with-apple": "Appleでサインイン",
+    "login-create-account": "アカウントを作成"
+}

@@ -195,21 +195,30 @@ func organizationsGroup(router *gin.Engine) {
 
 	g.GET("/register/pre", auth.LoginRequired(), func(c *gin.Context) {
 		next := c.Query("next")
+		nonce := c.MustGet("nonce")
+
 		if next != "" {
 			session := sessions.Default(c)
 			session.Set("next", next)
 			session.Save()
 		}
-		c.HTML(http.StatusOK, "pre-org-register.html", gin.H{})
+
+		c.HTML(http.StatusOK, "pre-org-register.html", gin.H{
+			"nonce": nonce,
+		})
 	})
 
 	g.GET("/register", auth.LoginRequired(), func(c *gin.Context) {
-		c.HTML(http.StatusOK, "org-register.html", gin.H{})
+		nonce := c.MustGet("nonce")
+		c.HTML(http.StatusOK, "org-register.html", gin.H{
+			"nonce": nonce,
+		})
 	})
 
 	g.POST("/register", auth.LoginRequired(), func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
 		user := c.MustGet("user").(*models.User)
+		nonce := c.MustGet("nonce")
 
 		session := sessions.Default(c)
 
@@ -217,6 +226,7 @@ func organizationsGroup(router *gin.Engine) {
 		if err := c.ShouldBind(form); err != nil {
 			c.HTML(http.StatusBadRequest, "org-register.html", gin.H{
 				"error": err.Error(),
+				"nonce": nonce,
 			})
 			return
 		}
@@ -228,6 +238,7 @@ func organizationsGroup(router *gin.Engine) {
 		if _, err := models.GetOrganizationByShortname(form.Shortname); err == nil {
 			c.HTML(http.StatusBadRequest, "update-profile.html", gin.H{
 				"error": "Username is already in use. Please select different username.",
+				"nonce": nonce,
 			})
 			return
 		}
@@ -235,6 +246,7 @@ func organizationsGroup(router *gin.Engine) {
 		if err := organization.Create(ctx); err != nil {
 			c.HTML(http.StatusBadRequest, "org-register.html", gin.H{
 				"error": err.Error(),
+				"nonce": nonce,
 			})
 			return
 		}
@@ -242,10 +254,12 @@ func organizationsGroup(router *gin.Engine) {
 		if err := organization.AddMember(ctx, user.ID); err != nil {
 			c.HTML(http.StatusBadRequest, "org-register.html", gin.H{
 				"error": err.Error(),
+				"nonce": nonce,
 			})
 			return
 		}
 
+		//TODO: needs to be handled by PolicyTypeEnforceOrgCreation
 		if session.Get("org_onboard") != nil && session.Get("org_onboard").(bool) {
 			session.Delete("org_onboard")
 			session.Save()

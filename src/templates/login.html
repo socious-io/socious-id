@@ -1,51 +1,89 @@
 {{template "header" .}}
 
 <body>
-	<form method="post">
-		<div class="intro">
-			<div class="card">
-				<div class="logo">
-					<img src="/statics/icons/lock.svg" alt="Login Lock" width="24" height="24" />
-				</div>
-				<div name="header" class="header">
-					<h2>Sign in with Socious ID</h2>
-					<span class="text-grey leading-6">Your access for all your impact platforms</span>
-				</div>
-				<div name="content-section" class="section">
-					<input placeholder="Enter your email" type="email" name="email" autocomplete="email" />
-					<input
-						placeholder="Enter your password"
-						type="password"
-						name="password"
-						autocomplete="current-password"
-					/>
-					<a class="self-end" href="/auth/password/forget">Forget password?</a>
-				</div>
-				<div name="button-section" class="section">
-					<button type="submit" theme="primary">Sign in</button>
-					<div class="separator">
-						<div class="separator-text">OR</div>
-					</div>
-					<a href="/auth/google">
-						<button type="button" theme="secondary-outline">
-							<img src="/statics/icons/google.svg" alt="Google" width="24" height="24" />
-							Continue with Google
-						</button>
-					</a>
-					<a href="/auth/apple">
-						<button type="button" theme="secondary-outline">
-							<img src="/statics/icons/apple.svg" alt="Apple" width="24" height="24" />
-							Login with Apple
-						</button>
-					</a>
-					<a href="/auth/register/pre"><button type="button" theme="primary-outline">Create account</button></a>
-				</div>
-				{{if .error}}
-                    <p style="color: red">{{.error}}</p>
-                    {{end}}
+	{{template "loader" .}}
+	<div class="wrapper">
+		<div class="custom-select-desktop">
+			<div class="input-control" data-event="toggle-lang-dropdown">
+				<span id="desktop-selected">English (US)</span>
+				<img src="/statics/icons/chevron-down.svg"  alt="chevron-down" width="20" height="20" />
 			</div>
+			<ul id="desktop-options" class="options">
+				<li data-value="en" data-event="change-language">English (US)</li>
+				<li data-value="ja" data-event="change-language">Japanese 日本語</li>
+				<li data-value="es" data-event="change-language">Spanish Español</li>
+				<li data-value="ko" data-event="change-language">Korean 한국어</li>
+				<li data-value="ar" data-event="change-language">Arabic العربية</li>
+				<li data-value="zh-CN" data-event="change-language">Chinese 中文简体</li>
+				<li data-value="fr" data-event="change-language">French Français</li>
+			</ul>
 		</div>
-	</form>
+		<form method="post">
+			<div class="intro">
+				<div class="card">
+					<div class="logo">
+						<img src="/statics/icons/lock.svg" alt="Login Lock" width="24" height="24" />
+					</div>
+					<div name="header" class="header">
+						<h2 data-i18n="login-header">Sign in with Socious ID</h2>
+						<span data-i18n="login-subheader" class="text-grey leading-6">
+							Your access for all your impact platforms
+						</span>
+					</div>
+					<div name="content-section" class="section">
+						<input data-i18n-placeholder="login-email-placeholder" placeholder="Enter your email"
+							type="email" name="email" autocomplete="email" />
+						<input data-i18n-placeholder="login-password-placeholder" placeholder="Enter your password"
+							type="password" name="password" autocomplete="current-password" />
+						<a data-i18n="login-forget-password" class="self-end" href="/auth/password/forget">
+							Forget password?
+						</a>
+					</div>
+					<div name="button-section" class="section">
+						<button data-i18n="login-button" type="submit" theme="primary">Sign in</button>
+						<div class="separator">
+							<div data-i18n="login-or" class="separator-text">OR</div>
+						</div>
+						<a href="/auth/google">
+							<button type="button" theme="secondary-outline">
+								<img src="/statics/icons/google.svg" alt="Google" width="24" height="24" />
+								<span data-i18n="login-continue-with-google">Continue with Google</span>
+							</button>
+						</a>
+						<a href="/auth/apple">
+							<button type="button" theme="secondary-outline">
+								<img src="/statics/icons/apple.svg" alt="Apple" width="24" height="24" />
+								<span data-i18n="login-login-with-apple">Login with Apple</span>
+							</button>
+						</a>
+						<a href="/auth/register/pre">
+							<button data-i18n="login-create-account" type="button" theme="primary-outline">
+								Create account
+							</button>
+						</a>
+					</div>
+					{{if .error}}
+					<p style="color: red">{{.error}}</p>
+					{{end}}
+					<div class="custom-select-mobile">
+						<div class="input-control" data-event="toggle-lang-dropdown-mobile">
+							<span id="mobile-selected">English (US)</span>
+							<img src="/statics/icons/chevron-down.svg"  alt="chevron-down" width="20" height="20" />
+						</div>
+						<ul id="mobile-options" class="options">
+							<li data-value="en" data-event="change-language">English (US)</li>
+							<li data-value="ja" data-event="change-language">Japanese 日本語</li>
+							<li data-value="es" data-event="change-language">Spanish Español</li>
+							<li data-value="ko" data-event="change-language">Korean 한국어</li>
+							<li data-value="ar" data-event="change-language">Arabic العربية</li>
+							<li data-value="zh-CN" data-event="change-language">Chinese 中文简体</li>
+							<li data-value="fr" data-event="change-language">French Français</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
 </body>
 
 {{ template "footer" . }}

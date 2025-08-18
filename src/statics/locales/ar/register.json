@@ -1,0 +1,11 @@
+{
+    "register-header": "أدخل بريدك الإلكتروني",
+    "register-subheader": "سنرسل لك رمز تحقق",
+    "register-email-label": "البريد الإلكتروني*",
+    "register-email-placeholder": "أدخل بريدك الإلكتروني",
+    "register-continue-button": "متابعة",
+    "register-what-next": "ماذا سيحدث بعد ذلك؟",
+    "register-what-next-step1": "سنرسل رمز تحقق إلى بريدك الإلكتروني",
+    "register-what-next-step2": "أدخل الرمز لتأكيد بريدك الإلكتروني",
+    "register-what-next-step3": "أكمل ملفك الشخصي في Socious ID"
+}
