@@ -108,19 +108,19 @@ func authGroup(router *gin.Engine) {
 
 	g.GET("/login", auth.CheckLogin(), func(c *gin.Context) {
 		nonce := c.MustGet("nonce")
-		fmt.Println(gin.H{
-			"nonce": nonce,
-		})
 		c.HTML(http.StatusOK, "login.html", gin.H{
 			"nonce": nonce,
 		})
 	})
 
 	g.POST("/login", auth.CheckLogin(), func(c *gin.Context) {
+		nonce := c.MustGet("nonce")
 		form := new(auth.LoginForm)
+
 		if err := c.ShouldBind(form); err != nil {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
 				"error": err.Error(),
+				"nonce": nonce,
 			})
 			return
 		}
@@ -129,27 +129,34 @@ func authGroup(router *gin.Engine) {
 		if err != nil || u == nil {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
 				"error": "Error: User couldn't be found/is not registered on Socious",
+				"nonce": nonce,
 			})
 			return
 		}
 		if u.Status == models.UserStatusTypeInactive {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
 				"error": "Error: User couldn't be found/is not registered on Socious",
+				"nonce": nonce,
 			})
 			return
 		}
-		if u.Password == nil && u.PasswordExpired {
-			c.Redirect(http.StatusSeeOther, "/auth/password/set")
+		if u.PasswordExpired {
+			c.HTML(http.StatusBadRequest, "login.html", gin.H{
+				"error": "Error: password is expired, attempt to reset the password through forget password",
+				"nonce": nonce,
+			})
 			return
 		} else if u.Password == nil {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
 				"error": "Error: email/password not match",
+				"nonce": nonce,
 			})
 			return
 		}
 		if err := auth.CheckPasswordHash(form.Password, *u.Password); err != nil {
 			c.HTML(http.StatusBadRequest, "login.html", gin.H{
 				"error": "Error: email/password not match",
+				"nonce": nonce,
 			})
 			return
 		}
@@ -218,7 +225,7 @@ func authGroup(router *gin.Engine) {
 		session.Save()
 
 		//Redirect
-		if u.Password == nil {
+		if u.Password == nil || u.PasswordExpired {
 			c.Redirect(http.StatusSeeOther, "/auth/password/set")
 			return
 		}
@@ -299,7 +306,7 @@ func authGroup(router *gin.Engine) {
 		session.Save()
 
 		//Redirect
-		if u.Password == nil {
+		if u.Password == nil || u.PasswordExpired {
 			c.Redirect(http.StatusSeeOther, "/auth/password/set")
 			return
 		}
