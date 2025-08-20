@@ -37,8 +37,7 @@
                             maxlength="24" data-event="validate-form" />
                         <span data-i18n="profile-username-hint" class="input-hints">This will be your unique identifier
                             across all platforms</span>
-                        <span data-i18n="profile-username-error" id="username-error" class="error-message"
-                            style="display: none;">
+                        <span data-i18n="profile-username-error" id="username-error" class="error-message">
                             Username must be 6–24 characters and can only contain lowercase letters, numbers, and
                             underscores (no spaces, dashes, dots, or uppercase letters).
                         </span>
@@ -67,7 +66,7 @@
                 <div name="button-section" class="section">
                     <button data-i18n="profile-create-button" data-event="on-submit-profile" theme="primary" disabled>Create profile</button>
                 </div>
-                <p id="error" style="color: red">
+                <p id="error">
                     {{.error}}
                 </p>
             </div>
