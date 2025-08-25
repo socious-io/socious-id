@@ -83,7 +83,7 @@ func referralsGroup(router *gin.Engine) {
 		})
 	})
 
-	g.POST("achievements/claim", adminAccessRequired(), func(c *gin.Context) {
+	g.GET("achievements/claim", adminAccessRequired(), func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
 		identityId := uuid.MustParse(c.Query("identity_id"))
 
