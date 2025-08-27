@@ -769,9 +769,10 @@ func authGroup(router *gin.Engine) {
 			return
 		} */
 
-		//Make sure the referrer user exists in the platform
-		if otp.User.ReferredBy != nil {
-			go workers.Sync(*otp.User.ReferredBy)
+		//Make sure the referrer users exist in the platform
+		referralAncestors, _ := models.GetReferralAncestorIds(otp.User.ID)
+		for _, ra := range referralAncestors {
+			go workers.Sync(ra)
 		}
 
 		tokens, err := auth.Signin(otp.User.ID.String(), otp.User.Email)
