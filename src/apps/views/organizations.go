@@ -131,6 +131,7 @@ func organizationsGroup(router *gin.Engine) {
 
 	g.PUT("/:id", auth.LoginRequired(), isOrgMember(), func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
+		user := c.MustGet("user").(*models.User)
 		organization := c.MustGet("organization").(*models.Organization)
 
 		form := new(OrganizationForm)
@@ -145,7 +146,7 @@ func organizationsGroup(router *gin.Engine) {
 			return
 		}
 		// FIXME: use nats
-		go workers.Sync(c.MustGet("user").(*models.User).ID)
+		go workers.Sync(user.ID)
 		c.JSON(http.StatusAccepted, organization)
 	})
 
