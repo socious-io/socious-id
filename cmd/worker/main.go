@@ -1,6 +1,7 @@
 package main
 
 import (
+	"socious-id/src/apps/workers"
 	"socious-id/src/config"
 	"time"
 
@@ -38,7 +39,8 @@ func main() {
 		WorkerChannel:  "email",
 		MessageQueue:   gomq.Mq,
 	})
-	gomq.AddConsumer(gomail.GetConfig().WorkerChannel, gomail.EmailWorker)
+
+	workers.RegisterConsumers()
 
 	gomq.Init()
 
