@@ -128,7 +128,7 @@ func usersGroup(router *gin.Engine) {
 			c.Redirect(http.StatusSeeOther, "/organizations/register/pre")
 			return
 		}
-		// FIXME: use nats
+
 		go workers.Sync(user.ID)
 
 		c.Redirect(http.StatusSeeOther, "/auth/confirm")

@@ -31,7 +31,6 @@ func impactPointsGroup(router *gin.Engine) {
 			return
 		}
 
-		// FIXME: use nats
 		go workers.Sync(impactPoint.UserID)
 
 		c.JSON(http.StatusCreated, impactPoint)
