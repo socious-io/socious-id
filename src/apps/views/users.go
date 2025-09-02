@@ -77,7 +77,8 @@ func usersGroup(router *gin.Engine) {
 
 		//delete user
 		gomq.Mq.SendJson("event:user.delete", gin.H{
-			"user": user,
+			"user":   user,
+			"reason": "example_reason", //TODO: Fetch reason
 		})
 
 		c.JSON(http.StatusOK, user)
