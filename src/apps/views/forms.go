@@ -50,8 +50,8 @@ type UserForm struct {
 }
 
 type UserCreateForm struct {
-	FirstName string `json:"first_name" form:"first_name" binding:"required"`
-	LastName  string `json:"last_name" form:"last_name" binding:"required"`
+	FirstName string `json:"first_name" form:"first_name"`
+	LastName  string `json:"last_name" form:"last_name"`
 	Email     string `json:"email" form:"email" binding:"required,email"`
 	Username  string `json:"username" form:"username"`
 }

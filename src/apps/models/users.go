@@ -215,3 +215,11 @@ func GetUserByUsername(username *string) (*User, error) {
 	}
 	return u, nil
 }
+
+func GetReferralAncestorIds(id uuid.UUID) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
+	if err := database.QuerySelect("users/get_referral_ancestors", &ids, id); err != nil {
+		return nil, err
+	}
+	return ids, nil
+}

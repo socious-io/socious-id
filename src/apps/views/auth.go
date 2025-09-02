@@ -11,6 +11,7 @@ import (
 	"socious-id/src/apps/auth"
 	"socious-id/src/apps/models"
 	"socious-id/src/apps/utils"
+	"socious-id/src/apps/workers"
 	"socious-id/src/config"
 	"strings"
 	"time"
@@ -767,6 +768,12 @@ func authGroup(router *gin.Engine) {
 			})
 			return
 		} */
+
+		//Make sure the referrer users exist in the platform
+		referralAncestors, _ := models.GetReferralAncestorIds(otp.User.ID)
+		for _, ra := range referralAncestors {
+			go workers.Sync(ra)
+		}
 
 		tokens, err := auth.Signin(otp.User.ID.String(), otp.User.Email)
 		if err != nil {
