@@ -82,7 +82,6 @@ func organizationsGroup(router *gin.Engine) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		// FIXME: use nats
 		go workers.Sync(user.ID)
 		c.JSON(http.StatusCreated, organization)
 	})
@@ -131,6 +130,7 @@ func organizationsGroup(router *gin.Engine) {
 
 	g.PUT("/:id", auth.LoginRequired(), isOrgMember(), func(c *gin.Context) {
 		ctx := c.MustGet("ctx").(context.Context)
+		user := c.MustGet("user").(*models.User)
 		organization := c.MustGet("organization").(*models.Organization)
 
 		form := new(OrganizationForm)
@@ -144,8 +144,7 @@ func organizationsGroup(router *gin.Engine) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		// FIXME: use nats
-		go workers.Sync(c.MustGet("user").(*models.User).ID)
+		go workers.Sync(user.ID)
 		c.JSON(http.StatusAccepted, organization)
 	})
 
@@ -170,7 +169,6 @@ func organizationsGroup(router *gin.Engine) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		// FIXME: use nats
 		go workers.Sync(userId)
 		c.JSON(http.StatusOK, organization)
 	})
@@ -264,8 +262,6 @@ func organizationsGroup(router *gin.Engine) {
 			session.Delete("org_onboard")
 			session.Save()
 		}
-
-		// FIXME: use nats
 		go workers.Sync(user.ID)
 
 		c.Redirect(http.StatusSeeOther, "/auth/confirm")
