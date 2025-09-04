@@ -123,7 +123,8 @@ func (c *Credential) HandleByType(ctx context.Context, params HandleCredentialPa
 	}
 
 	//KYC
-	if c.PresentID == nil && params.CheckPresentID {
+	// NOTE: always make new proof on callbacks
+	if params.CheckPresentID {
 		c.ProofRequest(ctx)
 	}
 	return c.ProofVerify(ctx)
