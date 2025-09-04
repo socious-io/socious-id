@@ -71,7 +71,7 @@ func (c *Credential) Create(ctx context.Context, cType CredentialType) error {
 }
 
 func (v *Credential) NewConnection(ctx context.Context, callback string) error {
-	if v.Status == CredentialStatusRequested {
+	if v.Status == CredentialStatusRequested && time.Since(v.UpdatedAt) < 5*time.Minute {
 		return nil
 	}
 	conn, err := wallet.CreateConnection(callback)
