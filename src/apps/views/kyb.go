@@ -51,7 +51,6 @@ func kybVerificationGroup(router *gin.Engine) {
 		}
 
 		//Synchronize
-		//TODO: use nats
 		go workers.Sync(user.ID)
 
 		utils.DiscordSendTextMessage(
