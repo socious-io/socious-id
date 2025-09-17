@@ -51,9 +51,23 @@
             }
         }
     }
+
+    .consent-accounts::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .consent-accounts::-webkit-scrollbar-thumb {
+        background-color: var(--color-primary-600);
+        border-radius: 8px;
+    }
+
+    .consent-accounts::-webkit-scrollbar-track {
+        background-color: var(--color-grey-200);
+        border-radius: 8px;
+    }
 }
 
-.disable-user-selection-overlay{
+.disable-user-selection-overlay {
     backdrop-filter: blur(7px) grayscale(100%);
     position: absolute;
     top: 0;
@@ -68,7 +82,7 @@
     font-weight: 500;
 }
 
-.require-org-creation{
+.require-org-creation {
     display: flex;
     position: relative;
     align-items: center;
