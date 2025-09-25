@@ -15,7 +15,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.22.2
 	github.com/onsi/gomega v1.36.2
 	github.com/socious-io/gomail v0.1.3
-	github.com/socious-io/gomq v0.2.2-0.20250831194730-a20916bdb188
+	github.com/socious-io/gomq v0.2.2
 	github.com/socious-io/gopay v0.0.27
 	github.com/socious-io/pkg_database v1.0.0
 	github.com/spf13/viper v1.20.1
