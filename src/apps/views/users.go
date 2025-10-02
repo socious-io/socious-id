@@ -11,6 +11,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/socious-io/gomq"
 )
 
 func usersGroup(router *gin.Engine) {
@@ -66,8 +67,19 @@ func usersGroup(router *gin.Engine) {
 			return
 		}
 
-		// FIXME: use nats
 		go workers.Sync(user.ID)
+
+		c.JSON(http.StatusOK, user)
+	})
+
+	g.DELETE("", auth.LoginRequired(), func(c *gin.Context) {
+		user := c.MustGet("user").(*models.User)
+
+		//delete user
+		gomq.Mq.SendJson("event:user.delete", gin.H{
+			"user":   user,
+			"reason": "example_reason", //TODO: Fetch reason
+		})
 
 		c.JSON(http.StatusOK, user)
 	})
@@ -117,7 +129,7 @@ func usersGroup(router *gin.Engine) {
 			c.Redirect(http.StatusSeeOther, "/organizations/register/pre")
 			return
 		}
-		// FIXME: use nats
+
 		go workers.Sync(user.ID)
 
 		c.Redirect(http.StatusSeeOther, "/auth/confirm")
