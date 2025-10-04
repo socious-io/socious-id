@@ -20,6 +20,7 @@ type Access struct {
 	ClientSecret string    `db:"client_secret" json:"-"`
 
 	SyncURL             *string    `db:"sync_url" json:"sync_url"`
+	SyncMethod          SyncMethod `db:"sync_method" json:"sync_method"`
 	DestinationSyncedAt *time.Time `db:"destination_synced_at" json:"destination_synced_at"`
 	SourceSyncedAt      *time.Time `db:"source_synced_at" json:"source_synced_at"`
 

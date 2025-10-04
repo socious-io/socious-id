@@ -19,6 +19,7 @@ type (
 	IdentityType                 string
 	OauthConnectedProviders      string
 	CredentialType               string
+	SyncMethod                   string
 )
 
 const (
@@ -85,6 +86,10 @@ const (
 	//CredentialType
 	CredentialTypeKYC    CredentialType = "KYC"
 	CredentialTypeBadges CredentialType = "BADGES"
+
+	//CredentialType
+	SyncMethodMq   SyncMethod = "MQ"
+	SyncMethodHttp SyncMethod = "HTTP"
 )
 
 func (pt *OTPType) Scan(value interface{}) error {
